@@ -1,7 +1,9 @@
 /* eslint-disable no-console -- a CLI script whose output is the point */
 import { defaultFeatureFlags } from '@optical/config/flags';
 import { commerce } from '@optical/config/commerce';
-import { loadApiEnv, loadDotEnvFile } from '../../src/config/env';
+import { nodeEnvSchema, parseEnv } from '@optical/config/env';
+import { z } from 'zod';
+import { loadDotEnvFile } from '../../src/config/env';
 import { hashPassword } from '../../src/lib/password';
 import { createPrismaClient, type Db } from '../../src/infra/prisma';
 import { seedCatalog } from './catalog';
@@ -9,6 +11,17 @@ import { seedOrders, seedReviews } from './orders';
 import { demoAddresses, demoUsers } from './people';
 import { toJson } from './json';
 import { createRandom } from './random';
+
+/** The seed needs only a database; it must not require the API's other settings. */
+const seedEnvSchema = z.object({
+  NODE_ENV: nodeEnvSchema,
+  DATABASE_URL: z.url({
+    protocol: /^postgres(ql)?$/,
+    error: 'must be a postgres:// connection URL',
+  }),
+  SEED_DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }).optional(),
+  SEED_ALLOW_PRODUCTION: z.enum(['true', 'false']).optional(),
+});
 
 /** Fixed "today" so the seed is identical on every run and machine. */
 const SEED_NOW = new Date('2026-09-15T06:30:00Z');
@@ -110,13 +123,11 @@ async function seedSettings(db: Db) {
 
 async function main() {
   loadDotEnvFile();
-  const env = loadApiEnv();
-  if (env.NODE_ENV === 'production' && process.env.SEED_ALLOW_PRODUCTION !== 'true') {
+  const env = parseEnv('seed', seedEnvSchema, process.env);
+  if (env.NODE_ENV === 'production' && env.SEED_ALLOW_PRODUCTION !== 'true') {
     throw new Error('Refusing to seed a production database. The seed deletes all data.');
   }
-  const db = createPrismaClient(process.env.SEED_DATABASE_URL ?? env.DATABASE_URL, {
-    maxConnections: 4,
-  });
+  const db = createPrismaClient(env.SEED_DATABASE_URL ?? env.DATABASE_URL, { maxConnections: 4 });
   const random = createRandom(20260915);
   const started = Date.now();
 
