@@ -24,7 +24,12 @@ export const openApiPlugin = fp(
           version: options.version,
         },
         servers: [{ url: options.publicUrl }],
-        tags: [{ name: 'system', description: 'Health and readiness probes' }],
+        tags: [
+          { name: 'catalogue', description: 'Products, categories and collections' },
+          { name: 'search', description: 'Typo-tolerant search and suggestions' },
+          { name: 'lenses', description: 'Lens options and pricing' },
+          { name: 'system', description: 'Health and readiness probes' },
+        ],
       },
       transform: jsonSchemaTransform,
       transformObject: jsonSchemaTransformObject,

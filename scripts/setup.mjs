@@ -6,10 +6,13 @@
  *   2. installs dependencies
  *   3. creates .env from .env.example (never overwrites)
  *   4. starts Postgres, Redis and Mailpit in Docker and waits until healthy
+ *   5. applies database migrations and seeds the demo catalogue
+ *   6. renders product images (Chromium is downloaded once if missing)
  *
  * Flags:
  *   --skip-install   don't run `pnpm install`
  *   --skip-docker    use your own Postgres/Redis (set DATABASE_URL and REDIS_URL in .env)
+ *   --skip-assets    don't render product images now (run `pnpm setup:assets` later)
  *
  * Uses only Node built-ins so it can run before dependencies are installed.
  */
@@ -93,6 +96,30 @@ if (args.has('--skip-docker')) {
   ok('Services are healthy');
 }
 
+step('Preparing the database');
+if (!run('pnpm', ['db:migrate']).ok) {
+  fail([
+    'Migrations failed. Check DATABASE_URL in .env and that Postgres is running (pnpm docker:up).',
+  ]);
+}
+ok('Migrations applied');
+if (!run('pnpm', ['db:seed']).ok) fail(['Seeding failed; see the output above.']);
+ok('Demo catalogue, orders and accounts seeded');
+
+if (args.has('--skip-assets')) {
+  step('Skipping product images');
+  ok('Run `pnpm setup:assets` when you want them');
+} else {
+  step('Rendering product images (a few minutes the first time, incremental afterwards)');
+  if (!run('pnpm', ['setup:assets']).ok) {
+    fail([
+      'Rendering product images failed; see the output above.',
+      'Everything else is ready. Retry with `pnpm setup:assets`, or skip it with --skip-assets.',
+    ]);
+  }
+  ok('Product images rendered');
+}
+
 console.log(`
 ${paint('32', 'Setup complete.')} Start everything with:
 
@@ -103,4 +130,6 @@ ${paint('32', 'Setup complete.')} Start everything with:
   API             http://localhost:4000
   API docs        http://localhost:4000/docs
   Mailpit inbox   http://localhost:8025
+
+  Demo accounts are printed above and listed in README.md.
 `);

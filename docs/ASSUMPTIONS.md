@@ -6,15 +6,20 @@ follows.
 
 ## Product and market
 
-| #   | Assumption                                                                                                                                                  | Where it lives                    |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| A1  | Brand name is **Lumen Optics**. It is referenced only through `brand.name`.                                                                                 | `packages/config/src/brand.ts`    |
-| A2  | Primary market is India: currency `INR`, locale `en-IN`, 6-digit PIN codes. Nothing else in the code assumes India.                                         | `packages/config/src/commerce.ts` |
-| A3  | Prices are **tax-inclusive**. GST at 12% is extracted from the inclusive price and shown as an invoice line, never added on top.                            | `commerce.tax`                    |
-| A4  | Money is stored as **integer minor units** (paise for INR). Rounding is half-away-from-zero at each line, then summed.                                      | `packages/shared/src/money`       |
-| A5  | Contact lenses are out of scope. Products are frames, prescription lenses, sunglasses, computer glasses, kids' frames, and accessories.                     | Catalogue seed (Phase 1)          |
-| A6  | Free-shipping threshold, returns window, warranty length and dispatch times are business settings, stored in config now and editable from admin in Phase 6. | `commerce.policies`               |
-| A7  | Legal pages are drafts written for India. They are flagged "review with a lawyer before launch" in `docs/`, not in the UI.                                  | Phase 2                           |
+| #   | Assumption                                                                                                                                                                                                                        | Where it lives                    |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| A1  | Brand name is **Lumen Optics**. It is referenced only through `brand.name`.                                                                                                                                                       | `packages/config/src/brand.ts`    |
+| A2  | Primary market is India: currency `INR`, locale `en-IN`, 6-digit PIN codes. Nothing else in the code assumes India.                                                                                                               | `packages/config/src/commerce.ts` |
+| A3  | Prices are **tax-inclusive**. GST at 12% is extracted from the inclusive price and shown as an invoice line, never added on top.                                                                                                  | `commerce.tax`                    |
+| A4  | Money is stored as **integer minor units** (paise for INR). Rounding is half-away-from-zero at each line, then summed.                                                                                                            | `packages/shared/src/money`       |
+| A5  | Contact lenses are out of scope. Products are frames, prescription lenses, sunglasses, computer glasses, kids' frames, and accessories.                                                                                           | Catalogue seed (Phase 1)          |
+| A6  | Free-shipping threshold, returns window, warranty length and dispatch times are business settings, stored in config now and editable from admin in Phase 6.                                                                       | `commerce.policies`               |
+| A7  | Legal pages are drafts written for India. They are flagged "review with a lawyer before launch" in `docs/`, not in the UI.                                                                                                        | Phase 2                           |
+| A8  | Launch prices (tax-inclusive): frames ₹1,290–₹7,990; single-vision lenses from ₹1,190, progressive from ₹3,990; zero-power lenses included free.                                                                                  | Seed, `defaultLensCatalog`        |
+| A9  | Shipping zones: metro PIN prefixes (Delhi, Mumbai, Bengaluru, Chennai, Kolkata, Hyderabad) are a day faster; J&K, Ladakh, the North East and Andaman & Nicobar are remote (₹50 surcharge, 3 extra days). Sundays are non-working. | `commerce.shipping`               |
+| A10 | "Low stock" is shown only at 3 units or fewer, and the exact count only then.                                                                                                                                                     | `stockStateFor`                   |
+| A11 | Frames launched within 45 days are labelled new.                                                                                                                                                                                  | `NEW_PRODUCT_DAYS`                |
+| A12 | Progressive lenses need at least 28 mm of lens height; rimless frames need 1.61 or thinner lenses; polarised lenses aren't made in 1.74.                                                                                          | Lens rules (data)                 |
 
 ## Engineering
 

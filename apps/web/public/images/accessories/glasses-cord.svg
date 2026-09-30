@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Adjustable glasses cord">
+  <defs>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="600" cy="660" rx="400" ry="34" fill="url(#shadow)"/>
+  <path d="M300 360 C 300 640, 900 640, 900 360" stroke="#26272a" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <rect x="276" y="300" width="48" height="90" rx="20" fill="#3a3b3f"/>
+  <rect x="876" y="300" width="48" height="90" rx="20" fill="#3a3b3f"/>
+  <rect x="580" y="585" width="40" height="30" rx="8" fill="#b9b9be"/>
+</svg>

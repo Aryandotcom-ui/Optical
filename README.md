@@ -6,21 +6,26 @@ plain language, honest pricing, and on-device virtual try-on.
 This repository is a TypeScript monorepo with a Next.js storefront, a Fastify API and shared
 packages. It runs fully locally with no paid services or API keys.
 
-> **Status: Phase 0 (foundations).** Tooling, design tokens, the API skeleton with health checks,
-> local services and CI are in place. The storefront, catalogue and checkout arrive in later
-> phases; see [the roadmap](#roadmap).
+> **Status: Phase 1 (data and API core).** The data model, a deterministic demo catalogue of 64
+> frames, the catalogue, search and lens-pricing API, the shared pricing engine and procedurally
+> rendered product images are in place. The storefront UI arrives in Phase 2; see
+> [the roadmap](#roadmap).
 
 ## Quick start
 
 **Prerequisites:** Node 22.12+ (`nvm use` reads `.nvmrc`), pnpm 10 (`corepack enable`), Docker.
 
 ```bash
-pnpm run setup   # install, create .env, start Postgres/Redis/Mailpit and wait until healthy
+pnpm run setup   # install, .env, Docker services, migrate, seed, render product images
 pnpm dev         # web on :3000, API on :4000, both with hot reload
 ```
 
 > `pnpm setup` (without `run`) is a built-in pnpm command, so use `pnpm run setup` or
 > `pnpm bootstrap`. See [ADR-006](docs/DECISIONS.md).
+>
+> The first run renders about 615 product images in headless Chromium, which takes several
+> minutes; later runs only redraw what changed. Use `pnpm run setup --skip-assets` to skip it and
+> run `pnpm setup:assets` later.
 
 | What                     | Where                                   |
 | ------------------------ | --------------------------------------- |
@@ -33,22 +38,56 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 
 ## Scripts
 
-| Command                                          | Does                                                                  |
-| ------------------------------------------------ | --------------------------------------------------------------------- |
-| `pnpm run setup`                                 | One-time setup. `--skip-install` and `--skip-docker` are available.   |
-| `pnpm dev`                                       | Runs web and API in watch mode.                                       |
-| `pnpm build`                                     | Production builds of every app.                                       |
-| `pnpm start`                                     | Runs the production builds.                                           |
-| `pnpm lint`                                      | ESLint (type-aware, React, a11y, Next.js).                            |
-| `pnpm typecheck`                                 | TypeScript in every package.                                          |
-| `pnpm test`                                      | Vitest in every package. API integration tests need `pnpm docker:up`. |
-| `pnpm test:coverage`                             | Tests with coverage thresholds.                                       |
-| `pnpm check`                                     | lint, typecheck, test, build. Run before pushing.                     |
-| `pnpm format` / `format:check`                   | Prettier.                                                             |
-| `pnpm docker:up` / `docker:down` / `docker:logs` | Local services.                                                       |
+| Command                                          | Does                                                                                 |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `pnpm run setup`                                 | One-time setup. `--skip-install`, `--skip-docker` and `--skip-assets` are available. |
+| `pnpm dev`                                       | Runs web and API in watch mode.                                                      |
+| `pnpm build`                                     | Production builds of every app.                                                      |
+| `pnpm start`                                     | Runs the production builds.                                                          |
+| `pnpm lint`                                      | ESLint (type-aware, React, a11y, Next.js).                                           |
+| `pnpm typecheck`                                 | TypeScript in every package.                                                         |
+| `pnpm test`                                      | Vitest in every package. API integration tests need `pnpm docker:up`.                |
+| `pnpm test:coverage`                             | Tests with coverage thresholds.                                                      |
+| `pnpm check`                                     | lint, typecheck, test, build. Run before pushing.                                    |
+| `pnpm format` / `format:check`                   | Prettier.                                                                            |
+| `pnpm docker:up` / `docker:down` / `docker:logs` | Local services.                                                                      |
+| `pnpm db:migrate`                                | Applies pending migrations (`prisma migrate deploy`).                                |
+| `pnpm db:seed`                                   | Wipes and reseeds the demo data. Refuses to run in production.                       |
+| `pnpm db:reset`                                  | Drops everything, re-migrates and reseeds.                                           |
+| `pnpm db:studio`                                 | Opens Prisma Studio to browse the data.                                              |
+| `pnpm render:images`                             | Renders product images. `--force` redraws all, `--only=<slug>` one product.          |
+| `pnpm setup:assets`                              | Ensures Chromium is available, then renders images.                                  |
 
-Database, seed, e2e and image-rendering scripts (`db:migrate`, `db:seed`, `test:e2e`,
-`render:images`) are added in the phases that introduce them.
+End-to-end tests (`test:e2e`) arrive with the storefront in Phase 2.
+
+## Demo data
+
+The seed is deterministic, so every machine gets the same data:
+
+- 64 frames in 8 shapes (eyeglasses, sunglasses, computer glasses, kids) with 214 colour
+  variants, real measurements and honest stock levels, plus 5 accessories
+- the full lens catalogue: 5 lens types, 5 materials, 5 coatings in 3 packages, 5 tints, 7 rules
+- 15 sample orders covering every order status, 107 reviews, 4 coupons (`WELCOME10`, `FREESHIP`,
+  `FLAT300`, and the expired `MONSOON15`), 6 collections and 12 help articles
+
+Demo accounts, for local development only:
+
+| Role     | Email               | Password          |
+| -------- | ------------------- | ----------------- |
+| Admin    | `admin@example.com` | `Admin#Lumen2026` |
+| Staff    | `staff@example.com` | `Staff#Lumen2026` |
+| Customer | `asha@example.com`  | `Asha#Lumen2026`  |
+| Customer | `rahul@example.com` | `Rahul#Lumen2026` |
+
+## API
+
+Browse the interactive reference at http://localhost:4000/docs. Conventions, error codes and
+endpoint details are in [docs/API.md](docs/API.md). For example:
+
+```bash
+curl 'http://localhost:4000/v1/products?category=sunglasses&shape=aviator&sort=price-asc'
+curl 'http://localhost:4000/v1/search/suggest?q=titanum'   # typo-tolerant
+```
 
 ## Architecture
 
@@ -67,7 +106,9 @@ flowchart LR
 - `apps/web` is the storefront (and later the admin panel)
 - `apps/api` is the REST API, with OpenAPI generated from Zod schemas
 - `packages/shared` holds the schemas, API contracts and money maths that both apps import
-- `packages/config` holds brand, market (currency, tax, postal codes), feature flags, env validation, design tokens, and the lint and TypeScript presets
+- `packages/config` holds brand, market (currency, tax, postal codes, shipping zones), feature flags, env validation, design tokens, and the lint and TypeScript presets
+- `packages/shared` also holds the pricing engine, prescription validation, lens rules, the order state machine and the parametric frame geometry
+- `scripts` holds setup, asset and product-image rendering tools
 
 More in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Decisions are recorded in
 [docs/DECISIONS.md](docs/DECISIONS.md), and assumptions in [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md).
@@ -96,6 +137,14 @@ on :4000, and that `API_INTERNAL_URL` (or `NEXT_PUBLIC_API_URL`) points at it.
 
 **"Invalid environment" on startup.** The message lists every variable that is missing or
 malformed. Compare your `.env` with `.env.example`.
+
+**Product images fail to render.** Rendering needs Chrome or Chromium. `pnpm setup:assets`
+downloads one through Playwright if none is found; behind a proxy, set `CHROMIUM_PATH` in `.env`
+to an existing browser instead. The site works without the images; they only affect product
+cards and galleries.
+
+**API tests fail with a database error.** They need Postgres and Redis running (`pnpm docker:up`)
+and use the separate `optical_test` database. See [docs/TESTING.md](docs/TESTING.md).
 
 **Camera access.** Browsers allow the camera only on `https://` or `http://localhost`. If you open
 the site at a LAN IP address (for example from a phone), try-on needs HTTPS. Try-on arrives in Phase 5.

@@ -24,8 +24,14 @@
     "docker:up": "docker compose up -d --wait",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
+    "db:migrate": "pnpm --filter @optical/api db:migrate",
+    "db:seed": "pnpm --filter @optical/api db:seed",
+    "db:reset": "pnpm --filter @optical/api db:reset",
+    "db:studio": "pnpm --filter @optical/api db:studio",
+    "render:images": "pnpm --filter @optical/scripts render:images",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "setup:assets": "pnpm --filter @optical/scripts setup:assets"
   },
   "devDependencies": {
     "@optical/config": "workspace:*",

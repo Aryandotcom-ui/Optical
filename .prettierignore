@@ -6,3 +6,5 @@ coverage
 .turbo
 apps/web/public
 LICENSE
+apps/api/src/generated
+apps/api/prisma/migrations

@@ -83,3 +83,71 @@ buy. Orchestrators then keep routing traffic instead of taking every instance ou
 Prisma arrives with the data model in Phase 1. Until then, a two-connection `pg` pool answers the
 database readiness check. Prisma 7's Postgres adapter uses the same driver, so this changes the
 probe's implementation, not its behaviour.
+
+## ADR-012: Prisma 7 with the `pg` driver adapter
+
+**Status:** accepted · Phase 1
+Prisma 7 is configured in `prisma.config.ts`, generates a TypeScript client into
+`apps/api/src/generated` (git-ignored, rebuilt by `postinstall`), and talks to Postgres through
+`@prisma/adapter-pg`. The readiness probe now pings through the same client. Migrations are
+applied with `prisma migrate deploy` everywhere (setup, CI, production); new ones are authored with
+`pnpm --filter @optical/api db:migrate:create`.
+
+## ADR-013: Catalogue vocabularies are text with CHECK constraints
+
+**Status:** accepted · Phase 1
+Shapes, materials, colour families and similar lists use the hyphenated values that appear in URLs
+(`cat-eye`, `rose-gold`). Prisma enums can't hold hyphens without a mapping layer, so these columns
+are `text` guarded by `CHECK` constraints, and `apps/api/test/migrations.test.ts` fails if a
+constraint drifts from the shared Zod enum. Workflow states (order, payment, role) stay Prisma enums.
+
+## ADR-014: Search in Postgres, faceting in memory
+
+**Status:** accepted · Phase 1
+Relevance comes from Postgres: a trigger-maintained `tsvector` (English stemming plus `simple` for
+prefix matching) and `pg_trgm` similarity for typos. Filtering, disjunctive facet counts, sorting and
+paging run over a compact index of published products (a few hundred bytes each), cached in Redis
+for 60 seconds. This keeps facet logic simple, testable and fast for catalogues into the thousands
+of products. If the range ever grows past roughly 10,000 products, the same `runListing` contract
+can be moved into SQL.
+
+## ADR-015: Invalid lens configurations are a normal response
+
+**Status:** accepted · Phase 1
+`POST /v1/lens/quote` returns `200` with `valid: false` and reasons when a configuration is
+incomplete or breaks a rule, because that is an ordinary state while someone is configuring lenses.
+Only a malformed request body is a `422`. Availability of every option is always returned, so the UI
+can disable options with the reason instead of hiding them.
+
+## ADR-016: Lens compatibility rules are data, applied in both directions
+
+**Status:** accepted · Phase 1
+Rules live in the `LensRule` table as JSON (`when` conditions, `forbid` option, customer-facing
+`reason`) and are evaluated by a pure function in `packages/shared`. A pairwise rule ("with 1.74,
+no polarised") also blocks the other side while its forbidden option is selected, so a customer
+can't reach a forbidden combination from either direction.
+
+## ADR-017: Procedural product images rendered in headless Chromium
+
+**Status:** accepted · Phase 1
+There is no product photography, so every variant is rendered from the same parametric geometry the
+3D viewer uses, with three.js in headless Chromium (software WebGL via SwiftShader), then encoded
+as transparent WebP with sharp. Transparency lets one image work on light and dark backgrounds.
+Patterns such as tortoise shell are painted as vertex colours from 3D noise, so meshes need no UV
+maps. Renders are generated (`pnpm render:images`), incremental through a hash manifest, and never
+committed. Real photos replace them by changing `ProductImage` rows.
+
+## ADR-018: The order state machine lives in `packages/shared`
+
+**Status:** accepted · Phase 1
+The lifecycle in spec section 8.5 is a pure function (`canTransition`) with guards for frame-only
+and cash-on-delivery orders. Phase 1 uses it to build consistent seed timelines; Phase 3 enforces it
+in the API and Phase 6 in admin, and the web app uses the same copy to describe each status.
+
+## ADR-019: A deterministic seed with a fixed clock
+
+**Status:** accepted · Phase 1
+The seed uses a seeded PRNG and a fixed "today" (15 September 2026), so every machine and every CI
+run gets identical data, and tests can assert exact counts. It wipes the database first and refuses
+to run when `NODE_ENV=production`. Sample order totals come from the real pricing engine, and their
+timelines come from the state machine.

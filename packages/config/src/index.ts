@@ -3,6 +3,8 @@ export {
   commerce,
   indiaMarket,
   isValidPostalCode,
+  shippingZoneFor,
+  type ShippingZone,
   type CommerceConfig,
   type TaxConfig,
   type PostalCodeConfig,

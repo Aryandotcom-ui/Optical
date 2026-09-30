@@ -1,0 +1,6 @@
+{
+  "extends": "@optical/config/tsconfig/node.json",
+  "compilerOptions": { "lib": ["ES2023", "DOM"] },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}

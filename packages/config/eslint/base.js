@@ -46,7 +46,10 @@ export default tseslint.config(
         { allowNumber: true, allowBoolean: true },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/switch-exhaustiveness-check': [
+        'error',
+        { considerDefaultExhaustiveForUnions: true },
+      ],
     },
   },
   {

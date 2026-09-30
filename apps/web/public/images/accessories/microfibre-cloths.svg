@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Three folded microfibre cloths">
+  <defs>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="600" cy="640" rx="380" ry="40" fill="url(#shadow)"/>
+  <rect x="300" y="520" width="600" height="100" rx="14" fill="#6e7479"/>
+  <rect x="320" y="430" width="560" height="100" rx="14" fill="#8a9095"/>
+  <rect x="340" y="340" width="520" height="100" rx="14" fill="#a8adb2"/>
+  <path d="M360 360 h480 M340 450 h520 M320 540 h560" stroke="#ffffff" stroke-opacity="0.25" stroke-width="4"/>
+</svg>

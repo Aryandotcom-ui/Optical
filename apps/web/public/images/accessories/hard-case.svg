@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Hard glasses case">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3a3e"/>
+      <stop offset="1" stop-color="#1b1b1e"/>
+    </linearGradient>
+    <linearGradient id="lid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a4a4f"/>
+      <stop offset="1" stop-color="#2a2a2e"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="600" cy="640" rx="380" ry="40" fill="url(#shadow)"/>
+  <rect x="250" y="380" width="700" height="250" rx="125" fill="url(#shell)"/>
+  <path d="M250 505 a125 125 0 0 1 125 -125 h450 a125 125 0 0 1 125 125 z" fill="url(#lid)"/>
+  <rect x="250" y="500" width="700" height="10" fill="#141416" opacity="0.6"/>
+  <rect x="560" y="492" width="80" height="26" rx="6" fill="#b9b9be"/>
+  <path d="M320 430 q280 -40 560 0" stroke="#ffffff" stroke-opacity="0.18" stroke-width="10" fill="none" stroke-linecap="round"/>
+</svg>

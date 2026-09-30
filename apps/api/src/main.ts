@@ -3,6 +3,7 @@ import { EnvValidationError } from '@optical/config/env';
 import { buildApp } from './app';
 import { loadApiEnv, loadDotEnvFile } from './config/env';
 import { createDatabaseProbe } from './infra/database';
+import { createPrismaClient } from './infra/prisma';
 import { createRedisProbe } from './infra/redis';
 
 function loadEnvOrExit() {
@@ -19,9 +20,13 @@ function loadEnvOrExit() {
 }
 
 const env = loadEnvOrExit();
+const db = createPrismaClient(env.DATABASE_URL);
+const redis = createRedisProbe(env.REDIS_URL);
 const app = await buildApp(env, {
-  database: createDatabaseProbe(env.DATABASE_URL),
-  redis: createRedisProbe(env.REDIS_URL),
+  db,
+  cacheClient: redis.client,
+  database: createDatabaseProbe(db),
+  redis,
 });
 
 closeWithGrace({ delay: 10_000 }, async ({ signal, err }) => {

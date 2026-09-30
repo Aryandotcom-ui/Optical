@@ -22,9 +22,20 @@ Run a single package with `pnpm --filter @optical/api test`, or watch mode with
 | `apps/api`        | HTTP behaviour through `app.inject()`: probes, request IDs, error envelope, CORS, security headers, OpenAPI. Dependencies are injected fakes, so no services are needed. | Integration (in-process) |
 | `apps/web`        | Components (Testing Library + jsdom), the server API client, status derivation, and copy rules (no exclamation marks, no hard-coded brand name).                         | Unit + component         |
 
+## The test database
+
+API tests need Postgres and Redis (`pnpm docker:up`). A Vitest global setup
+(`apps/api/test/global-setup.ts`) migrates and seeds the separate `optical_test` database once per
+run, so tests never touch development data and always see the same deterministic catalogue.
+
+| Variable             | Default                                                    | Purpose                                                              |
+| -------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| `TEST_DATABASE_URL`  | `postgresql://optical:optical@localhost:5432/optical_test` | Database the API tests use.                                          |
+| `TEST_REDIS_URL`     | `redis://localhost:6379`                                   | Redis for cache and probe tests.                                     |
+| `TEST_SKIP_DB_SETUP` | unset                                                      | Set to `1` to reuse an already-seeded test database (faster reruns). |
+
 ## Coming in later phases
 
-- **Phase 1:** API tests against a real Postgres (`optical_test` database, created by the Docker init script).
 - **Phase 2:** Playwright end-to-end tests with axe accessibility checks, and Lighthouse CI budgets.
 - **Phase 5:** try-on e2e with Chromium's fake camera (`--use-fake-device-for-media-stream`).
 - **Phase 7:** visual regression baselines at three breakpoints in both themes.

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Folding leather glasses case">
+  <defs>
+    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b98752"/>
+      <stop offset="1" stop-color="#8a5c2f"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="600" cy="650" rx="360" ry="36" fill="url(#shadow)"/>
+  <path d="M290 360 L910 360 L940 620 L260 620 Z" fill="url(#leather)"/>
+  <path d="M290 360 L910 360 L880 470 L320 470 Z" fill="#a47142"/>
+  <path d="M320 470 L880 470" stroke="#6f4623" stroke-width="4"/>
+  <path d="M300 380 L900 380 M275 600 L925 600" stroke="#f3e2c8" stroke-width="3" stroke-dasharray="14 10" opacity="0.7"/>
+  <circle cx="600" cy="505" r="16" fill="#5c3a1c"/>
+</svg>

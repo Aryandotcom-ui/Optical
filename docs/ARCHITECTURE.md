@@ -53,6 +53,36 @@ External dependencies (database, Redis, payments, email, storage) sit behind int
 injected into `buildApp`, so tests swap them for in-memory fakes. See `src/infra/probes.ts` for the
 first example.
 
+## Catalogue reads
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant R as Route (Zod)
+  participant S as CatalogService
+  participant K as Redis cache
+  participant P as Postgres
+  C->>R: GET /v1/products?shape=round&q=tortoise
+  R->>S: list(query)
+  S->>K: catalogue index (60 s)
+  K-->>S: hit, or load from Postgres
+  S->>P: full-text + trigram search → ranked ids
+  S->>S: filter, disjunctive facets, sort, page (in memory)
+  S->>P: product cards for the page's ids
+  S-->>C: items, total, facets
+```
+
+Search relevance comes from Postgres; everything else runs over a compact cached index of published
+products (ADR-014). The cache fails open: if Redis is down, reads go to Postgres and a warning is
+logged.
+
+## Lens pricing
+
+The web app and the API run the same `quoteLens` and `priceOrder` from `packages/shared`. The web
+app shows live prices; the API recomputes on every write and trusts only its own result. Lens
+choices are stored as an immutable snapshot on cart and order items, so later catalogue changes
+never alter a placed order.
+
 ## Request tracing
 
 The web server sends `x-request-id: web-<uuid>` on every API call. The API reuses a safe incoming

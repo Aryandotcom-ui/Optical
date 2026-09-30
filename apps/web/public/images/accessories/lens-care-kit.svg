@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Lens spray bottle and microfibre cloth">
+  <defs>
+    <linearGradient id="bottle" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dfe6ea"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c9d2d8"/>
+    </linearGradient>
+    <linearGradient id="cloth" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9aa0a6"/>
+      <stop offset="1" stop-color="#6e7479"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="600" cy="690" rx="400" ry="38" fill="url(#shadow)"/>
+  <path d="M470 560 L860 520 L900 660 L500 700 Z" fill="url(#cloth)"/>
+  <path d="M470 560 L860 520" stroke="#b4babf" stroke-width="3"/>
+  <rect x="330" y="330" width="170" height="360" rx="34" fill="url(#bottle)" stroke="#b7c0c6" stroke-width="3"/>
+  <rect x="370" y="250" width="90" height="90" rx="10" fill="#1d1d1f"/>
+  <rect x="455" y="268" width="60" height="26" rx="6" fill="#1d1d1f"/>
+  <rect x="350" y="450" width="130" height="120" rx="10" fill="#0a66ff" opacity="0.9"/>
+  <path d="M372 492 h86 M372 516 h60" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+</svg>
