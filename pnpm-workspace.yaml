@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
+
+# Both ship prebuilt native binaries; their install scripts are only fallbacks.
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'

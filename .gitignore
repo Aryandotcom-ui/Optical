@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment: only the documented example is committed
+.env
+.env.*
+!.env.example
+
+# Build output
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+
+# Runtime data
+uploads/
+apps/api/storage/
+*.log
+logs/
+
+# Generated product renders (produced by `pnpm render:images`, never committed)
+apps/web/public/renders/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "titleTemplate": "%s · {brand}",
+    "defaultTitle": "{brand}: {tagline}"
+  },
+  "common": {
+    "skipToContent": "Skip to content",
+    "goHome": "Go to the home page",
+    "tryAgain": "Try again",
+    "opensInNewTab": "(opens in a new tab)"
+  },
+  "home": {
+    "eyebrow": "Development build",
+    "lede": "The foundations are in place: design tokens, the API, local services and the test pipeline. The storefront is built on top of these next.",
+    "statusCta": "Check system status",
+    "designSystemCta": "View the design system",
+    "apiDocsCta": "Open the API reference"
+  },
+  "status": {
+    "title": "System status",
+    "lede": "Live checks of every service this site depends on. The page refreshes its data on every load.",
+    "overall": {
+      "ready": "Everything is running.",
+      "degraded": "Running with reduced capability.",
+      "unavailable": "Some services are down."
+    },
+    "services": {
+      "web": "Storefront",
+      "api": "API",
+      "database": "Database",
+      "redis": "Cache and queues"
+    },
+    "state": {
+      "up": "Operational",
+      "down": "Unavailable",
+      "unknown": "Unknown"
+    },
+    "latency": "{ms} ms",
+    "version": "Version {version}",
+    "unknownBecauseApiDown": "Unknown while the API is unreachable.",
+    "redisDownImpact": "The site keeps working. Rate limits are relaxed and background jobs wait until the cache is back.",
+    "apiDownHint": "Start the API with pnpm dev, or check API_INTERNAL_URL in your .env file.",
+    "servicesDownHint": "Start local services with pnpm docker:up.",
+    "requestId": "Request ID {id}",
+    "checkedAt": "Checked at {time}"
+  },
+  "notFound": {
+    "title": "We couldn’t find that page",
+    "body": "The link may be out of date, or the page may have moved.",
+    "code": "Error 404"
+  },
+  "error": {
+    "title": "Something went wrong on our side",
+    "body": "Your details are safe. Try again, and if the problem continues, contact us with the reference below.",
+    "reference": "Reference {digest}"
+  },
+  "designSystem": {
+    "title": "Design system",
+    "lede": "Tokens and primitives every screen is built from. Values come from packages/config and switch with your system’s light or dark setting.",
+    "colour": "Colour",
+    "contrastOnBackground": "{ratio}:1 on background",
+    "typography": "Typography",
+    "typeSample": "Glasses, made clear.",
+    "radius": "Radius",
+    "motion": "Motion",
+    "motionHint": "Hover or focus a tile to see each duration with the standard easing. Reduced-motion settings shorten these to a fade.",
+    "buttons": "Buttons",
+    "money": "Money formatting",
+    "moneyHint": "Integer minor units formatted with Intl.NumberFormat for {locale}.",
+    "primary": "Choose lenses",
+    "secondary": "Try on with camera",
+    "ghost": "Add to wishlist",
+    "disabled": "Unavailable"
+  }
+}
