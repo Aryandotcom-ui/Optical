@@ -8,7 +8,16 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       // Personal, internal or endlessly parameterised pages.
-      disallow: ['/dev/', '/status', '/search', '/wishlist', '/compare'],
+      disallow: [
+        '/dev/',
+        '/status',
+        '/search',
+        '/wishlist',
+        '/compare',
+        '/cart',
+        '/checkout',
+        '/order/',
+      ],
     },
     sitemap: `${base}/sitemap.xml`,
   };

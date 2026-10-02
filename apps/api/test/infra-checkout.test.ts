@@ -176,3 +176,22 @@ describe('mock webhook job', () => {
     ).rejects.toThrow('401');
   });
 });
+
+describe('rate limit scale', () => {
+  it('multiplies every limit for test environments', async () => {
+    const { app } = await buildTestApp({ env: { RATE_LIMIT_SCALE: '2' } });
+    const statuses: number[] = [];
+    for (let attempt = 0; attempt < 21; attempt += 1)
+      statuses.push(
+        (
+          await app.inject({
+            method: 'POST',
+            url: '/v1/orders/track',
+            payload: { number: 'LO-26-000001', email: 'a@example.com' },
+          })
+        ).statusCode,
+      );
+    expect(statuses.filter((status) => status === 429)).toEqual([429]);
+    await app.close();
+  });
+});

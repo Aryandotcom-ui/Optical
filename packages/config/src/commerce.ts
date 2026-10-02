@@ -5,8 +5,6 @@
  *
  * All money values are integer minor units (paise for INR).
  */
-import { indiaAddress } from './india-address';
-
 export interface TaxConfig {
   /** Label printed on invoices, e.g. "GST" or "VAT". */
   readonly name: string;
@@ -67,30 +65,6 @@ export interface PolicyConfig {
   readonly stockReservationMinutes: number;
 }
 
-export interface PhoneConfig {
-  /** International dialling code, e.g. "+91". */
-  readonly dialCode: string;
-  /** Source of a RegExp that the national number (digits only) must fully match. */
-  readonly pattern: string;
-  readonly example: string;
-}
-
-export interface PostalLookupEntry {
-  /** Leading digits of the postal code; the longest matching prefix wins. */
-  readonly prefix: string;
-  readonly region: string;
-  readonly city: string | null;
-}
-
-export interface AddressConfig {
-  /** What the first-level division is called: "State", "County", "Province". */
-  readonly regionLabel: string;
-  readonly regions: readonly string[];
-  readonly phone: PhoneConfig;
-  /** Pre-fills region (and city, where known) from a postal code. */
-  readonly postalLookup: readonly PostalLookupEntry[];
-}
-
 export interface CommerceConfig {
   /** ISO 3166-1 alpha-2 country code of the market. */
   readonly country: string;
@@ -103,7 +77,6 @@ export interface CommerceConfig {
   readonly timeZone: string;
   readonly tax: TaxConfig;
   readonly postalCode: PostalCodeConfig;
-  readonly address: AddressConfig;
   readonly shipping: ShippingConfig;
   readonly cashOnDelivery: CashOnDeliveryConfig;
   readonly policies: PolicyConfig;
@@ -117,7 +90,6 @@ export const indiaMarket: CommerceConfig = {
   timeZone: 'Asia/Kolkata',
   tax: { name: 'GST', rateBasisPoints: 1200, pricesIncludeTax: true },
   postalCode: { label: 'PIN code', pattern: '^[1-9][0-9]{5}$', example: '560001' },
-  address: indiaAddress,
   shipping: {
     freeShippingThresholdMinor: 1_499_00,
     standardFeeMinor: 99_00,
@@ -189,37 +161,4 @@ export function shippingZoneFor(
 /** Returns true when `code` is a valid postal code for the given market. */
 export function isValidPostalCode(code: string, market: CommerceConfig = commerce): boolean {
   return new RegExp(market.postalCode.pattern).test(code.trim());
-}
-
-/** Region and city for a postal code, by longest matching prefix, or null when unknown. */
-export function lookupPostalCode(
-  code: string,
-  market: CommerceConfig = commerce,
-): { region: string; city: string | null } | null {
-  const trimmed = code.trim();
-  if (!isValidPostalCode(trimmed, market)) return null;
-  let best: PostalLookupEntry | undefined;
-  for (const entry of market.address.postalLookup) {
-    if (!trimmed.startsWith(entry.prefix)) continue;
-    const length = best?.prefix.length ?? 0;
-    // On a tie, an entry that also knows the city wins.
-    if (entry.prefix.length > length || (entry.prefix.length === length && !best?.city))
-      best = entry;
-  }
-  return best ? { region: best.region, city: best.city } : null;
-}
-
-/**
- * Normalises a phone number to international form (+919876543210), or
- * returns null when it isn't a valid number for the market. Accepts spaces,
- * dashes, brackets, a leading 0 and the country code.
- */
-export function normalisePhone(input: string, market: CommerceConfig = commerce): string | null {
-  const { dialCode, pattern } = market.address.phone;
-  let digits = input.replace(/[\s()-]/g, '');
-  if (digits.startsWith(dialCode)) digits = digits.slice(dialCode.length);
-  else if (digits.startsWith(`00${dialCode.slice(1)}`)) digits = digits.slice(dialCode.length + 1);
-  else if (digits.startsWith('0')) digits = digits.slice(1);
-  if (!/^[0-9]+$/.test(digits) || !new RegExp(pattern).test(digits)) return null;
-  return `${dialCode}${digits}`;
 }

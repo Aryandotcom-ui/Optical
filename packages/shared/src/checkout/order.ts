@@ -53,6 +53,8 @@ const prescriptionStateSchema = z.object({
   mode: z.enum(['manual', 'upload', 'saved', 'later']),
   /** True once values or a file are on the order item. */
   provided: z.boolean(),
+  /** Progressive lenses also need the reading addition (ADD). */
+  requiresAdd: z.boolean(),
 });
 
 /** The address as stored on an order (output only, so no input transforms). */
@@ -81,6 +83,7 @@ export const orderViewSchema = z
     paymentProvider: paymentProviderSchema,
     payment: z
       .object({
+        id: z.uuid(),
         status: z.enum([
           'CREATED',
           'PENDING',

@@ -123,7 +123,7 @@ describe('sending a prescription after ordering', () => {
     expect(placed.order).toMatchObject({
       status: 'PRESCRIPTION_REVIEW',
       awaitingPrescription: true,
-      items: [{ prescription: { mode: 'later', provided: false } }],
+      items: [{ prescription: { mode: 'later', provided: false, requiresAdd: false } }],
     });
     expect(placed.order.upcoming.map((step) => step.status)).toEqual([
       'IN_PRODUCTION',
@@ -171,6 +171,7 @@ describe('sending a prescription after ordering', () => {
     expect(attached.json<OrderView>().items[0]?.prescription).toEqual({
       mode: 'later',
       provided: true,
+      requiresAdd: false,
     });
   });
 });

@@ -36,6 +36,8 @@ export const apiEnvSchema = z
       .url({ protocol: /^smtps?$/, error: 'must be an smtp:// or smtps:// URL' })
       .default('smtp://localhost:1025'),
     EMAIL_FROM: z.string().optional(),
+    /** Multiplies every rate limit; raise it only for test environments that share one IP. */
+    RATE_LIMIT_SCALE: z.coerce.number().min(1).max(1000).default(1),
     MOCK_PAYMENTS_ENABLED: envField.boolean().optional(),
     MOCK_PENDING_SETTLE_SECONDS: z.coerce.number().int().min(1).max(3600).default(30),
     RAZORPAY_KEY_ID: z.string().optional(),

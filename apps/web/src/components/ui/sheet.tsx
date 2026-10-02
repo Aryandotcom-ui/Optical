@@ -18,6 +18,9 @@ const sides = {
     'inset-y-0 right-0 h-dvh w-full max-w-md data-[state=open]:animate-sheet-in-right data-[state=closed]:animate-sheet-out-right',
   bottom:
     'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-media pb-[env(safe-area-inset-bottom)] data-[state=open]:animate-sheet-in-bottom data-[state=closed]:animate-sheet-out-bottom',
+  /** Full screen on phones, a wide slide-over from the right on larger screens. */
+  panel:
+    'inset-0 h-dvh w-full sm:left-auto sm:max-w-2xl data-[state=open]:animate-sheet-in-right data-[state=closed]:animate-sheet-out-right',
   center:
     'top-1/2 left-1/2 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-card data-[state=open]:animate-fade-in',
 } as const;

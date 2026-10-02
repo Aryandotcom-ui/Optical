@@ -6,10 +6,9 @@ plain language, honest pricing, and on-device virtual try-on.
 This repository is a TypeScript monorepo with a Next.js storefront, a Fastify API and shared
 packages. It runs fully locally with no paid services or API keys.
 
-> **Status: Phase 2 (storefront browsing).** The storefront is browsable: home, listings with
-> filters in the URL, product pages with a 3D viewer and a to-scale fit guide, search, wishlist,
-> compare, help and policy pages. Lens selection, cart and checkout arrive in Phase 3; see
-> [the roadmap](#roadmap).
+> **Status: Phase 3 (buying).** Browse, choose lenses with live pricing, and buy: bag, a
+> single-page checkout, a local test payment (or cash on delivery), a confirmation email in
+> Mailpit, and guest order tracking. Accounts arrive in Phase 4; see [the roadmap](#roadmap).
 
 ## Quick start
 
@@ -17,7 +16,7 @@ packages. It runs fully locally with no paid services or API keys.
 
 ```bash
 pnpm run setup   # install, .env, Docker services, migrate, seed, render product images
-pnpm dev         # web on :3000, API on :4000, both with hot reload
+pnpm dev         # web on :3000, API on :4000 and the background worker, all with hot reload
 ```
 
 > `pnpm setup` (without `run`) is a built-in pnpm command, so use `pnpm run setup` or
@@ -32,6 +31,8 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 | Storefront               | http://localhost:3000                   |
 | All frames               | http://localhost:3000/shop              |
 | A product page           | http://localhost:3000/p/harbour         |
+| Your bag                 | http://localhost:3000/cart              |
+| Track an order           | http://localhost:3000/track             |
 | System status            | http://localhost:3000/status            |
 | Design system (dev only) | http://localhost:3000/dev/design-system |
 | API                      | http://localhost:4000                   |
@@ -43,7 +44,7 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 | Command                                          | Does                                                                                 |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | `pnpm run setup`                                 | One-time setup. `--skip-install`, `--skip-docker` and `--skip-assets` are available. |
-| `pnpm dev`                                       | Runs web and API in watch mode.                                                      |
+| `pnpm dev`                                       | Runs web, API and the background worker in watch mode.                               |
 | `pnpm build`                                     | Production builds of every app.                                                      |
 | `pnpm start`                                     | Runs the production builds.                                                          |
 | `pnpm lint`                                      | ESLint (type-aware, React, a11y, Next.js).                                           |
@@ -64,6 +65,22 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 | `pnpm setup:assets`                              | Ensures Chromium is available, then renders images.                                  |
 
 See [docs/TESTING.md](docs/TESTING.md) for what each suite covers and the performance budgets.
+
+## Buying locally
+
+1. Open a product (for example http://localhost:3000/p/harbour) and choose **Choose lenses**.
+   Type a prescription (or upload a photo, or send it later), compare lens thickness, pick
+   coatings and a tint, and add to the bag. **Frame only** skips lenses.
+2. Check out with any email and a 10-digit mobile number; a PIN code such as `560038` fills in
+   the city and state. Try `FREESHIP` or `WELCOME10` in the coupon field.
+3. Pay with **Test payment**: on the order page choose to pay, decline or leave the payment
+   pending (it settles after `MOCK_PENDING_SETTLE_SECONDS`). The outcome arrives as a signed
+   webhook through the worker, as a real one would. **Cash on delivery** confirms at once.
+4. Read the confirmation email at http://localhost:8025, and find the order again at
+   http://localhost:3000/track with its number and your email.
+
+Razorpay and Stripe switch on when their keys are set in `.env` (hosted payment pages; see
+`.env.example`). Nothing is charged locally.
 
 ## Demo data
 
@@ -130,6 +147,12 @@ Brand name, currency, tax rate, shipping thresholds and store policies live in
 
 ## Troubleshooting
 
+**`APP_SECRET: is required but not set`.** Run `pnpm run setup` again (it adds one to an existing
+`.env` without touching anything else), or add `APP_SECRET=` followed by `openssl rand -hex 32`.
+
+**A test payment stays on "Waiting for the payment provider".** The worker delivers payment results
+and emails; check that `pnpm dev` shows `Worker started`, and that Redis is running.
+
 **Docker isn't running.** `pnpm run setup` stops and tells you so. Start Docker Desktop (or
 `dockerd`) and run it again. To use your own Postgres 16 and Redis 7, set `DATABASE_URL` and
 `REDIS_URL` in `.env` and run `pnpm run setup --skip-docker`.
@@ -162,8 +185,8 @@ the site at a LAN IP address (for example from a phone), try-on needs HTTPS. Try
 | 0     | Foundations: monorepo, tooling, tokens, env validation, health checks, CI | Done  |
 | 1     | Data model, seed, catalogue/search/lens-quote API, pricing engine         | Done  |
 | 2     | Storefront browsing: shell, home, listings, product pages, 3D viewer      | Done  |
-| 3     | Lens configurator, cart, checkout, payments, emails                       | Next  |
-| 4     | Auth and account area                                                     |       |
+| 3     | Lens configurator, cart, checkout, payments, emails                       | Done  |
+| 4     | Auth and account area                                                     | Next  |
 | 5     | Virtual try-on and Frame Finder                                           |       |
 | 6     | Admin panel                                                               |       |
 | 7     | Hardening and polish                                                      |       |

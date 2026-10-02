@@ -1,10 +1,16 @@
 export { brand, type BrandConfig } from './brand';
 export {
+  addressConfig,
+  addressConfigFor,
+  lookupPostalCode,
+  normalisePhone,
+  type AddressConfig,
+  type PhoneConfig,
+} from './address';
+export {
   commerce,
   indiaMarket,
   isValidPostalCode,
-  lookupPostalCode,
-  normalisePhone,
   shippingZoneFor,
   type ShippingZone,
   type CommerceConfig,
@@ -13,8 +19,6 @@ export {
   type ShippingConfig,
   type CashOnDeliveryConfig,
   type PolicyConfig,
-  type AddressConfig,
-  type PhoneConfig,
 } from './commerce';
 export {
   defaultFeatureFlags,

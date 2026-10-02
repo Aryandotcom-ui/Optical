@@ -25,6 +25,10 @@ const PAGES = [
   '/help',
   '/help/size-guide',
   '/legal/privacy',
+  '/cart',
+  '/checkout',
+  '/track',
+  '/order/LO-26-001001',
 ];
 
 const base = (process.argv[2] ?? 'http://localhost:3000').replace(/\/+$/, '');

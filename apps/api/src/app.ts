@@ -155,7 +155,9 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
   const now = deps.now ?? (() => new Date());
   const limiter =
     deps.rateLimiter ??
-    (deps.cacheClient ? new RedisRateLimiter(deps.cacheClient, app.log) : new MemoryRateLimiter());
+    (deps.cacheClient
+      ? new RedisRateLimiter(deps.cacheClient, app.log, env.RATE_LIMIT_SCALE)
+      : new MemoryRateLimiter(Date.now, env.RATE_LIMIT_SCALE));
   const cartService = new CartService(deps.db, lensService, now);
   const gateway = new PaymentGateway(
     deps.db,

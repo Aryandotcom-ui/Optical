@@ -14,6 +14,10 @@ flowchart LR
   subgraph apps/api [apps/api · Fastify]
     Routes --> Controllers --> Services --> Repositories
   end
+  subgraph Worker [apps/api worker · BullMQ]
+    Jobs[Outbox · hold expiry · reconciliation · mock webhooks]
+  end
+  Providers[(Razorpay / Stripe hosted pages)]
   subgraph Services [Local services · Docker Compose]
     PG[(Postgres 16)]
     RD[(Redis 7)]
@@ -24,7 +28,12 @@ flowchart LR
   RSC -- JSON, x-request-id --> Routes
   Repositories --> PG
   Services --> RD
-  Services --> MP
+  Services --> Jobs
+  Jobs --> PG
+  Jobs --> MP
+  Jobs -- signed mock webhooks --> Routes
+  Providers -- signed webhooks --> Routes
+  UI -- redirect to pay --> Providers
   shared[[packages/shared · schemas, pricing, money]] -.imported by.-> apps/web
   shared -.imported by.-> apps/api
   config[[packages/config · brand, market, flags, tokens]] -.imported by.-> apps/web
@@ -82,6 +91,39 @@ The web app and the API run the same `quoteLens` and `priceOrder` from `packages
 app shows live prices; the API recomputes on every write and trusts only its own result. Lens
 choices are stored as an immutable snapshot on cart and order items, so later catalogue changes
 never alter a placed order.
+
+## Buying
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant A as API
+  participant D as Postgres
+  participant W as Worker
+  participant P as Provider
+  B->>A: POST /v1/cart/items (config, expected price)
+  A->>A: quoteLens on the server
+  A->>D: bag line with price snapshot
+  B->>A: POST /v1/checkout/orders (Idempotency-Key, expected total)
+  A->>D: order, items, hold stock 15 min, coupon use (one transaction)
+  A->>P: create intent (mock, Payment Link or Checkout Session)
+  A-->>B: order, access token, payment action
+  P->>A: signed webhook
+  A->>D: WebhookEvent + PAID + commit stock + empty bag + outbox email (one transaction)
+  W->>D: claim outbox rows (SKIP LOCKED)
+  W->>W: render React Email, send by SMTP
+  W->>D: release expired holds, cancel unpaid orders
+```
+
+- **Guest sessions:** an opaque cookie, hashed server-side; bags, uploads and their use are tied
+  to it (ADR-028).
+- **Payments:** a `PaymentProvider` per method, registered only when configured. The order page
+  learns the outcome by polling the API, which learns it only from verified webhooks or a status
+  check (ADR-031).
+- **Stock:** `available = onHand − reserved`; holds and commits are conditional updates with a
+  database check constraint behind them (ADR-030).
+- **Emails:** transactional outbox, sent by the worker with retries (ADR-034).
+- **Uploads:** sniffed, stripped, scanned, private, signed links (ADR-035).
 
 ## Request tracing
 

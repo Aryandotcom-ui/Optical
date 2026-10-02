@@ -9,6 +9,7 @@ import { ProductPurchase } from '@/components/pdp/product-purchase';
 import { MAX_REVIEW_PAGES, ProductReviews } from '@/components/pdp/product-reviews';
 import { ProductViewProvider } from '@/components/pdp/product-view-context';
 import { ProductRail } from '@/components/product/product-rail';
+import { WithMessages } from '@/components/providers/with-messages';
 import { getEnv } from '@/env';
 import { getCategories, getListing, getProduct, getRelated, getReviews } from '@/lib/catalog';
 import { jsonLdScript, productJsonLd } from '@/lib/structured-data';
@@ -109,64 +110,69 @@ export default async function ProductPage({ params, searchParams }: Props) {
         </ol>
       </nav>
 
-      <ProductViewProvider product={product} initialVariantId={initialVariantId}>
-        <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
-          <div className="lg:sticky lg:top-24 lg:self-start">
-            <ProductGallery />
-          </div>
-          <ProductPurchase categoryName={categoryName} />
-        </div>
-
-        <div className="mt-20 space-y-20">
-          <section aria-labelledby="details" className="grid gap-10 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <h2 id="details" className="text-headline font-semibold">
-                {t('about')}
-              </h2>
-              <p className="mt-4 max-w-prose text-body-lg text-ink-secondary">
-                {product.description}
-              </p>
-              <h3 className="mt-8 font-medium">{t('care')}</h3>
-              <p className="mt-2 max-w-prose text-ink-secondary">{product.materialsAndCare}</p>
+      <WithMessages namespaces={['configurator']}>
+        <ProductViewProvider product={product} initialVariantId={initialVariantId}>
+          <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <ProductGallery />
             </div>
-            {suits.length > 0 ? (
-              <div>
-                <h3 className="font-medium">{t('suits')}</h3>
-                <p className="mt-2 text-caption text-ink-secondary">{t('suitsNote')}</p>
-                <ul className="mt-4 flex flex-wrap gap-2">
-                  {suits.map((entry) => (
-                    <li key={entry.faceShape}>
-                      <Link
-                        href={`/shop/${product.category}?faceShape=${entry.faceShape}` as Route}
-                        className="inline-flex min-h-9 items-center rounded-pill bg-surface-muted px-4 text-caption font-medium hover:bg-hairline"
-                      >
-                        {tFace(entry.faceShape)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </section>
+            <ProductPurchase categoryName={categoryName} />
+          </div>
 
-          {product.frame ? (
-            <section aria-labelledby="fit" className="scroll-mt-24">
-              <h2 id="fit" className="text-headline font-semibold">
-                {t('fitTitle')}
-              </h2>
-              <p className="mt-2 max-w-prose text-ink-secondary">{t('fitIntro')}</p>
-              <div className="mt-8">
-                <FitGuide frame={product.frame} />
+          <div className="mt-20 space-y-20">
+            <section aria-labelledby="details" className="grid gap-10 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <h2 id="details" className="text-headline font-semibold">
+                  {t('about')}
+                </h2>
+                <p className="mt-4 max-w-prose text-body-lg text-ink-secondary">
+                  {product.description}
+                </p>
+                <h3 className="mt-8 font-medium">{t('care')}</h3>
+                <p className="mt-2 max-w-prose text-ink-secondary">{product.materialsAndCare}</p>
               </div>
-              <p className="mt-6 text-caption">
-                <Link href={'/help/size-guide'} className="font-medium text-accent hover:underline">
-                  {t('sizeGuideLink')}
-                </Link>
-              </p>
+              {suits.length > 0 ? (
+                <div>
+                  <h3 className="font-medium">{t('suits')}</h3>
+                  <p className="mt-2 text-caption text-ink-secondary">{t('suitsNote')}</p>
+                  <ul className="mt-4 flex flex-wrap gap-2">
+                    {suits.map((entry) => (
+                      <li key={entry.faceShape}>
+                        <Link
+                          href={`/shop/${product.category}?faceShape=${entry.faceShape}` as Route}
+                          className="inline-flex min-h-9 items-center rounded-pill bg-surface-muted px-4 text-caption font-medium hover:bg-hairline"
+                        >
+                          {tFace(entry.faceShape)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </section>
-          ) : null}
-        </div>
-      </ProductViewProvider>
+
+            {product.frame ? (
+              <section aria-labelledby="fit" className="scroll-mt-24">
+                <h2 id="fit" className="text-headline font-semibold">
+                  {t('fitTitle')}
+                </h2>
+                <p className="mt-2 max-w-prose text-ink-secondary">{t('fitIntro')}</p>
+                <div className="mt-8">
+                  <FitGuide frame={product.frame} />
+                </div>
+                <p className="mt-6 text-caption">
+                  <Link
+                    href={'/help/size-guide'}
+                    className="font-medium text-accent hover:underline"
+                  >
+                    {t('sizeGuideLink')}
+                  </Link>
+                </p>
+              </section>
+            ) : null}
+          </div>
+        </ProductViewProvider>
+      </WithMessages>
 
       <div className="mt-20 space-y-20">
         <section aria-labelledby="reviews" className="scroll-mt-24">

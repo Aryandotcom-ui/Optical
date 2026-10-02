@@ -1,7 +1,7 @@
 'use client';
 
 import { commerce } from '@optical/config/commerce';
-import { Check, Info, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Check, RotateCcw, ShieldCheck } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -10,6 +10,7 @@ import { WishlistButton } from '@/components/product/wishlist-button';
 import { RatingStars } from '@/components/ui/rating';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/format';
+import { BuyButtons } from './buy-buttons';
 import { DeliveryEstimate } from './delivery-estimate';
 import { useColourSelection, useProductView } from './product-view-context';
 
@@ -144,6 +145,8 @@ export function ProductPurchase({ categoryName }: { categoryName: string }) {
         ) : null}
       </div>
 
+      <BuyButtons />
+
       <div className="flex flex-wrap gap-3">
         <WishlistButton
           id={product.id}
@@ -161,10 +164,6 @@ export function ProductPurchase({ categoryName }: { categoryName: string }) {
           />
         ) : null}
       </div>
-      <p className="flex gap-2 text-caption text-ink-secondary">
-        <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
-        {t('orderingSoon')}
-      </p>
 
       <DeliveryEstimate />
 

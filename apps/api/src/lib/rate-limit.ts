@@ -13,6 +13,8 @@ export interface RateLimitRule {
 export interface RateLimiter {
   /** Counts a hit and returns the number of hits in the current window. */
   hit(key: string, windowSeconds: number): Promise<number>;
+  /** Multiplies every limit (RATE_LIMIT_SCALE), e.g. for end-to-end tests from one machine. */
+  scale?: number;
 }
 
 /**
@@ -24,6 +26,7 @@ export class RedisRateLimiter implements RateLimiter {
   constructor(
     private readonly redis: Redis,
     private readonly log: Pick<FastifyBaseLogger, 'warn'>,
+    readonly scale = 1,
   ) {}
 
   async hit(key: string, windowSeconds: number): Promise<number> {
@@ -45,7 +48,10 @@ export class RedisRateLimiter implements RateLimiter {
 export class MemoryRateLimiter implements RateLimiter {
   private readonly windows = new Map<string, { count: number; resetAt: number }>();
 
-  constructor(private readonly now: () => number = Date.now) {}
+  constructor(
+    private readonly now: () => number = Date.now,
+    readonly scale = 1,
+  ) {}
 
   hit(key: string, windowSeconds: number): Promise<number> {
     const now = this.now();
@@ -60,7 +66,8 @@ export class MemoryRateLimiter implements RateLimiter {
 }
 
 /** A preHandler that limits requests per client IP for one rule. */
-export function rateLimit(limiter: RateLimiter, rule: RateLimitRule) {
+export function rateLimit(limiter: RateLimiter, base: RateLimitRule) {
+  const rule = { ...base, max: Math.ceil(base.max * (limiter.scale ?? 1)) };
   return async (request: FastifyRequest, reply: FastifyReply) => {
     const window = Math.floor(Date.now() / 1000 / rule.windowSeconds);
     const count = await limiter.hit(`rl:${rule.name}:${request.ip}:${window}`, rule.windowSeconds);
@@ -79,5 +86,6 @@ export const rateLimits = {
   upload: { name: 'upload', max: 10, windowSeconds: 300 },
   track: { name: 'track', max: 10, windowSeconds: 60 },
   placeOrder: { name: 'place-order', max: 10, windowSeconds: 300 },
+  paymentRetry: { name: 'payment-retry', max: 10, windowSeconds: 300 },
   cartWrite: { name: 'cart-write', max: 60, windowSeconds: 60 },
 } satisfies Record<string, RateLimitRule>;

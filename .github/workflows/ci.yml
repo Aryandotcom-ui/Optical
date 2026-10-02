@@ -109,11 +109,21 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 2s --health-timeout 3s --health-retries 30
+      mailpit:
+        image: axllent/mailpit:v1.31
+        ports: ['1025:1025', '8025:8025']
+        options: >-
+          --health-cmd "/mailpit readyz"
+          --health-interval 2s --health-timeout 3s --health-retries 30
     env:
       DATABASE_URL: postgresql://optical:optical@localhost:5432/optical
       REDIS_URL: redis://localhost:6379
+      SMTP_URL: smtp://localhost:1025
       E2E_BASE_URL: http://localhost:3000
       LHCI_BASE_URL: http://localhost:3000
+      # Every e2e order comes from one IP, and pending test payments settle quickly.
+      RATE_LIMIT_SCALE: '50'
+      MOCK_PENDING_SETTLE_SECONDS: '5'
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -122,6 +132,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generate a throwaway signing secret
+        run: echo "APP_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
       - name: Install Chromium for Playwright, Lighthouse and image rendering
         run: pnpm --filter @optical/web exec playwright install --with-deps chromium
       - name: Migrate and seed the demo data
@@ -135,18 +147,19 @@ jobs:
           restore-keys: renders-
       - run: pnpm render:images
       - run: pnpm build
-      - name: Start the API and the storefront
+      - name: Start the API, the worker and the storefront
         run: |
           pnpm --filter @optical/api start > api.log 2>&1 &
+          pnpm --filter @optical/api start:worker > worker.log 2>&1 &
           pnpm --filter @optical/web start > web.log 2>&1 &
           for _ in $(seq 1 60); do
             curl -sf http://localhost:4000/readyz > /dev/null && curl -sf http://localhost:3000/healthz > /dev/null && exit 0
             sleep 1
           done
-          echo "The apps did not start"; tail -50 api.log web.log; exit 1
+          echo "The apps did not start"; tail -50 api.log worker.log web.log; exit 1
       - name: Initial JavaScript budget
         run: pnpm --filter @optical/web budget:js http://localhost:3000
-      - name: Playwright (journeys, axe in light and dark, responsiveness)
+      - name: Playwright (journeys, purchases, axe in light and dark, responsiveness)
         run: pnpm --filter @optical/web test:e2e
       - name: Lighthouse CI budgets (Home, listing, product page)
         run: |
@@ -161,6 +174,7 @@ jobs:
             apps/web/test-results/
             apps/web/.lighthouseci/
             api.log
+            worker.log
             web.log
           retention-days: 7
 

@@ -178,7 +178,9 @@
     "byShape": "Shop by shape",
     "collections": "Collections",
     "dismissAnnouncement": "Dismiss this message",
-    "announcement": "Free delivery on orders over {amount} · {days}-day returns, no questions asked"
+    "announcement": "Free delivery on orders over {amount} · {days}-day returns, no questions asked",
+    "bag": "Bag",
+    "bagWithCount": "Bag, {count, plural, one {# item} other {# items}}"
   },
   "footer": {
     "shop": "Shop",
@@ -206,7 +208,8 @@
       "cards": "Cards",
       "netbanking": "Netbanking",
       "cod": "Cash on delivery"
-    }
+    },
+    "trackOrder": "Track your order"
   },
   "filters": {
     "title": "Filters",
@@ -356,7 +359,6 @@
     "colour": "Colour:",
     "colourOut": "{colour}, out of stock",
     "checkFit": "Check the fit",
-    "orderingSoon": "Lens selection and checkout are on their way. Save this frame and it will be waiting in your wishlist.",
     "returns": "{days}-day returns",
     "warranty": "{months}-month frame warranty",
     "about": "About this frame",
@@ -476,6 +478,16 @@
       "more": "Show more reviews",
       "noneTitle": "No reviews yet",
       "noneBody": "Nobody has reviewed {name} yet."
+    },
+    "buy": {
+      "chooseLenses": "Choose lenses",
+      "frameOnly": "Frame only",
+      "addToBag": "Add to bag",
+      "adding": "Adding…",
+      "soldOut": "Sold out in this colour",
+      "added": "{name} is in your bag.",
+      "viewBag": "View bag",
+      "failed": "We couldn't add that to your bag. Please try again."
     }
   },
   "compare": {
@@ -659,5 +671,365 @@
   "legal": {
     "nav": "Policies",
     "updated": "Last updated {date}"
+  },
+  "configurator": {
+    "title": "Lenses for {name}",
+    "subtitle": "Frame colour: {colour}",
+    "close": "Close lens choices",
+    "stepsLabel": "Lens choices",
+    "steps": {
+      "purpose": "Type",
+      "prescription": "Prescription",
+      "thickness": "Thickness",
+      "coatings": "Coatings",
+      "tint": "Tint",
+      "review": "Review"
+    },
+    "headings": {
+      "purpose": "What are these glasses for?",
+      "prescription": "Your prescription",
+      "thickness": "How thin should the lenses be?",
+      "coatings": "Coatings",
+      "tint": "Tint",
+      "review": "Review your lenses"
+    },
+    "progress": "Step {current} of {total}",
+    "incomplete": {
+      "purpose": "Choose a lens type to continue.",
+      "prescription": "Finish your prescription, upload it, or choose to send it later.",
+      "thickness": "Choose a lens thickness to continue.",
+      "coatings": "One of these coatings can't be combined with your other choices.",
+      "tint": "Choose a tint colour to continue.",
+      "review": "Some choices need attention before adding to your bag."
+    },
+    "recommend": "Not sure? Recommend for me",
+    "totalExact": "Frame and lenses",
+    "totalSoFar": "So far",
+    "back": "Back",
+    "next": "Continue",
+    "addToBag": "Add to bag",
+    "adding": "Adding…",
+    "added": "{name} with your lenses is in your bag.",
+    "viewBag": "View bag",
+    "addFailed": "We couldn't add that to your bag. Please try again.",
+    "loadFailed": "We couldn't load the lens options. Check your connection and open this again.",
+    "purpose": {
+      "legend": "Lens type",
+      "included": "Included",
+      "from": "from {price}",
+      "helpTitle": "Two quick questions",
+      "hasPrescription": "Do you have a prescription for glasses?",
+      "needsReading": "Do you need help reading up close as well as seeing far away?",
+      "useSuggestion": "Choose the lens that fits",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "prescription": {
+      "legend": "How to give us your prescription",
+      "manualTitle": "Type it in",
+      "manualDescription": "About a minute, with your prescription in front of you.",
+      "uploadTitle": "Upload a photo or PDF",
+      "uploadDescription": "An optician reads it and checks it before your lenses are made.",
+      "laterTitle": "Send it later",
+      "laterDescription": "Order now; we'll hold your lenses until you add it from your order page or by replying to our email.",
+      "recommend": "Not sure? Send it later"
+    },
+    "rx": {
+      "rightEye": "Right eye",
+      "leftEye": "Left eye",
+      "sph": "SPH",
+      "cyl": "CYL",
+      "axis": "AXIS",
+      "add": "ADD",
+      "none": "None",
+      "decrease": "Decrease {field}",
+      "increase": "Increase {field}",
+      "pdTitle": "Pupillary distance (PD)",
+      "pdSingle": "One number",
+      "pdDual": "Two numbers",
+      "pd": "PD",
+      "pdEmpty": "Enter",
+      "pdRight": "Right PD",
+      "pdLeft": "Left PD",
+      "whatMeanTitle": "What do these mean?",
+      "sphHelpTerm": "SPH (sphere)",
+      "sphHelp": "The main power. Minus for short sight (distance is blurry), plus for long sight. 0.00 or 'plano' means no correction.",
+      "cylHelpTerm": "CYL (cylinder)",
+      "cylHelp": "Corrects astigmatism. Leave it empty if your prescription has no cylinder.",
+      "axisHelpTerm": "AXIS",
+      "axisHelp": "The angle of the cylinder, from 1 to 180. It is only used with a cylinder.",
+      "addHelpTerm": "ADD (addition)",
+      "addHelp": "The extra power for reading, used by progressive lenses. It is usually the same for both eyes.",
+      "pdHelpTerm": "PD (pupillary distance)",
+      "pdHelp": "The distance between your pupils in millimetres, so the centre of each lens sits in front of your eye. Two numbers mean each eye is measured from the middle of your nose.",
+      "measureTitle": "Don't know your PD?",
+      "measureStep1": "Stand about 20 cm from a mirror and hold a millimetre ruler flat against your brow.",
+      "measureStep2": "Close your right eye and line up 0 with the centre of your left pupil.",
+      "measureStep3": "Open your right eye, close your left, and read the number at the centre of your right pupil. Most adults measure between 54 and 74 mm."
+    },
+    "upload": {
+      "choose": "Choose a photo or PDF",
+      "replace": "Replace the file",
+      "uploading": "Uploading…",
+      "uploaded": "{name} uploaded",
+      "hint": "JPEG, PNG, WebP or PDF, up to 8 MB. Location and camera details are removed from photos before they are stored.",
+      "tooLarge": "That file is over 8 MB. Try a smaller photo or a PDF.",
+      "failed": "The upload didn't work. Please try again."
+    },
+    "thickness": {
+      "legend": "Lens material",
+      "included": "Included",
+      "recommended": "Recommended",
+      "thickest": "About {mm} mm at the thickest point",
+      "example": "Example for a {power} prescription. Type in your prescription to see your own lenses.",
+      "yours": "Your lenses, cut through the middle",
+      "slider": "Compare lens thickness",
+      "thicker": "Thicker",
+      "thinner": "Thinner",
+      "estimateNote": "Estimates: real lenses vary a little with the frame and lens curve."
+    },
+    "coatings": {
+      "packages": "Coating packages",
+      "extras": "Add individually",
+      "none": "No coatings",
+      "noneDescription": "Plain lenses, nothing added.",
+      "included": "Included",
+      "popular": "Most chosen",
+      "includedList": "Included: {list}.",
+      "glareAlt": "A window reflected in a lens without anti-reflective coating, and the same view through a coated lens with no reflection.",
+      "without": "Without anti-reflective",
+      "with": "With anti-reflective",
+      "withYours": "With your choice"
+    },
+    "tint": {
+      "legend": "Lens tint",
+      "included": "Included",
+      "colour": "Colour",
+      "strength": "Strength",
+      "preview": "Preview",
+      "indoors": "Indoors",
+      "outdoors": "In sunlight"
+    },
+    "review": {
+      "needsAttention": "A few choices need attention:",
+      "included": "Included",
+      "total": "Total",
+      "tax": "Includes {tax} of {amount}.",
+      "rxManual": "We'll use the prescription you typed in. An optician checks every prescription before lenses are made.",
+      "rxUpload": "An optician will read your uploaded prescription before your lenses are made.",
+      "rxLater": "Add your prescription after ordering, from your order page. Your lenses are made once it's checked.",
+      "delivery": "Lenses are made and fitted in about {days} working days, then shipped."
+    }
+  },
+  "bag": {
+    "title": "Your bag",
+    "loadFailed": "We couldn't load your bag. Check your connection and try again.",
+    "changeFailed": "That change didn't go through. Please try again.",
+    "retry": "Try again",
+    "emptyTitle": "Your bag is empty",
+    "emptyBody": "Frames you add, with or without lenses, wait here until you check out.",
+    "browse": "Browse frames",
+    "itemsHeading": "{count, plural, one {# item} other {# items}} in your bag",
+    "summaryHeading": "Summary",
+    "checkout": "Check out",
+    "fixIssues": "Some items need attention before you can check out.",
+    "reassurance": "14-day returns. Prices include GST; nothing is added at checkout except delivery speed and any cash-on-delivery fee.",
+    "item": {
+      "frameOnly": "Frame only, no lenses",
+      "remove": "Remove",
+      "quantity": "Quantity of {name}",
+      "qtyOption": "Qty {quantity}",
+      "each": "{price} each",
+      "rx": {
+        "manual": "Prescription typed in",
+        "upload": "Prescription photo uploaded",
+        "later": "Prescription to send after ordering",
+        "saved": "Saved prescription"
+      },
+      "issue": {
+        "unavailable": "This frame is no longer sold. Remove it to check out.",
+        "out-of-stock": "This colour has sold out. Remove it to check out.",
+        "insufficient-stock": "Only {count} available now. Lower the quantity to check out."
+      }
+    },
+    "coupon": {
+      "label": "Coupon code",
+      "apply": "Apply",
+      "applied": "{code} applied",
+      "remove": "Remove coupon {code}",
+      "failed": "That code couldn't be checked. Please try again."
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "discount": "Discount ({code})",
+      "delivery": {
+        "standard": "Standard delivery",
+        "express": "Express delivery"
+      },
+      "deliveryFrom": "Standard delivery",
+      "free": "Free",
+      "codFee": "Cash on delivery fee",
+      "total": "Total",
+      "tax": "Includes {tax} of {amount}",
+      "freeShippingGap": "{amount} more and standard delivery is free."
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "intro": "Three short steps. Nothing is charged until you place the order.",
+    "loadFailed": "We couldn't load your bag. Check your connection and reload the page; what you typed is kept.",
+    "emptyTitle": "Your bag is empty",
+    "browse": "Browse frames",
+    "showSummary": "Order summary",
+    "summaryLabel": "Order summary",
+    "frameOnly": "Frame only",
+    "edit": "Edit",
+    "continue": "Continue",
+    "place": "Place order · {total}",
+    "placing": "Placing your order…",
+    "placeFailed": "Your order couldn't be placed. Nothing was charged; please try again.",
+    "terms": "By placing the order you agree to our terms and returns policy. Your details are used only to deliver this order.",
+    "contact": {
+      "title": "Contact",
+      "email": "Email",
+      "emailHint": "For your confirmation and delivery updates. No marketing unless you ask.",
+      "phone": "Mobile number",
+      "phoneHint": "The courier calls this number if they can't find you."
+    },
+    "delivery": {
+      "title": "Delivery",
+      "fullName": "Full name",
+      "postalHint": "We fill in the city and state from it; change them if they're wrong.",
+      "line1": "House, building and street",
+      "line2": "Area or locality (optional)",
+      "landmark": "Landmark (optional)",
+      "city": "City",
+      "chooseRegion": "Choose your {label}",
+      "speed": "Delivery speed",
+      "standard": "Standard",
+      "express": "Express",
+      "window": "Arrives {from} – {to}",
+      "windowPending": "Dates appear once your PIN code is in."
+    },
+    "payment": {
+      "title": "Payment",
+      "legend": "How would you like to pay?",
+      "mock": {
+        "title": "Test payment",
+        "description": "A local payment simulator: after placing the order you choose whether the payment succeeds, fails or stays pending. No money moves."
+      },
+      "razorpay": {
+        "title": "Card, UPI or netbanking",
+        "description": "Pay on Razorpay's secure page, then you come straight back here."
+      },
+      "stripe": {
+        "title": "Card",
+        "description": "Pay on Stripe's secure page, then you come straight back here."
+      },
+      "cod": {
+        "title": "Cash on delivery",
+        "description": "Pay in cash when your order arrives."
+      }
+    },
+    "errors": {
+      "email": "Enter an email address like name@example.com.",
+      "phone": "Enter a 10-digit mobile number, like {example}.",
+      "fullName": "Enter the name of the person receiving the order.",
+      "line1": "Enter the house, building and street.",
+      "city": "Enter the city.",
+      "region": "Choose your {label}.",
+      "postalCode": "Enter a valid {label}, like {example}."
+    },
+    "updatingTotal": "Updating your total…"
+  },
+  "order": {
+    "metaTitle": "Your order",
+    "missingTitle": "We couldn't open that order",
+    "trackInstead": "Find it with your order number",
+    "timeline": "Progress",
+    "upcoming": "still to come",
+    "waitingForPayment": "We're waiting to hear from the payment provider. This page updates by itself.",
+    "retry": "Try paying again",
+    "retrying": "Starting payment…",
+    "retryFailed": "The payment couldn't be started. Please try again.",
+    "held": "Your frames are still held for you while you try again.",
+    "keepShopping": "Keep shopping",
+    "help": "Delivery and returns",
+    "hero": {
+      "eta": "Estimated delivery {from} – {to}",
+      "confirmed": {
+        "title": "Thank you. Your order is confirmed.",
+        "body": "Order {number}. We've sent a confirmation to {email}."
+      },
+      "awaiting-payment": {
+        "title": "Almost there",
+        "body": "Order {number} is saved. Complete the payment to confirm it."
+      },
+      "processing": {
+        "title": "Your payment is processing",
+        "body": "Your bank is confirming the payment for order {number}. This page updates by itself, and we'll email {email} when it's done."
+      },
+      "failed": {
+        "title": "Your payment didn't go through",
+        "body": "{reason} No money was taken. You can try again; your frames are held for a few minutes."
+      },
+      "cancelled": {
+        "title": "This order was cancelled",
+        "body": "Order {number} was cancelled. If a payment went through, it is refunded to you automatically."
+      }
+    },
+    "mock": {
+      "title": "Test payment",
+      "body": "This is the local payment simulator. Choose what the bank does; the result arrives as a signed webhook, like a real payment.",
+      "success": "Pay successfully",
+      "failure": "Decline the payment",
+      "pending": "Leave it pending",
+      "waiting": "Waiting for the payment provider…",
+      "failed": "The simulator couldn't be reached. Is the API running?"
+    },
+    "prescription": {
+      "title": "We still need your prescription",
+      "body": "Your lenses are made once an optician has checked it. Upload a photo or type in the values.",
+      "for": "{name}, {colour}",
+      "how": "How to add your prescription",
+      "upload": "Upload a photo",
+      "manual": "Type it in",
+      "save": "Save prescription",
+      "failed": "That didn't save. Please try again."
+    },
+    "details": {
+      "title": "Order {number}",
+      "rxReceived": "Prescription received: an optician will check it.",
+      "rxNeeded": "Prescription still needed",
+      "subtotal": "Subtotal",
+      "discount": "Discount ({code})",
+      "delivery": {
+        "standard": "Standard delivery",
+        "express": "Express delivery"
+      },
+      "free": "Free",
+      "codFee": "Cash on delivery fee",
+      "total": "Total",
+      "tax": "Includes {tax} of {amount}",
+      "deliverTo": "Delivering to",
+      "payment": "Payment",
+      "shipment": "Shipment",
+      "provider": {
+        "mock": "Test payment",
+        "razorpay": "Razorpay",
+        "stripe": "Stripe",
+        "cod": "Cash on delivery"
+      }
+    }
+  },
+  "track": {
+    "title": "Track your order",
+    "intro": "Enter your order number and the email you used. No account needed.",
+    "number": "Order number",
+    "numberHint": "It's in your confirmation email, like LO-26-001234.",
+    "email": "Email",
+    "submit": "Find my order",
+    "finding": "Finding your order…",
+    "failed": "We couldn't check that right now. Please try again."
   }
 }

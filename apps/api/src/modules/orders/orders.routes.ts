@@ -66,7 +66,7 @@ export const orderRoutes: FastifyPluginAsyncZod<{
   app.post(
     '/orders/:number/payment',
     {
-      preHandler: rateLimit(limiter, rateLimits.placeOrder),
+      preHandler: rateLimit(limiter, rateLimits.paymentRetry),
       schema: {
         tags: ['orders'],
         summary: 'Try paying again',

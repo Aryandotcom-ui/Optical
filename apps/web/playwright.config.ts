@@ -1,10 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * End-to-end tests against production builds of the web app and API with
- * the seeded demo data. Locally: `pnpm build`, then `pnpm test:e2e` (it
- * starts both apps, or reuses ones already running). CI starts the apps
- * itself and sets E2E_BASE_URL.
+ * End-to-end tests against production builds of the web app, API and
+ * worker with the seeded demo data, plus Mailpit for emails. Locally:
+ * `pnpm build`, then `pnpm test:e2e` (it starts the apps, or reuses ones
+ * already running). CI starts the apps itself and sets E2E_BASE_URL.
  */
 const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
 const executablePath = process.env.CHROMIUM_PATH ?? undefined;
@@ -47,6 +47,13 @@ export default defineConfig({
           command: 'pnpm --filter @optical/api start',
           url: 'http://localhost:4000/readyz',
           reuseExistingServer: true,
+          cwd: '../..',
+          timeout: 120_000,
+        },
+        {
+          // Delivers mock payment webhooks and sends emails; a running dev worker also works.
+          command: 'pnpm --filter @optical/api start:worker',
+          wait: { stdout: /Worker started/ },
           cwd: '../..',
           timeout: 120_000,
         },

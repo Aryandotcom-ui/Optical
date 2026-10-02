@@ -1,4 +1,4 @@
-import type { AddressConfig } from './commerce';
+import type { AddressConfig } from './address';
 
 /**
  * India: states and union territories, and which region a PIN code belongs

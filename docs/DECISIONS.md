@@ -227,7 +227,7 @@ search engines. The product page's canonical URL ignores these parameters.
 
 ## ADR-026: Features from later phases are not faked
 
-**Status:** accepted · Phase 2
+**Status:** accepted · Phase 2 · lens selection and checkout shipped in Phase 3 (ADR-029–036)
 Until lens selection and checkout exist (Phase 3), product pages show no "Add to cart" or "Choose
 lenses" button; a short note says ordering is on its way and the wishlist keeps the frame. Try-on
 and Frame Finder links appear only when those features ship (Phase 5). Help copy that mentions
@@ -240,3 +240,85 @@ Privacy, terms, returns and shipping pages are TypeScript content modules (`src/
 not message-catalogue strings: they are long-form documents, and every day, fee and threshold in
 them is read from `packages/config`, so a policy change in settings can't leave a stale number in
 a legal page. They are drafts for India and need legal review before launch (docs/LEGAL.md).
+
+## ADR-028: Guest sessions are an opaque cookie; CSRF is checked by Origin
+
+**Status:** accepted · Phase 3
+The bag belongs to a guest session: a random 256-bit token in an `httpOnly`, `SameSite=Lax`
+cookie (`Secure` in production), stored server-side only as its SHA-256. It is set lazily, on the
+first add to bag or upload. Cookie-carrying writes must come from an allowed `Origin`, the API
+accepts only JSON and multipart bodies (no `text/plain`, so an HTML form can't post), and
+webhooks are exempt because they carry no cookies and are signed instead.
+
+## ADR-029: Prices are snapshots, re-computed by the server and compared
+
+**Status:** accepted · Phase 3
+The configurator prices with the shared, Zod-free lens engine (`@optical/shared/lens/engine`) for
+instant feedback. Adding to the bag re-quotes on the server and stores the frame price and lens
+lines as an immutable snapshot; a different `expectedUnitPriceMinor` returns `PRICE_CHANGED` and
+adds nothing. Placing an order recomputes the whole order and compares `expectedTotalMinor` the
+same way, so the customer never pays a number they didn't see.
+
+## ADR-030: Orders are idempotent; stock is held by conditional updates
+
+**Status:** accepted · Phase 3
+`POST /v1/checkout/orders` requires an `Idempotency-Key`; the key and a hash of the request are
+stored on the order (unique index), so a retry returns the same order and a reused key with a
+different body is refused. The browser keeps the key per set of order details. Stock holds and
+coupon uses are conditional `UPDATE … WHERE available >= n` statements inside the order
+transaction, backed by a `reserved <= onHand` check constraint: two checkouts can never take the
+last frame. Holds last 15 minutes; the worker releases expired ones and cancels unpaid orders.
+
+## ADR-031: Payment outcomes arrive only by verified webhook (or reconciliation)
+
+**Status:** accepted · Phase 3
+The browser never tells the API a payment succeeded. Every provider implements one interface
+(`createIntent`, `verifyWebhook`, `fetchStatus`, `refund`); webhooks are verified against the raw
+body, events are recorded in `WebhookEvent` in the same transaction that applies them, and a
+duplicate is acknowledged without effect. A reconciliation job asks providers about payments
+still open after two minutes, in case a webhook was lost. The mock provider follows the same path:
+the simulator's choice becomes a signed webhook delivered by the worker.
+
+## ADR-032: Hosted payment pages for Razorpay and Stripe
+
+**Status:** accepted · Phase 3
+Razorpay uses Payment Links and Stripe uses Checkout Sessions: the customer pays on the provider's
+page and returns to the order page. No third-party script runs on our pages (simpler CSP, smaller
+PCI scope, no extra JavaScript), and both work with the same webhook flow. Providers register only
+when all their keys are set; a partly configured provider fails startup.
+
+## ADR-033: Order links are derived from the secret, not stored
+
+**Status:** accepted · Phase 3
+Order pages are reached with `?token=`, an HMAC of the order id under `APP_SECRET`. Nothing needs
+storing, links in old emails keep working, and rotating the secret revokes them all. Guest
+tracking by order number and email returns the same token and answers identically for a wrong
+number or a wrong email. Order pages are `noindex` and send no `Referer`.
+
+## ADR-034: Transactional outbox and a BullMQ worker
+
+**Status:** accepted · Phase 3
+Emails are written to `EmailOutbox` in the transaction that causes them and sent by the worker
+(claimed with `FOR UPDATE SKIP LOCKED`, exponential backoff, six attempts), so an order is never
+saved without its email or vice versa. The worker is a separate process (`src/worker.ts`; `pnpm
+dev` runs it beside the API) that also expires holds, reconciles payments and delivers mock
+webhooks. Templates are React Email components with a plain-text version.
+
+## ADR-035: Uploads are sniffed, stripped and kept private
+
+**Status:** accepted · Phase 3
+Prescription uploads are typed by magic bytes (JPEG, PNG, WebP, PDF), capped at 8 MB, stripped of
+EXIF/XMP/IPTC/comments by a strict parser that rejects malformed files, passed to a malware-scan
+hook, and stored outside any web root under random names with owner-only permissions. They are
+read back only through five-minute HMAC-signed links, and only the browser session that uploaded
+one can attach it to a bag or order. PDFs are stored unchanged (no camera or location metadata).
+The S3-compatible driver arrives with deployment readiness (Phase 8); `StorageProvider` is the seam.
+
+## ADR-036: Per-route client messages
+
+**Status:** accepted · Phase 3
+The configurator, bag, checkout and order pages need many strings. Rather than sending them to
+every page from the root layout, `WithMessages` adds namespaces for one subtree, merged on the
+client over the root ones. To stay within the 170 kB budget the product page loads the
+configurator, and even the add-to-bag request code, on first use; address data (states, PIN
+lookup) lives in `@optical/config/address`, away from the price formatting every page needs.

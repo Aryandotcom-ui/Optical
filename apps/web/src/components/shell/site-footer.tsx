@@ -23,6 +23,7 @@ export async function SiteFooter({ nav }: { nav: NavModel }) {
       title: t('help'),
       links: [
         { href: '/help', label: t('helpCentre') },
+        { href: '/track', label: t('trackOrder') },
         { href: '/help/size-guide', label: t('sizeGuide') },
         { href: '/help/prescription', label: t('readPrescription') },
         { href: '/help/returns', label: t('returnsWarranty') },

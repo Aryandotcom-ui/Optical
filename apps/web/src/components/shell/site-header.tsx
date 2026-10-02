@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Menu } from 'lucide-react';
+import { Heart, Menu, ShoppingBag } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -10,6 +10,7 @@ import { Wordmark } from '@/components/brand/wordmark';
 import { LazySheet } from '@/components/ui/lazy-sheet';
 import { cn } from '@/lib/cn';
 import type { NavModel } from '@/lib/nav';
+import { bagCount } from '@/stores/bag';
 import { useSavedLists, useSavedListsHydrated } from '@/stores/saved-lists';
 import { MegaMenu } from './mega-menu';
 import { SearchLauncher } from './search-launcher';
@@ -36,6 +37,29 @@ function WishlistLink() {
           className="tabular absolute top-1.5 right-1 min-w-4.5 animate-fade-in rounded-pill bg-accent-strong px-1 text-center text-[0.6875rem] leading-4.5 font-semibold text-on-accent"
         >
           {shown}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
+/** The bag, with the number of items kept in this browser (see stores/bag.ts). */
+function BagLink() {
+  const t = useTranslations('shell');
+  const count = bagCount.useValue();
+  return (
+    <Link
+      href="/cart"
+      aria-label={count ? t('bagWithCount', { count }) : t('bag')}
+      className="relative inline-flex size-11 items-center justify-center rounded-pill text-ink transition-colors hover:bg-ink/5"
+    >
+      <ShoppingBag aria-hidden="true" className="size-5" strokeWidth={1.5} />
+      {count ? (
+        <span
+          key={count}
+          className="tabular absolute top-1.5 right-1 min-w-4.5 animate-fade-in rounded-pill bg-accent-strong px-1 text-center text-[0.6875rem] leading-4.5 font-semibold text-on-accent"
+        >
+          {count}
         </span>
       ) : null}
     </Link>
@@ -166,6 +190,7 @@ export function SiteHeader({ nav }: { nav: NavModel }) {
         <div className="ml-auto flex items-center gap-1">
           <SearchLauncher />
           <WishlistLink />
+          <BagLink />
         </div>
       </div>
     </header>

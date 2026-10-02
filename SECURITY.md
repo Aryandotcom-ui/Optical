@@ -24,5 +24,15 @@ information.
   No images or face landmarks are transmitted or stored.
 - Dependencies are audited in CI and weekly, and Dependabot keeps them current.
 
-Authentication, upload hardening, rate limiting and the full CSP are introduced in their phases
-(see the roadmap in README.md) and documented here as they land.
+- Guest sessions are opaque 256-bit tokens in `httpOnly`, `SameSite=Lax` cookies (`Secure` in
+  production), stored only as hashes. Cookie-carrying writes must come from an allowed `Origin`,
+  and the API accepts only JSON and multipart bodies.
+- Prices are recomputed on the server for every bag change and order; payments are trusted only
+  from signed, replay-protected webhooks (or a status check with the provider), applied once.
+- Prescription uploads are typed by content, capped at 8 MB, stripped of EXIF/XMP, stored privately
+  under random names and read only through five-minute signed links.
+- Order links carry an HMAC token; tracking answers the same for a wrong number or email.
+- Coupon, upload, tracking and order endpoints are rate limited per IP (Redis, failing open).
+
+Authentication, admin access control and the full CSP are introduced in their phases (see the
+roadmap in README.md) and documented here as they land.

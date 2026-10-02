@@ -10,7 +10,6 @@ import type { Db } from '../../infra/prisma';
 import { queueEmail } from '../../infra/email/outbox';
 import type { JobQueue } from '../../infra/queue';
 import { AppError } from '../../lib/app-error';
-import { randomToken } from '../../lib/tokens';
 import { commitHolds, holdStock, transition, type OrderState, type Tx } from '../orders/lifecycle';
 import { orderAccessToken, verifyOrderAccess } from '../orders/order-access';
 import { orderEmailData, orderUrl } from '../orders/order-email';
@@ -21,7 +20,7 @@ import {
   toOrderView,
 } from '../orders/orders.mapper';
 import { orderInclude, type OrderRow } from '../orders/orders.repository';
-import { MockProvider } from './mock';
+import { simulateMockPayment } from './simulate';
 import type { PaymentEvent, PaymentProvider } from './provider';
 import type { PaymentRegistry } from './registry';
 
@@ -215,55 +214,20 @@ export class PaymentGateway {
     outcome: MockOutcome,
     token: string | undefined,
   ): Promise<OrderView> {
-    const payment = await this.db.payment.findUnique({
-      where: { id: paymentId },
-      include: { order: true },
-    });
-    const provider = this.registry.get('mock');
-    const authorised =
-      payment?.provider === 'MOCK' &&
-      payment.providerRef !== null &&
-      provider instanceof MockProvider &&
-      token !== undefined &&
-      verifyOrderAccess(this.options.secret, payment.orderId, token);
-    if (!authorised || !payment.providerRef)
-      throw AppError.notFound('We could not find that payment.');
-    if (payment.status === 'SUCCEEDED' || payment.status === 'FAILED')
-      throw new AppError('CONFLICT', 'This payment is already complete.');
-
-    const ref = payment.providerRef;
-    const settleMs = this.options.mockPendingSettleSeconds * 1000;
-    const failureReason =
-      outcome === 'failure' ? 'The bank declined the payment (simulated).' : null;
-    await provider.bank.set(ref, {
-      outcome: outcome === 'success' ? 'succeeded' : outcome === 'failure' ? 'failed' : 'pending',
-      failureReason,
-      settlesAt: outcome === 'pending' ? Date.now() + settleMs : null,
-    });
-    const event = (eventOutcome: PaymentEvent['outcome']) => ({
-      eventId: `evt_mock_${randomToken(12)}`,
-      paymentRef: ref,
-      outcome: eventOutcome,
-      ...(failureReason ? { failureReason } : {}),
-    });
-    try {
-      if (outcome === 'pending') {
-        await this.jobs.deliverMockWebhook(event('pending'), 300);
-        await this.jobs.deliverMockWebhook(event('succeeded'), settleMs);
-      } else {
-        await this.jobs.deliverMockWebhook(
-          event(outcome === 'success' ? 'succeeded' : 'failed'),
-          600,
-        );
-      }
-    } catch (error) {
-      this.log.error({ err: error }, 'Could not queue the mock payment webhook');
-      throw new AppError(
-        'SERVICE_UNAVAILABLE',
-        'Payments are unavailable right now. Try again in a moment.',
-      );
-    }
-    const order = await this.loadOrder({ id: payment.orderId });
+    const orderId = await simulateMockPayment(
+      {
+        db: this.db,
+        provider: this.registry.get('mock'),
+        jobs: this.jobs,
+        secret: this.options.secret,
+        settleSeconds: this.options.mockPendingSettleSeconds,
+        log: this.log,
+      },
+      paymentId,
+      outcome,
+      token,
+    );
+    const order = await this.loadOrder({ id: orderId });
     if (!order) throw AppError.notFound();
     return toOrderView(order);
   }

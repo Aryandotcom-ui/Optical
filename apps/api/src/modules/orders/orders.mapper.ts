@@ -59,7 +59,9 @@ export function toOrderView(order: OrderRow): OrderView {
     placedAt: order.placedAt.toISOString(),
     email: order.email,
     paymentProvider: providerCode(order.paymentProvider),
-    payment: payment ? { status: payment.status, failureReason: payment.failureReason } : null,
+    payment: payment
+      ? { id: payment.id, status: payment.status, failureReason: payment.failureReason }
+      : null,
     canRetryPayment: canRetryPayment(order),
     reservedUntil: holds.length ? new Date(Math.min(...holds)).toISOString() : null,
     items: order.items.map((item) => {
@@ -78,6 +80,7 @@ export function toOrderView(order: OrderRow): OrderView {
           ? {
               mode: source.mode,
               provided: source.mode === 'manual' || item.prescriptionId !== null,
+              requiresAdd: config?.purpose === 'progressive',
             }
           : null,
       };

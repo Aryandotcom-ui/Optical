@@ -8,6 +8,7 @@
     ".": "./src/index.ts",
     "./brand": "./src/brand.ts",
     "./commerce": "./src/commerce.ts",
+    "./address": "./src/address.ts",
     "./flags": "./src/flags.ts",
     "./env": "./src/env.ts",
     "./tokens": "./src/tokens.ts",

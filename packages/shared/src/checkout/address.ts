@@ -1,9 +1,5 @@
-import {
-  commerce,
-  isValidPostalCode,
-  normalisePhone,
-  type CommerceConfig,
-} from '@optical/config/commerce';
+import { addressConfigFor, normalisePhone } from '@optical/config/address';
+import { commerce, isValidPostalCode, type CommerceConfig } from '@optical/config/commerce';
 import { z } from 'zod';
 
 const text = (min: number, max: number, label: string) =>
@@ -29,7 +25,7 @@ export function phoneSchema(market: CommerceConfig = commerce) {
     if (!phone) {
       ctx.addIssue({
         code: 'custom',
-        message: `Enter a 10-digit mobile number, like ${market.address.phone.example}.`,
+        message: `Enter a 10-digit mobile number, like ${addressConfigFor(market).phone.example}.`,
       });
       return z.NEVER;
     }
@@ -50,6 +46,7 @@ export const emailSchema = z
  * snapshot, for the courier.
  */
 export function shippingAddressSchema(market: CommerceConfig = commerce) {
+  const address = addressConfigFor(market);
   return z
     .object({
       fullName: text(2, 80, 'Full name'),
@@ -60,8 +57,8 @@ export function shippingAddressSchema(market: CommerceConfig = commerce) {
       region: z
         .string()
         .trim()
-        .refine((value) => market.address.regions.includes(value), {
-          message: `Choose your ${market.address.regionLabel.toLowerCase()}.`,
+        .refine((value) => address.regions.includes(value), {
+          message: `Choose your ${address.regionLabel.toLowerCase()}.`,
         }),
       postalCode: z
         .string()
