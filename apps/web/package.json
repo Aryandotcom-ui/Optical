@@ -7,13 +7,14 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start --port 3000",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "lint": "next typegen && eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "budget:js": "node scripts/check-js-budget.mjs",
     "lhci": "lhci autorun --config=lighthouserc.cjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typegen": "next typegen"
   },
   "dependencies": {
     "@optical/config": "workspace:*",
