@@ -38,11 +38,12 @@ model User {
   deletedAt        DateTime?
 
   refreshTokens RefreshToken[]
+  resetTokens   PasswordResetToken[]
   addresses     Address[]
   carts         Cart[]
   wishlist      Wishlist?
-  prescriptions Prescription[]     @relation("PrescriptionOwner")
-  verified      Prescription[]     @relation("PrescriptionVerifier")
+  prescriptions Prescription[]       @relation("PrescriptionOwner")
+  verified      Prescription[]       @relation("PrescriptionVerifier")
   orders        Order[]
   reviews       Review[]
   redemptions   CouponRedemption[]
@@ -68,6 +69,20 @@ model RefreshToken {
 
   @@index([userId])
   @@index([familyId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @db.Uuid
+  /// SHA-256 of the token in the emailed link; the token itself is never stored.
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Address {
@@ -486,6 +501,8 @@ model Prescription {
   verifiedById   String?            @db.Uuid
   verifiedAt     DateTime?
   reviewNote     String?
+  /// When the "expires soon" reminder email was sent.
+  reminderSentAt DateTime?
   createdAt      DateTime           @default(now())
   deletedAt      DateTime?
 

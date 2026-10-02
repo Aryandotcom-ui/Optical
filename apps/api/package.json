@@ -41,7 +41,9 @@
     "fastify-plugin": "^5.1.0",
     "fastify-type-provider-zod": "^7.0.0",
     "ioredis": "^6.0.0",
+    "jose": "^6.2.12",
     "nodemailer": "^10.0.13",
+    "pdfkit": "^0.20.2",
     "pino": "^10.3.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -50,6 +52,7 @@
   "devDependencies": {
     "@types/node": "^22.20.4",
     "@types/nodemailer": "^8.0.2",
+    "@types/pdfkit": "^0.17.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^5.0.3",
