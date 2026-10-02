@@ -11,7 +11,7 @@ import { RatingStars } from '@/components/ui/rating';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/format';
 import { DeliveryEstimate } from './delivery-estimate';
-import { useProductView } from './product-view-context';
+import { useColourSelection, useProductView } from './product-view-context';
 
 function StockLine() {
   const t = useTranslations('pdp.stock');
@@ -32,11 +32,61 @@ function StockLine() {
   return <p className="text-ink-secondary">{othersInStock ? t('outOtherColours') : t('out')}</p>;
 }
 
+/** The colour choice. It reads only the selection, so a click repaints just the swatches. */
+function ColourSwatches() {
+  const t = useTranslations('pdp');
+  const { product } = useProductView();
+  const { selectedId, selectVariant } = useColourSelection();
+  const selected = product.variants.find((option) => option.id === selectedId);
+  return (
+    <fieldset>
+      <legend className="font-medium">
+        {t('colour')} <span className="font-normal text-ink-secondary">{selected?.colourName}</span>
+      </legend>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {product.variants.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            aria-pressed={option.id === selectedId}
+            aria-label={
+              option.stockState === 'out-of-stock'
+                ? t('colourOut', { colour: option.colourName })
+                : option.colourName
+            }
+            title={option.colourName}
+            onClick={() => {
+              selectVariant(option.id);
+            }}
+            className={cn(
+              'duration-micro relative flex size-11 items-center justify-center rounded-pill transition-shadow ease-standard ring-inset',
+              option.id === selectedId
+                ? 'ring-2 ring-ink'
+                : 'ring-1 ring-hairline hover:ring-ink-secondary',
+            )}
+          >
+            <span
+              className="size-7 rounded-pill ring-1 ring-black/10"
+              style={{ backgroundColor: option.swatchHex }}
+            />
+            {option.stockState === 'out-of-stock' ? (
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-1.5 top-1/2 h-px -rotate-45 bg-ink-secondary"
+              />
+            ) : null}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 /** Name, price, colour choice, stock, saving and delivery: the right-hand column. */
 export function ProductPurchase({ categoryName }: { categoryName: string }) {
   const t = useTranslations('pdp');
   const tFits = useTranslations('product.fits');
-  const { product, variant, selectVariant } = useProductView();
+  const { product, variant } = useProductView();
   const frame = product.frame;
 
   return (
@@ -78,46 +128,7 @@ export function ProductPurchase({ categoryName }: { categoryName: string }) {
         </p>
       </div>
 
-      <fieldset>
-        <legend className="font-medium">
-          {t('colour')} <span className="font-normal text-ink-secondary">{variant.colourName}</span>
-        </legend>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {product.variants.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              aria-pressed={option.id === variant.id}
-              aria-label={
-                option.stockState === 'out-of-stock'
-                  ? t('colourOut', { colour: option.colourName })
-                  : option.colourName
-              }
-              title={option.colourName}
-              onClick={() => {
-                selectVariant(option.id);
-              }}
-              className={cn(
-                'duration-micro relative flex size-11 items-center justify-center rounded-pill transition-shadow ease-standard ring-inset',
-                option.id === variant.id
-                  ? 'ring-2 ring-ink'
-                  : 'ring-1 ring-hairline hover:ring-ink-secondary',
-              )}
-            >
-              <span
-                className="size-7 rounded-pill ring-1 ring-black/10"
-                style={{ backgroundColor: option.swatchHex }}
-              />
-              {option.stockState === 'out-of-stock' ? (
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-x-1.5 top-1/2 h-px -rotate-45 bg-ink-secondary"
-                />
-              ) : null}
-            </button>
-          ))}
-        </div>
-      </fieldset>
+      <ColourSwatches />
 
       <div className="space-y-1 text-caption">
         <StockLine />

@@ -28,9 +28,17 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop',
+      testIgnore: /responsiveness/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'mobile', testIgnore: /responsiveness/, use: { ...devices['Pixel 7'] } },
+    // Timing runs last and alone, so other test browsers don't compete for the CPU.
+    {
+      name: 'responsiveness',
+      testMatch: /responsiveness/,
+      dependencies: ['desktop', 'mobile'],
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined

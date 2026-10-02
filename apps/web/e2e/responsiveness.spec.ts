@@ -38,11 +38,7 @@ async function worstInteraction(page: Page): Promise<number> {
   );
 }
 
-test('filtering, choosing a colour and saving respond within budget', async ({
-  page,
-}, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'one profile is enough for timing');
-
+test('filtering, choosing a colour and saving respond within budget', async ({ page }) => {
   await page.goto('/shop');
   await page.waitForLoadState('networkidle');
   await slowDown(page);
@@ -51,6 +47,9 @@ test('filtering, choosing a colour and saving respond within budget', async ({
     .locator('aside')
     .getByRole('button', { name: /^Round, \d+ frames$/ })
     .click();
+  // Like a person, act on the result once it has appeared.
+  await expect(page).toHaveURL(/shape=round/);
+  await page.waitForLoadState('networkidle');
   await page
     .locator('article')
     .first()
@@ -69,6 +68,7 @@ test('filtering, choosing a colour and saving respond within budget', async ({
     .getByRole('button')
     .nth(2)
     .click();
+  await expect(page).toHaveURL(/colour=/);
   await page.getByRole('button', { name: 'Compare', exact: true }).click();
   expect(await worstInteraction(page), 'slowest product-page interaction (ms)').toBeLessThan(
     INP_BUDGET_MS,

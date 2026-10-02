@@ -4,7 +4,7 @@ import { commerce, isValidPostalCode, shippingZoneFor } from '@optical/config/co
 import { estimateDelivery } from '@optical/shared/pricing/delivery';
 import { Truck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useState, type SyntheticEvent } from 'react';
+import { useId, useMemo, useState, type SyntheticEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { formatPrice, formatShortDate } from '@/lib/format';
 import { createLocalValue } from '@/lib/local-value';
@@ -43,24 +43,18 @@ export function DeliveryEstimate() {
     setDraft(null);
   };
 
-  const now = new Date();
-  const frameOnly = checked
-    ? estimateDelivery({
-        orderedAt: now,
-        speed: 'standard',
-        postalCode: checked,
-        needsLensProduction: false,
-      })
-    : null;
-  const withLenses = checked
-    ? estimateDelivery({
-        orderedAt: now,
-        speed: 'standard',
-        postalCode: checked,
-        needsLensProduction: true,
-      })
-    : null;
-  const zone = checked ? shippingZoneFor(checked) : null;
+  // Worked out once per PIN, not on every render of the purchase panel.
+  const { frameOnly, withLenses, zone } = useMemo(() => {
+    if (!checked) return { frameOnly: null, withLenses: null, zone: null };
+    const orderedAt = new Date();
+    const estimate = (needsLensProduction: boolean) =>
+      estimateDelivery({ orderedAt, speed: 'standard', postalCode: checked, needsLensProduction });
+    return {
+      frameOnly: estimate(false),
+      withLenses: estimate(true),
+      zone: shippingZoneFor(checked),
+    };
+  }, [checked]);
 
   return (
     <section aria-labelledby={`${id}-heading`} className="rounded-card bg-surface-muted p-5">
@@ -99,7 +93,7 @@ export function DeliveryEstimate() {
             {t('invalid', { label: commerce.postalCode.label })}
           </p>
         ) : null}
-        {frameOnly && withLenses && zone ? (
+        {frameOnly ? (
           <dl className="space-y-1.5">
             <div className="flex justify-between gap-4">
               <dt className="text-ink-secondary">{t('frameOnly')}</dt>

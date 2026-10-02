@@ -14,15 +14,23 @@ export interface DeliveryEstimate {
 /** Extra business days between the earliest and latest estimate. */
 const ESTIMATE_WINDOW_DAYS = 2;
 
+/** Intl formatters are costly to create, so one is kept per time zone. */
+const isoDateFormatters = new Map<string, Intl.DateTimeFormat>();
+
 /** The calendar date (YYYY-MM-DD) of an instant in a time zone. */
 export function localIsoDate(instant: Date, timeZone: string): string {
-  // en-CA formats dates as YYYY-MM-DD.
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(instant);
+  let formatter = isoDateFormatters.get(timeZone);
+  if (!formatter) {
+    // en-CA formats dates as YYYY-MM-DD.
+    formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    isoDateFormatters.set(timeZone, formatter);
+  }
+  return formatter.format(instant);
 }
 
 /** Adds business days to a calendar date, skipping the market's non-working weekdays. */
