@@ -11,11 +11,13 @@
     "./catalog": "./src/catalog/index.ts",
     "./catalog/lite": "./src/catalog/lite.ts",
     "./rx": "./src/rx/index.ts",
+    "./lens/engine": "./src/lens/engine.ts",
     "./lens": "./src/lens/index.ts",
     "./pricing": "./src/pricing/index.ts",
     "./pricing/delivery": "./src/pricing/delivery.ts",
     "./frame-geometry": "./src/frame-geometry/index.ts",
-    "./orders": "./src/orders/index.ts"
+    "./orders": "./src/orders/index.ts",
+    "./checkout": "./src/checkout/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

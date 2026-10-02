@@ -4,7 +4,9 @@ import { buildApp } from './app';
 import { loadApiEnv, loadDotEnvFile } from './config/env';
 import { createDatabaseProbe } from './infra/database';
 import { createPrismaClient } from './infra/prisma';
+import { BullJobQueue, createQueueConnection } from './infra/queue';
 import { createRedisProbe } from './infra/redis';
+import { RedisMockBank } from './modules/payments/mock';
 
 function loadEnvOrExit() {
   loadDotEnvFile();
@@ -27,6 +29,8 @@ const app = await buildApp(env, {
   cacheClient: redis.client,
   database: createDatabaseProbe(db),
   redis,
+  jobs: new BullJobQueue(createQueueConnection(env.REDIS_URL)),
+  mockBank: new RedisMockBank(redis.client),
 });
 
 // Connect Redis now rather than on first use, so caching works from the first

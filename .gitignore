@@ -42,3 +42,6 @@ Thumbs.db
 
 # Generated Prisma client (rebuilt by `prisma generate` on install)
 apps/api/src/generated/
+
+# Local uploads and other runtime data (never commit customer files)
+.data/

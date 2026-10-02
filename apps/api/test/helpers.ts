@@ -2,6 +2,9 @@ import { buildApp } from '../src/app';
 import { loadApiEnv, type ApiEnv } from '../src/config/env';
 import { createPrismaClient, type Db } from '../src/infra/prisma';
 import type { DependencyProbe } from '../src/infra/probes';
+import { RecordingJobQueue } from '../src/infra/queue';
+import type { RateLimiter } from '../src/lib/rate-limit';
+import { MemoryMockBank } from '../src/modules/payments/mock';
 
 export const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL ?? 'postgresql://optical:optical@localhost:5432/optical_test';
@@ -13,6 +16,8 @@ export const baseTestEnv = {
   REDIS_URL: TEST_REDIS_URL,
   LOG_LEVEL: 'silent',
   CORS_ALLOWED_ORIGINS: 'http://localhost:3000',
+  APP_SECRET: 'test-secret-that-is-at-least-32-characters-long',
+  UPLOAD_DIR: '.data/test-uploads',
 };
 
 export function testEnv(overrides: Record<string, string> = {}): ApiEnv {
@@ -56,7 +61,13 @@ export async function buildTestApp(
 ) {
   const database = fakeProbe('database', options.database);
   const redis = fakeProbe('redis', options.redis);
-  const app = await buildApp(testEnv(options.env), { db: unusedDb, database, redis });
+  const app = await buildApp(testEnv(options.env), {
+    db: unusedDb,
+    database,
+    redis,
+    jobs: new RecordingJobQueue(),
+    mockBank: new MemoryMockBank(),
+  });
   return { app, database, redis };
 }
 
@@ -64,15 +75,26 @@ export async function buildTestApp(
  * App backed by the seeded test database (see test/global-setup.ts).
  * Caching is off so each test sees the database directly.
  */
-export async function buildDbTestApp() {
+/** Never limits; rate limiting has its own tests. */
+export const unlimited: RateLimiter = { hit: () => Promise.resolve(0) };
+
+export async function buildDbTestApp(
+  options: { env?: Record<string, string>; now?: () => Date; rateLimiter?: RateLimiter } = {},
+) {
   const db = createPrismaClient(TEST_DATABASE_URL, { maxConnections: 4 });
-  const app = await buildApp(testEnv(), {
+  const jobs = new RecordingJobQueue();
+  const mockBank = new MemoryMockBank();
+  const app = await buildApp(testEnv(options.env), {
     db,
     database: fakeProbe('database'),
     redis: fakeProbe('redis'),
+    jobs,
+    mockBank,
+    rateLimiter: options.rateLimiter ?? unlimited,
+    ...(options.now ? { now: options.now } : {}),
   });
   app.addHook('onClose', async () => {
     await db.$disconnect();
   });
-  return { app, db };
+  return { app, db, jobs, mockBank };
 }

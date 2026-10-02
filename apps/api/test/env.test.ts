@@ -15,6 +15,7 @@ describe('loadApiEnv', () => {
     const env = loadApiEnv({
       DATABASE_URL: baseTestEnv.DATABASE_URL,
       REDIS_URL: baseTestEnv.REDIS_URL,
+      APP_SECRET: baseTestEnv.APP_SECRET,
     });
     expect(env).toMatchObject({
       NODE_ENV: 'development',
@@ -23,6 +24,10 @@ describe('loadApiEnv', () => {
       CORS_ALLOWED_ORIGINS: ['http://localhost:3000'],
       LOG_PRETTY: true,
       API_DOCS_ENABLED: true,
+      COOKIE_SECURE: false,
+      MOCK_PAYMENTS_ENABLED: true,
+      SMTP_URL: 'smtp://localhost:1025',
+      EMAIL_FROM: 'Lumen Optics <orders@localhost>',
     });
     expect(env.featureFlags.googleOAuth).toBe(false);
   });
@@ -43,6 +48,34 @@ describe('loadApiEnv', () => {
       expect(message).toContain('DATABASE_URL: is required but not set.');
       expect(message).toContain('REDIS_URL: must be a redis:// or rediss:// URL');
     }
+  });
+
+  it('secures cookies and disables mock payments in production', () => {
+    const env = loadApiEnv({ ...baseTestEnv, NODE_ENV: 'production' });
+    expect(env.COOKIE_SECURE).toBe(true);
+    expect(env.MOCK_PAYMENTS_ENABLED).toBe(false);
+    expect(() =>
+      loadApiEnv({ ...baseTestEnv, NODE_ENV: 'production', MOCK_PAYMENTS_ENABLED: 'on' }),
+    ).toThrow(/MOCK_PAYMENTS_ENABLED: The mock payment provider cannot be enabled in production/);
+  });
+
+  it('requires a long enough secret', () => {
+    expect(() => loadApiEnv({ ...baseTestEnv, APP_SECRET: 'short' })).toThrow(
+      /APP_SECRET: must be at least 32 characters/,
+    );
+  });
+
+  it('rejects a partly configured payment provider', () => {
+    expect(() => loadApiEnv({ ...baseTestEnv, STRIPE_SECRET_KEY: 'sk_test_x' })).toThrow(
+      /STRIPE_WEBHOOK_SECRET: Stripe is partly configured/,
+    );
+    const env = loadApiEnv({
+      ...baseTestEnv,
+      RAZORPAY_KEY_ID: 'rzp_test_x',
+      RAZORPAY_KEY_SECRET: 'secret',
+      RAZORPAY_WEBHOOK_SECRET: 'whsec',
+    });
+    expect(env.RAZORPAY_KEY_ID).toBe('rzp_test_x');
   });
 
   it('reports a bad FEATURE_FLAGS value as an env problem', () => {

@@ -20,7 +20,7 @@ const availabilityMapSchema = z.object({
   tints: z.record(z.string(), availabilitySchema),
 });
 
-const lineSchema = z.object({
+export const lensQuoteLineSchema = z.object({
   kind: z.enum(['base', 'index', 'package', 'coating', 'tint']),
   code: z.string(),
   label: z.string(),
@@ -43,7 +43,7 @@ export const lensQuoteResponseSchema = z
     z.object({
       valid: z.literal(true),
       config: lensConfigSchema,
-      lines: z.array(lineSchema),
+      lines: z.array(lensQuoteLineSchema),
       totalMinor: z.number().int().nonnegative(),
       warnings: z.array(rxIssueSchema),
       recommendation: z.object({ indexCode: z.string(), reason: z.string() }).nullable(),

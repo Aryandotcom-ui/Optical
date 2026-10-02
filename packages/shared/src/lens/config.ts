@@ -12,7 +12,7 @@ export const prescriptionSourceSchema = z.discriminatedUnion('mode', [
 ]);
 export type PrescriptionSource = z.infer<typeof prescriptionSourceSchema>;
 
-export const TINT_INTENSITY = { min: 10, max: 90, default: 60 } as const;
+export { TINT_INTENSITY } from './constants';
 
 /** A customer's lens choices. Stored as an immutable snapshot on cart and order items. */
 export const lensConfigSchema = z

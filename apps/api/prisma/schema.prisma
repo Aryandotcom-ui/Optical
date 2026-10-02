@@ -286,13 +286,16 @@ model StockItem {
 }
 
 model StockReservation {
-  id         String    @id @default(uuid(7)) @db.Uuid
-  variantId  String    @db.Uuid
-  orderId    String?   @db.Uuid
-  quantity   Int
-  expiresAt  DateTime
-  releasedAt DateTime?
-  createdAt  DateTime  @default(now())
+  id          String    @id @default(uuid(7)) @db.Uuid
+  variantId   String    @db.Uuid
+  orderId     String?   @db.Uuid
+  quantity    Int
+  expiresAt   DateTime
+  /// Set when the hold ends without a sale (expired or cancelled).
+  releasedAt  DateTime?
+  /// Set when the hold turns into a sale and the units leave stock.
+  committedAt DateTime?
+  createdAt   DateTime  @default(now())
 
   variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
   order   Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
@@ -464,25 +467,27 @@ enum PrescriptionStatus {
 }
 
 model Prescription {
-  id           String             @id @default(uuid(7)) @db.Uuid
-  userId       String?            @db.Uuid
-  label        String
+  id             String             @id @default(uuid(7)) @db.Uuid
+  userId         String?            @db.Uuid
+  label          String
   /// Versions form a chain: each edit creates a new row pointing at its predecessor.
-  version      Int                @default(1)
-  previousId   String?            @unique @db.Uuid
+  version        Int                @default(1)
+  previousId     String?            @unique @db.Uuid
+  /// SHA-256 of the guest session that uploaded it; only that session may attach it to a cart or order.
+  ownerTokenHash String?
   /// Validated Prescription values, or null when only a file was uploaded.
-  values       Json?
+  values         Json?
   /// Private storage key of the uploaded photo or PDF.
-  fileKey      String?
-  fileMime     String?
-  prescribedAt DateTime?
-  expiresAt    DateTime?
-  status       PrescriptionStatus @default(PENDING_REVIEW)
-  verifiedById String?            @db.Uuid
-  verifiedAt   DateTime?
-  reviewNote   String?
-  createdAt    DateTime           @default(now())
-  deletedAt    DateTime?
+  fileKey        String?
+  fileMime       String?
+  prescribedAt   DateTime?
+  expiresAt      DateTime?
+  status         PrescriptionStatus @default(PENDING_REVIEW)
+  verifiedById   String?            @db.Uuid
+  verifiedAt     DateTime?
+  reviewNote     String?
+  createdAt      DateTime           @default(now())
+  deletedAt      DateTime?
 
   user       User?         @relation("PrescriptionOwner", fields: [userId], references: [id], onDelete: Cascade)
   verifiedBy User?         @relation("PrescriptionVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
@@ -492,6 +497,7 @@ model Prescription {
 
   @@index([userId])
   @@index([status])
+  @@index([ownerTokenHash])
 }
 
 // ─── Orders and payments ─────────────────────────────────────────────────────
@@ -560,6 +566,10 @@ model Order {
   customerNote          String?
   internalNote          String?
   idempotencyKey        String?         @unique
+  /// SHA-256 of the request body that used the idempotency key, to reject a reused key.
+  idempotencyHash       String?
+  /// The cart the order came from; emptied once the order is paid or confirmed.
+  cartId                String?         @db.Uuid
   /// SHA-256 of the token in the guest tracking link.
   trackingTokenHash     String?
   trackingNumber        String?
@@ -636,6 +646,8 @@ model Payment {
   amountMinor   Int
   currency      String
   method        String?
+  /// Hosted payment page for this attempt, so a retried request can return it again.
+  actionUrl     String?
   failureReason String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt

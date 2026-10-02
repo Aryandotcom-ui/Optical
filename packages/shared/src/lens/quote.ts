@@ -4,10 +4,11 @@ import {
   strongestSignedPower,
   validatePrescription,
   type RxIssue,
-} from '../rx/prescription';
+} from '../rx/validate';
 import { availabilityOf, type LensSelectionContext } from './availability';
 import type { LensCatalog, OptionRef } from './catalog';
-import { TINT_INTENSITY, type LensConfig, type LensFrameContext } from './config';
+import type { LensConfig, LensFrameContext } from './config';
+import { TINT_INTENSITY } from './constants';
 import { recommendIndex, type IndexRecommendation } from './recommend';
 import { estimateLensThickness, type ThicknessEstimate } from './thickness';
 

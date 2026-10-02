@@ -5,3 +5,4 @@ export * from './rx';
 export * from './lens';
 export * from './pricing';
 export * from './orders';
+export * from './checkout';

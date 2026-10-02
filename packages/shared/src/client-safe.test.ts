@@ -23,14 +23,17 @@ function runtimeImportGraph(entry: string, seen = new Set<string>()): Set<string
  * Entry points the storefront imports from browser code. Zod is about
  * 90 kB gzipped, so it must stay out of them; schemas belong on the server.
  */
-describe.each(['catalog/lite.ts', 'pricing/delivery.ts', 'frame-geometry/index.ts'])(
-  '%s',
-  (entry) => {
-    it('does not pull Zod into client bundles', () => {
-      const graph = runtimeImportGraph(resolve(root, entry));
-      expect([...graph].filter((module) => module === 'zod' || module.startsWith('zod/'))).toEqual(
-        [],
-      );
-    });
-  },
-);
+describe.each([
+  'catalog/lite.ts',
+  'pricing/delivery.ts',
+  'frame-geometry/index.ts',
+  'lens/engine.ts',
+  'money/index.ts',
+])('%s', (entry) => {
+  it('does not pull Zod into client bundles', () => {
+    const graph = runtimeImportGraph(resolve(root, entry));
+    expect([...graph].filter((module) => module === 'zod' || module.startsWith('zod/'))).toEqual(
+      [],
+    );
+  });
+});

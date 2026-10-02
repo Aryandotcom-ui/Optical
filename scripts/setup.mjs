@@ -17,7 +17,8 @@
  * Uses only Node built-ins so it can run before dependencies are installed.
  */
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
+import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -69,6 +70,16 @@ if (existsSync(envPath)) {
 } else {
   copyFileSync(join(root, '.env.example'), envPath);
   ok('Created .env from .env.example');
+}
+// Every install gets its own signing secret; an existing one is never replaced.
+const envText = readFileSync(envPath, 'utf8');
+if (!/^APP_SECRET=.{32,}$/m.test(envText)) {
+  const secret = randomBytes(32).toString('hex');
+  const updated = /^APP_SECRET=.*$/m.test(envText)
+    ? envText.replace(/^APP_SECRET=.*$/m, `APP_SECRET=${secret}`)
+    : `${envText.trimEnd()}\nAPP_SECRET=${secret}\n`;
+  writeFileSync(envPath, updated);
+  ok('Generated APP_SECRET in .env');
 }
 
 if (args.has('--skip-docker')) {
