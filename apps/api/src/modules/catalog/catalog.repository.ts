@@ -90,7 +90,10 @@ export class CatalogRepository {
              OR p."searchVector" @@ q.pre
              OR p.name % ${query}
              OR word_similarity(${query}, p."searchText") > 0.45)
-      ORDER BY rank DESC
+      -- Equal ranks are common (a typo matches a whole family of names), so
+      -- ties fall back to popularity and then name: the same query always
+      -- returns the same results, whatever the physical row order.
+      ORDER BY rank DESC, p.popularity DESC, p.name ASC
       LIMIT ${limit}`;
     return new Map(rows.map((row) => [row.id, row.rank]));
   }

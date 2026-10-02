@@ -324,6 +324,21 @@ describe('categories and collections', () => {
 });
 
 describe('GET /v1/search/suggest', () => {
+  it('breaks ties in relevance by popularity, then name, so results are stable', async () => {
+    // Seven titanium frames match "titanum" equally well; only six fit.
+    const suggestions = searchSuggestionSchema.parse(
+      (await app.inject({ method: 'GET', url: '/v1/search/suggest?q=titanum' })).json(),
+    );
+    expect(suggestions.products.map((product) => product.name)).toEqual([
+      'Soren',
+      'Zephyr',
+      'Pascal',
+      'Vale',
+      'Mira',
+      'Ulla',
+    ]);
+  });
+
   it('suggests products, categories, collections and help articles', async () => {
     const response = await app.inject({ method: 'GET', url: '/v1/search/suggest?q=sun' });
     const suggestions = searchSuggestionSchema.parse(response.json());

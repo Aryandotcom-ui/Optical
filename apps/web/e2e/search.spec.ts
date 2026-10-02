@@ -15,7 +15,9 @@ test('search tolerates typos and leads to results', async ({ page }, testInfo) =
   const dialog = page.getByRole('dialog', { name: 'Search the store' });
   await expect(dialog).toBeVisible();
   await dialog.getByRole('combobox').fill('titanum');
-  await expect(dialog.getByRole('option', { name: /Zephyr/ })).toBeVisible();
+  // "titanum" is a typo for titanium: titanium frames and the Titanium collection come up.
+  await expect(dialog.getByRole('option', { name: /^Soren/ })).toBeVisible();
+  await expect(dialog.getByRole('option', { name: 'Titanium' })).toBeVisible();
   await expect(dialog.getByText(/\d+ frames? found/)).toBeAttached();
 
   await dialog.getByRole('option', { name: 'Search for “titanum”' }).click();
