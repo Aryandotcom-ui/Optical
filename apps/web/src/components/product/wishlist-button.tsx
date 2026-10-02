@@ -37,6 +37,14 @@ export function WishlistButton({
         event.stopPropagation();
         const added = toggle({ id, slug });
         void notify(added ? t('added', { name }) : t('removed', { name }));
+        // Signed in: save the change to the account too (loaded only when needed).
+        if (document.cookie.includes('lo_auth=1'))
+          void import('@/lib/wishlist-sync')
+            .then((module) => module.syncWishlistChange(id, added))
+            .catch(() => {
+              toggle({ id, slug });
+              void notify(t('syncFailed'));
+            });
       }}
       className={cn(
         'duration-micro inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-pill transition-colors ease-standard',

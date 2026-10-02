@@ -322,3 +322,81 @@ every page from the root layout, `WithMessages` adds namespaces for one subtree,
 client over the root ones. To stay within the 170 kB budget the product page loads the
 configurator, and even the add-to-bag request code, on first use; address data (states, PIN
 lookup) lives in `@optical/config/address`, away from the price formatting every page needs.
+
+## ADR-037: Short JWT access tokens, rotating opaque refresh tokens, cookies only
+
+**Status:** accepted · Phase 4
+Signing in sets three cookies. `lo_access` holds a 15-minute HS256 JWT (`jose`; the key is derived
+from `APP_SECRET` with HKDF so it never equals the bytes used for order links or file signatures).
+`lo_refresh` holds an opaque 256-bit token, stored only as its SHA-256, valid 30 days from the last
+use and sent only to `/v1/auth`. Both are httpOnly and SameSite=Strict. `lo_auth=1` is readable by
+scripts and carries no secret; it only lets the shop say "signed in" without a request.
+
+The access cookie outlives the token inside it on purpose: an expired token is reported as `401
+UNAUTHENTICATED`, and the shop refreshes once and retries (one shared refresh per tab), instead of
+the browser silently dropping the cookie and the bag turning into a guest bag.
+
+Every access token names its refresh-token _family_ (one per sign-in), and every request that
+acts for a customer checks the family is still live (one indexed query). Signing out, a password
+change or reset, account deletion and refresh-token reuse therefore end a session at once, not
+15 minutes later. Catalogue requests skip the check.
+
+Alternatives rejected: tokens in `localStorage` (readable by any injected script); long-lived
+sessions without rotation (a stolen cookie lasts for weeks); server sessions in Redis (needs Redis
+for every request, and the API is meant to fail open on Redis).
+
+## ADR-038: Refresh rotation with reuse detection and a 30-second grace
+
+**Status:** accepted · Phase 4
+Each refresh replaces the token with a new one in the same family and records `replacedById`.
+Presenting a replaced token again means it was copied: the whole family is revoked (that sign-in
+ends on every device holding it) and an audit entry is written. Two tabs refreshing at the same
+moment would trip this, so a token replaced within the last 30 seconds is answered with a new
+access token but no new refresh token; the browser keeps the newer refresh cookie the first
+response set. A thief replaying inside that window gets at most one 15-minute access token and
+cannot continue the session. The row is locked (`FOR UPDATE`) so one token can never be rotated
+twice.
+
+## ADR-039: Lockout with exponential backoff, on top of rate limits
+
+**Status:** accepted · Phase 4
+After five consecutive wrong passwords an account's sign-in pauses for 1 minute, then 2, 4 … up
+to 60 minutes per further failure; during a pause even the right password is refused. A
+successful sign-in or a password reset clears it. Per-address limits (sign-in 10 per 5 minutes,
+registration 5 per hour, resets 5 per 15 minutes, refresh 30 per minute, password checks 5 per 15
+minutes) slow spraying across accounts. Lockout lets someone pause another person's sign-in, so
+the pause is short and capped, and the reset link always works.
+
+## ADR-040: The guest bag and uploads follow the customer into the account
+
+**Status:** accepted · Phase 4
+A signed-in customer has exactly one bag (`Cart.userId` is unique). On sign-in or registration the
+guest bag for this browser merges into it in the same transaction that issues the tokens: lines
+with the same frame, lenses and price add up (to the per-item limit), others move across (to the
+20-line limit), and the guest bag is deleted. Prices stay as they were when each item was added.
+Prescription uploads made from this browser are attached to the account. The guest session cookie
+stays, so signing out returns to an empty guest bag, not the account's.
+
+## ADR-041: Saved prescriptions are versioned, never edited in place
+
+**Status:** accepted · Phase 4
+Updating a saved prescription adds a row pointing at its predecessor (`previousId`, `version`);
+only the latest version can be edited, and orders keep pointing at the exact values their lenses
+were made to. Deleting removes the whole chain from the account and erases the values and files of
+versions no order uses. Expiry is the date on the prescription, or 24 months from the test date;
+the worker emails one reminder within 30 days of expiry (or up to 30 days after), claimed with a
+conditional update so two workers never both send it. A saved prescription is used at checkout
+by id (`mode: 'saved'`), checked to belong to the customer when added and again when ordering.
+
+## ADR-042: Order self-service on the order itself, for owners and link holders
+
+**Status:** accepted · Phase 4
+Cancel, return, buy again and the invoice live under `/v1/orders/{number}/…` and accept either the
+signed-in owner or the order's access token, so guests get them too and the account pages reuse
+the order page. Cancelling is allowed until production starts; it releases holds, puts committed
+stock back (recorded as `StockAdjustment`), returns the coupon use and refunds an online payment
+through the provider (left `PENDING` for staff if the provider fails). Returns are requested within
+the return window after delivery; later steps (received, refunded) are staff actions in the admin
+(Phase 6), and the email template already covers them. Invoices are rendered on request with
+`pdfkit` from the order's own snapshot; built-in Helvetica has no rupee sign, so amounts read
+"INR 1,234.00".

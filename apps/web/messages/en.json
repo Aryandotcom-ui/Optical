@@ -144,7 +144,8 @@
     "saved": "Saved",
     "addNamed": "Save {name} to your wishlist",
     "added": "{name} saved to your wishlist",
-    "removed": "{name} removed from your wishlist"
+    "removed": "{name} removed from your wishlist",
+    "syncFailed": "That change couldn't be saved to your account. Check your connection."
   },
   "search": {
     "open": "Search",
@@ -180,7 +181,8 @@
     "dismissAnnouncement": "Dismiss this message",
     "announcement": "Free delivery on orders over {amount} · {days}-day returns, no questions asked",
     "bag": "Bag",
-    "bagWithCount": "Bag, {count, plural, one {# item} other {# items}}"
+    "bagWithCount": "Bag, {count, plural, one {# item} other {# items}}",
+    "account": "Account"
   },
   "footer": {
     "shop": "Shop",
@@ -289,8 +291,8 @@
       "rose-gold": "Rose gold"
     },
     "ratingValues": {
-      "4": "4 stars and up",
-      "3": "3 stars and up"
+      "3": "3 stars and up",
+      "4": "4 stars and up"
     },
     "categoryValues": {
       "eyeglasses": "Eyeglasses",
@@ -505,8 +507,17 @@
     "emptyBody": "Tap the heart on any frame to keep it here while you decide.",
     "browse": "Browse frames",
     "missing": "{count, plural, one {# saved item is} other {# saved items are}} no longer sold, so {count, plural, one {it isn't} other {they aren't}} shown.",
-    "deviceNote": "Your wishlist is saved in this browser. Signing in to keep it across devices is coming soon.",
-    "error": "Your wishlist couldn't be loaded. Check your connection and try again."
+    "deviceNote": "Your wishlist is saved in this browser. Sign in to keep it on every device.",
+    "error": "Your wishlist couldn't be loaded. Check your connection and try again.",
+    "syncedNote": "Your wishlist is saved to your account, on every device you sign in on.",
+    "share": "Share a read-only link",
+    "copied": "Link copied. Anyone with it can see these frames, but not who saved them.",
+    "copyFailed": "Copy this link: {url}",
+    "resetShare": "Stop sharing the old link",
+    "resetDone": "The old link no longer works. Share the new one when you like.",
+    "sharedTitle": "A shared wishlist",
+    "sharedIntro": "Someone shared these frames with you. Tap the heart to save any to your own wishlist.",
+    "sharedMissing": "This wishlist is no longer shared. Ask for a new link."
   },
   "comparePage": {
     "title": "Compare frames",
@@ -818,7 +829,19 @@
       "rxManual": "We'll use the prescription you typed in. An optician checks every prescription before lenses are made.",
       "rxUpload": "An optician will read your uploaded prescription before your lenses are made.",
       "rxLater": "Add your prescription after ordering, from your order page. Your lenses are made once it's checked.",
-      "delivery": "Lenses are made and fitted in about {days} working days, then shipped."
+      "delivery": "Lenses are made and fitted in about {days} working days, then shipped.",
+      "rxSaved": "We will use your saved prescription “{label}”. An optician checks every prescription before lenses are made."
+    },
+    "saved": {
+      "title": "Use a saved prescription",
+      "description": "Choose one from your account. No retyping.",
+      "choose": "Saved prescriptions",
+      "version": "Version {version}",
+      "expired": "Expired {date}",
+      "expiring": "Expires {date}",
+      "fileOnly": "Photo, checked by an optician",
+      "none": "You have no saved prescriptions yet. Save one from your account, or type it in below.",
+      "manage": "Manage prescriptions"
     }
   },
   "bag": {
@@ -940,7 +963,15 @@
       "region": "Choose your {label}.",
       "postalCode": "Enter a valid {label}, like {example}."
     },
-    "updatingTotal": "Updating your total…"
+    "updatingTotal": "Updating your total…",
+    "account": {
+      "signInPrompt": "Have an account? <link>Sign in</link> to use your saved addresses, or carry on as a guest.",
+      "signedInAs": "Signed in as {email}",
+      "savedAddresses": "Your saved addresses",
+      "useAddress": "Deliver here",
+      "newAddress": "A different address",
+      "saveAddress": "Save this address to my account"
+    }
   },
   "order": {
     "metaTitle": "Your order",
@@ -976,6 +1007,14 @@
       "cancelled": {
         "title": "This order was cancelled",
         "body": "Order {number} was cancelled. If a payment went through, it is refunded to you automatically."
+      },
+      "delivered": {
+        "title": "Delivered",
+        "body": "Order {number} has arrived. We hope you love your new glasses."
+      },
+      "returning": {
+        "title": "Your return",
+        "body": "Order {number}: {status}. We email you at every step."
       }
     },
     "mock": {
@@ -1020,7 +1059,51 @@
         "stripe": "Stripe",
         "cod": "Cash on delivery"
       }
-    }
+    },
+    "actions": {
+      "title": "Manage this order",
+      "invoice": "Download invoice (PDF)",
+      "invoiceFailed": "The invoice couldn't be downloaded. Please try again.",
+      "reorder": "Buy again",
+      "reordering": "Adding to your bag…",
+      "reordered": "{count, plural, one {# item} other {# items}} added to your bag at today’s prices.",
+      "reorderSkipped": "Not added: {items}.",
+      "viewBag": "View bag",
+      "cancel": "Cancel order",
+      "cancelTitle": "Cancel this order?",
+      "cancelBody": "Nothing will be made or sent. If you paid online, the full amount is refunded to the way you paid.",
+      "cancelNote": "Anything we should know? (optional)",
+      "cancelConfirm": "Yes, cancel the order",
+      "cancelKeep": "Keep the order",
+      "cancelling": "Cancelling…",
+      "cancelled": "Your order is cancelled.",
+      "return": "Return",
+      "returnTitle": "Return this order",
+      "returnBody": "Free pickup within {days} days of delivery, until {date}. We refund you once the frames are back.",
+      "returnReason": "Why are you returning it?",
+      "reasons": {
+        "fit": "Doesn’t fit well",
+        "style": "Didn’t suit me",
+        "vision": "Vision isn’t right",
+        "damaged": "Arrived damaged",
+        "wrong-item": "Wrong item",
+        "other": "Something else"
+      },
+      "returnNote": "Tell us more (optional)",
+      "returnConfirm": "Request the return",
+      "returning": "Sending…",
+      "returned": "Return requested. We’ll email you a pickup slot within one working day.",
+      "failed": "That didn't work. Please try again."
+    },
+    "createAccount": {
+      "title": "Save your details for next time",
+      "body": "Choose a password to create an account with {email}. This order, your prescription and address will be there next time. Optional, and only if you want it.",
+      "password": "Password",
+      "submit": "Create my account",
+      "submitting": "Creating your account…",
+      "done": "Your account is ready. This order is now in it."
+    },
+    "backToOrders": "All your orders"
   },
   "track": {
     "title": "Track your order",
@@ -1031,5 +1114,183 @@
     "submit": "Find my order",
     "finding": "Finding your order…",
     "failed": "We couldn't check that right now. Please try again."
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInIntro": "Welcome back. Your bag and wishlist from this browser come with you.",
+    "registerTitle": "Create your account",
+    "registerIntro": "Keep your orders, prescriptions, addresses and wishlist in one place. Checkout never needs an account.",
+    "name": "Your name",
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "passwordHint": "At least {min} characters. A short phrase is easy to remember and hard to guess.",
+    "show": "Show password",
+    "hide": "Hide password",
+    "marketing": "Email me about new frames and offers (at most twice a month)",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "register": "Create account",
+    "registering": "Creating your account…",
+    "forgot": "Forgot your password?",
+    "noAccount": "New here?",
+    "createOne": "Create an account",
+    "haveAccount": "Already have an account?",
+    "failed": "That didn't work. Please try again.",
+    "forgotTitle": "Reset your password",
+    "forgotIntro": "Enter your email. If it has an account, we’ll send a link to choose a new password.",
+    "send": "Send the link",
+    "sending": "Sending…",
+    "sentTitle": "Check your email",
+    "sent": "If {email} has an account, a reset link is on its way. It works once, for 30 minutes. Check your spam folder if it doesn’t arrive.",
+    "backToSignIn": "Back to sign in",
+    "resetTitle": "Choose a new password",
+    "resetIntro": "Choose a new password. You’ll be signed out everywhere and can sign in with it straight away.",
+    "resetSubmit": "Save new password",
+    "saving": "Saving…",
+    "resetDone": "Your password is changed. Sign in with the new one.",
+    "resetMissing": "This reset link is incomplete. Open the link from your email again, or ask for a new one.",
+    "errors": {
+      "name": "Enter your name.",
+      "email": "Enter an email address like name@example.com.",
+      "password": "Enter your password.",
+      "too-short": "Use at least {min} characters.",
+      "too-long": "Use at most {max} characters.",
+      "too-common": "That password is one of the most used, so it is easy to guess. Choose another.",
+      "contains-email": "Your password should not contain your email address."
+    }
+  },
+  "account": {
+    "metaTitle": "Your account",
+    "nav": {
+      "label": "Account",
+      "overview": "Overview",
+      "orders": "Orders",
+      "prescriptions": "Prescriptions",
+      "addresses": "Addresses",
+      "settings": "Settings",
+      "signOut": "Sign out"
+    },
+    "loading": "Loading your account…",
+    "loadFailed": "We couldn't load this. Check your connection and try again.",
+    "retry": "Try again",
+    "overview": {
+      "greeting": "Hello, {name}",
+      "intro": "Your orders, prescriptions and addresses.",
+      "recentOrders": "Recent orders",
+      "noOrders": "No orders yet. When you order, you can follow it here.",
+      "allOrders": "See all orders",
+      "rxAlert": "{count, plural, one {A saved prescription expires soon or has expired.} other {# saved prescriptions expire soon or have expired.}}",
+      "rxAlertLink": "Review prescriptions",
+      "shop": "Browse frames"
+    },
+    "orders": {
+      "title": "Orders",
+      "empty": "No orders yet.",
+      "placed": "Placed {date}",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "view": "View order {number}",
+      "previous": "Newer orders",
+      "next": "Older orders",
+      "page": "Page {page} of {pages}"
+    },
+    "addresses": {
+      "title": "Addresses",
+      "intro": "Choose one at checkout with a single tap.",
+      "empty": "No saved addresses yet.",
+      "add": "Add an address",
+      "edit": "Edit",
+      "editTitle": "Edit address",
+      "addTitle": "New address",
+      "remove": "Delete",
+      "removeNamed": "Delete the address for {name}",
+      "removed": "Address deleted.",
+      "makeDefault": "Make default",
+      "default": "Default",
+      "phone": "Mobile number",
+      "setDefault": "Use as my default address",
+      "save": "Save address",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "saved": "Address saved.",
+      "failed": "That didn't save. Please try again."
+    },
+    "prescriptions": {
+      "title": "Prescriptions",
+      "intro": "Save a prescription once and choose it when you add lenses. Editing keeps the old values in its history.",
+      "empty": "No saved prescriptions yet.",
+      "add": "Add a prescription",
+      "addTitle": "New prescription",
+      "editTitle": "Update “{label}”",
+      "edit": "Update values",
+      "rename": "Rename",
+      "renameLabel": "Name",
+      "remove": "Delete",
+      "removeConfirm": "Delete “{label}” and its history? Orders that used it keep their copy.",
+      "removed": "Prescription deleted.",
+      "label": "Name",
+      "labelHint": "For example “Everyday” or “Reading”.",
+      "prescribedAt": "Date of eye test (optional)",
+      "expiresAt": "Expiry date (optional)",
+      "expiresHint": "If there is none on it, we count {months} months from the test date.",
+      "save": "Save prescription",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "saved": "Prescription saved.",
+      "version": "Version {version}",
+      "history": "Earlier versions: {count}",
+      "updated": "Saved {date}",
+      "expiry": {
+        "valid": "Valid until {date}",
+        "expiring": "Expires {date}",
+        "expired": "Expired {date}",
+        "unknown": "No expiry date"
+      },
+      "status": {
+        "PENDING_REVIEW": "Not yet checked by an optician",
+        "VERIFIED": "Checked by an optician",
+        "NEEDS_CORRECTION": "An optician needs to check something"
+      },
+      "file": "View the uploaded file",
+      "fileOnly": "Uploaded photo or PDF. Add the values to use it without waiting for an optician.",
+      "right": "Right eye (OD)",
+      "left": "Left eye (OS)",
+      "sph": "SPH",
+      "cyl": "CYL",
+      "axis": "Axis",
+      "pd": "PD",
+      "failed": "That didn't save. Please try again.",
+      "pdMissing": "Add your pupillary distance (PD) to save the prescription.",
+      "addPower": "ADD"
+    },
+    "settings": {
+      "title": "Settings",
+      "profile": "Profile",
+      "name": "Name",
+      "email": "Email",
+      "emailHint": "To change your email, write to us from the new address.",
+      "phone": "Mobile number (optional)",
+      "marketing": "Email me about new frames and offers (at most twice a month)",
+      "save": "Save profile",
+      "saving": "Saving…",
+      "saved": "Profile saved.",
+      "password": "Password",
+      "passwordIntro": "Changing it signs you out on every other device.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "changePassword": "Change password",
+      "changed": "Password changed. Other devices are signed out.",
+      "data": "Your data",
+      "dataIntro": "Download everything we hold about you: profile, addresses, prescriptions, orders and wishlist, as a JSON file.",
+      "export": "Download my data",
+      "exportFailed": "The download didn't start. Please try again.",
+      "delete": "Delete account",
+      "deleteIntro": "This erases your profile, addresses, saved prescriptions and wishlist, and signs you out everywhere. Orders stay on record for tax law, without your account. This can’t be undone.",
+      "deletePassword": "Enter your password to confirm",
+      "deleteConfirm": "Delete my account",
+      "deleting": "Deleting…",
+      "deleted": "Your account is deleted.",
+      "failed": "That didn't work. Please try again."
+    }
   }
 }

@@ -13,6 +13,10 @@ import { addToCart, bag, call, fetchCart } from './bag-api';
 
 export { CommerceError } from './bag-api';
 
+/** The order link's token, when there is one; signed-in owners don't need it. */
+const orderToken = (token: string): Record<string, string> =>
+  token ? { 'x-order-token': token } : {};
+
 /** Checkout, payments and order pages: everything beyond adding to the bag. */
 export const commerceApi = {
   lensOptions: () => call<LensCatalog>('GET', '/v1/lens/options'),
@@ -32,7 +36,7 @@ export const commerceApi = {
     }),
   order: (number: string, token: string) =>
     call<OrderView>('GET', `/v1/orders/${encodeURIComponent(number)}`, {
-      headers: { 'x-order-token': token },
+      headers: orderToken(token),
     }),
   track: (number: string, email: string) =>
     call<{ order: OrderView; accessToken: string }>('POST', '/v1/orders/track', {
@@ -41,12 +45,12 @@ export const commerceApi = {
   retryPayment: (number: string, token: string, provider: string) =>
     call<PlacedOrder>('POST', `/v1/orders/${encodeURIComponent(number)}/payment`, {
       body: { provider },
-      headers: { 'x-order-token': token },
+      headers: orderToken(token),
     }),
   simulatePayment: (paymentId: string, outcome: 'success' | 'failure' | 'pending', token: string) =>
     call<OrderView>('POST', '/v1/payments/mock/simulate', {
       body: { paymentId, outcome },
-      headers: { 'x-order-token': token },
+      headers: orderToken(token),
     }),
   uploadPrescription: (file: File) => {
     const form = new FormData();
@@ -56,6 +60,6 @@ export const commerceApi = {
   attachPrescription: (number: string, token: string, request: AttachPrescription) =>
     call<OrderView>('POST', `/v1/orders/${encodeURIComponent(number)}/prescriptions`, {
       body: request,
-      headers: { 'x-order-token': token },
+      headers: orderToken(token),
     }),
 };

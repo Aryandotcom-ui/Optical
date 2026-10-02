@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommerceError, commerceApi } from '@/lib/commerce-api';
+import { hasSignedInHint, useSignedInHint } from '@/lib/signed-in';
 import { MockPayment } from './mock-payment';
 import { OrderDetails } from './order-details';
 import { OrderStatusHero, orderPhase } from './order-status-hero';
@@ -16,6 +17,12 @@ import { OrderTimeline } from './order-timeline';
 // The prescription form (with the validation rules) loads only when a prescription is missing.
 const AddPrescription = dynamic(() =>
   import('./add-prescription').then((module) => module.AddPrescription),
+);
+
+// Order self-service and the account offer load only on order pages that show them.
+const OrderActions = dynamic(() => import('./order-actions').then((module) => module.OrderActions));
+const CreateAccount = dynamic(() =>
+  import('./create-account').then((module) => module.CreateAccount),
 );
 
 /** Stop asking after this long; a payment that takes longer arrives by email. */
@@ -28,9 +35,9 @@ type State =
   | { status: 'ready'; order: OrderView };
 
 /**
- * The order page behind the private link: confirmation, live payment
- * status (it follows the provider's webhook), retrying a failed payment,
- * adding a prescription, and the timeline.
+ * The order page, for its account or behind its private link: confirmation,
+ * live payment status (it follows the provider's webhook), retrying a failed
+ * payment, adding a prescription, the timeline, and cancel/return/reorder.
  */
 export function OrderPageView({ number, token }: { number: string; token: string }) {
   const t = useTranslations('order');
@@ -38,12 +45,16 @@ export function OrderPageView({ number, token }: { number: string; token: string
   const [watchingSince, setWatchingSince] = useState<number | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | null>(null);
+  const signedIn = useSignedInHint();
+  // Decided once, when the order first loads, so the offer stays to confirm once it is accepted.
+  const [offerAccount, setOfferAccount] = useState<boolean | null>(null);
 
   const load = useCallback(
     () =>
       commerceApi.order(number, token).then(
         (order) => {
           setState({ status: 'ready', order });
+          setOfferAccount((previous) => previous ?? !hasSignedInHint());
         },
         (error: unknown) => {
           if (error instanceof CommerceError && error.status === 404)
@@ -181,12 +192,29 @@ export function OrderPageView({ number, token }: { number: string; token: string
         </section>
       ) : null}
 
+      {token && offerAccount && phase === 'confirmed' ? (
+        <CreateAccount number={order.number} token={token} email={order.email} />
+      ) : null}
+
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <OrderDetails order={order} />
         <OrderTimeline order={order} />
       </div>
 
+      <OrderActions
+        order={order}
+        token={token}
+        onChange={(next) => {
+          setState({ status: 'ready', order: next });
+        }}
+      />
+
       <div className="flex flex-wrap gap-3">
+        {signedIn ? (
+          <Button asChild variant="secondary">
+            <Link href="/account/orders">{t('backToOrders')}</Link>
+          </Button>
+        ) : null}
         <Button asChild variant="secondary">
           <Link href="/shop">{t('keepShopping')}</Link>
         </Button>

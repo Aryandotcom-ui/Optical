@@ -35,7 +35,9 @@ export function ReviewStep({
       ? t('rxLater')
       : draft.rxMode === 'upload'
         ? t('rxUpload')
-        : t('rxManual');
+        : draft.rxMode === 'saved' && draft.saved
+          ? t('rxSaved', { label: draft.saved.label })
+          : t('rxManual');
   const needsRx = draft.purpose !== 'zero-power' && draft.purpose !== 'computer';
   return (
     <div className="space-y-5">

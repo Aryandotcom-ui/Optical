@@ -8,11 +8,21 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchProductsByIds } from '@/lib/browser-api';
 import { useGrowingSet, useRemote } from '@/lib/use-remote';
+import dynamic from 'next/dynamic';
+import { useSignedInHint } from '@/lib/signed-in';
 import { useSavedLists, useSavedListsHydrated } from '@/stores/saved-lists';
 
-/** The guest wishlist: saved in this browser, details fetched fresh so prices and stock are current. */
+const WishlistAccount = dynamic(() =>
+  import('./wishlist-account').then((module) => module.WishlistAccount),
+);
+
+/**
+ * The wishlist: saved in this browser (and in the account when signed in),
+ * details fetched fresh so prices and stock are current.
+ */
 export function WishlistView() {
   const t = useTranslations('wishlistPage');
+  const signedIn = useSignedInHint();
   const hydrated = useSavedListsHydrated();
   const saved = useSavedLists((state) => state.wishlist);
   const ids = saved.map((item) => item.id);
@@ -39,14 +49,21 @@ export function WishlistView() {
 
   if (ids.length === 0) {
     return (
-      <div className="rounded-media bg-surface-muted px-6 py-16 text-center">
-        <Heart aria-hidden="true" className="mx-auto size-8 text-ink-secondary" strokeWidth={1.5} />
-        <h2 className="mt-4 text-headline font-semibold">{t('emptyTitle')}</h2>
-        <p className="mx-auto mt-2 max-w-md text-ink-secondary">{t('emptyBody')}</p>
-        <Button asChild size="lg" className="mt-6">
-          <Link href="/shop">{t('browse')}</Link>
-        </Button>
-      </div>
+      <>
+        <div className="rounded-media bg-surface-muted px-6 py-16 text-center">
+          <Heart
+            aria-hidden="true"
+            className="mx-auto size-8 text-ink-secondary"
+            strokeWidth={1.5}
+          />
+          <h2 className="mt-4 text-headline font-semibold">{t('emptyTitle')}</h2>
+          <p className="mx-auto mt-2 max-w-md text-ink-secondary">{t('emptyBody')}</p>
+          <Button asChild size="lg" className="mt-6">
+            <Link href="/shop">{t('browse')}</Link>
+          </Button>
+        </div>
+        {signedIn ? <WishlistAccount /> : null}
+      </>
     );
   }
 
@@ -72,7 +89,11 @@ export function WishlistView() {
       {missing > 0 ? (
         <p className="mt-8 text-caption text-ink-secondary">{t('missing', { count: missing })}</p>
       ) : null}
-      <p className="mt-10 text-caption text-ink-secondary">{t('deviceNote')}</p>
+      {signedIn ? (
+        <WishlistAccount />
+      ) : (
+        <p className="mt-10 text-caption text-ink-secondary">{t('deviceNote')}</p>
+      )}
     </div>
   );
 }

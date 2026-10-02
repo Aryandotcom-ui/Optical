@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Menu, ShoppingBag } from 'lucide-react';
+import { Heart, Menu, ShoppingBag, UserRound } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,6 +39,20 @@ function WishlistLink() {
           {shown}
         </span>
       ) : null}
+    </Link>
+  );
+}
+
+/** Your account; guests are taken to sign in from there. Never a popup. */
+function AccountLink() {
+  const t = useTranslations('shell');
+  return (
+    <Link
+      href="/account"
+      aria-label={t('account')}
+      className="hidden size-11 items-center justify-center rounded-pill text-ink transition-colors hover:bg-ink/5 md:inline-flex"
+    >
+      <UserRound aria-hidden="true" className="size-5" strokeWidth={1.5} />
     </Link>
   );
 }
@@ -190,6 +204,7 @@ export function SiteHeader({ nav }: { nav: NavModel }) {
         <div className="ml-auto flex items-center gap-1">
           <SearchLauncher />
           <WishlistLink />
+          <AccountLink />
           <BagLink />
         </div>
       </div>

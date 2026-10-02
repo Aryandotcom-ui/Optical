@@ -125,6 +125,37 @@ sequenceDiagram
 - **Emails:** transactional outbox, sent by the worker with retries (ADR-034).
 - **Uploads:** sniffed, stripped, scanned, private, signed links (ADR-035).
 
+## Accounts
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant A as API
+  participant D as Postgres
+  B->>A: POST /v1/auth/login (email, password)
+  A->>D: check lockout, verify Argon2id hash
+  A->>D: merge guest bag and uploads, new refresh family (one transaction)
+  A-->>B: lo_access (JWT, 15 min), lo_refresh (/v1/auth, 30 days), lo_auth hint
+  B->>A: GET /v1/cart (lo_access)
+  A->>D: is the token's family still live?
+  A-->>B: the account's bag
+  Note over B,A: 15 minutes later
+  B->>A: GET /v1/cart
+  A-->>B: 401 UNAUTHENTICATED
+  B->>A: POST /v1/auth/refresh (lo_refresh)
+  A->>D: lock token, replace it in the family (reuse → revoke family)
+  A-->>B: new cookies; the request is repeated
+```
+
+- **Owner:** every bag, upload and order request acts for an _owner_: the signed-in customer,
+  or else the guest session. Orders also accept their access token, so guests keep their links
+  (ADR-040, ADR-042).
+- **Tokens:** ADR-037 and ADR-038. **Lockout:** ADR-039.
+- **Account data:** saved addresses, versioned prescriptions (ADR-041), wishlist with a share
+  token, order history; export and deletion in `account.service.ts`.
+- **Web:** account pages render in the browser from the API; the header shows "Account"
+  without a request thanks to the `lo_auth` hint cookie.
+
 ## Request tracing
 
 The web server sends `x-request-id: web-<uuid>` on every API call. The API reuses a safe incoming

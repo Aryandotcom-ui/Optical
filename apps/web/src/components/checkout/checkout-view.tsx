@@ -13,8 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommerceError, commerceApi } from '@/lib/commerce-api';
 import { formatPrice, formatShortDate } from '@/lib/format';
+import { useSignedInHint } from '@/lib/signed-in';
+import dynamic from 'next/dynamic';
 import { AddressFields } from './address-fields';
 import {
+  applyPrefill,
   attemptKey,
   clearDraft,
   contactErrors,
@@ -26,11 +29,20 @@ import {
   type CheckoutDraft,
   type FieldErrors,
 } from './checkout-draft';
+import { SaveAddressToggle, SignInPrompt } from './checkout-sign-in';
 import { CheckoutSection, TextField } from './fields';
 import { PaymentOptions } from './payment-options';
 import { SummaryItems } from './summary-items';
 
 type Step = 'contact' | 'delivery' | 'payment';
+
+// Account extras load only for signed-in customers.
+const AccountPrefill = dynamic(() =>
+  import('./checkout-account').then((module) => module.AccountPrefill),
+);
+const SavedAddresses = dynamic(() =>
+  import('./checkout-account').then((module) => module.SavedAddresses),
+);
 
 /**
  * Single-page checkout: contact, delivery and payment, each validated as
@@ -50,6 +62,7 @@ export function CheckoutView() {
   const [quoted, setQuoted] = useState<{ key: string; quote: CheckoutQuote } | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
+  const signedIn = useSignedInHint();
 
   useEffect(() => {
     commerceApi.cart().then(setCart, () => {
@@ -207,6 +220,16 @@ export function CheckoutView() {
       </details>
 
       <div className="space-y-4">
+        {signedIn ? (
+          <AccountPrefill
+            draft={draft}
+            onPrefill={(patch) => {
+              setDraft((current) => applyPrefill(current, patch));
+            }}
+          />
+        ) : (
+          <SignInPrompt />
+        )}
         <CheckoutSection
           number={1}
           title={t('contact.title')}
@@ -267,7 +290,16 @@ export function CheckoutView() {
           }}
           editLabel={t('edit')}
         >
+          {signedIn ? <SavedAddresses draft={draft} onChange={update} /> : null}
           <AddressFields draft={draft} errors={errors} onChange={update} />
+          {signedIn ? (
+            <SaveAddressToggle
+              checked={draft.saveAddress}
+              onChange={(saveAddress) => {
+                update({ ...draft, saveAddress });
+              }}
+            />
+          ) : null}
           <fieldset className="mt-6">
             <legend className="font-medium">{t('delivery.speed')}</legend>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">

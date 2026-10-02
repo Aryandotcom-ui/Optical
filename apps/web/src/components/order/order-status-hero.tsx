@@ -1,14 +1,25 @@
 'use client';
 
 import type { OrderView } from '@optical/shared/checkout';
-import { AlertCircle, Clock, XCircle } from 'lucide-react';
+import { AlertCircle, Clock, PackageCheck, Undo2, XCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatShortDate } from '@/lib/format';
 
-export type OrderPhase = 'confirmed' | 'awaiting-payment' | 'processing' | 'failed' | 'cancelled';
+export type OrderPhase =
+  | 'confirmed'
+  | 'awaiting-payment'
+  | 'processing'
+  | 'failed'
+  | 'cancelled'
+  | 'delivered'
+  | 'returning';
 
 export function orderPhase(order: OrderView): OrderPhase {
-  if (order.status === 'CANCELLED') return 'cancelled';
+  const cancelled = order.timeline.some((step) => step.status === 'CANCELLED');
+  if (order.status === 'CANCELLED' || (order.status === 'REFUNDED' && cancelled))
+    return 'cancelled';
+  if (['RETURN_REQUESTED', 'RETURNED', 'REFUNDED'].includes(order.status)) return 'returning';
+  if (order.status === 'DELIVERED') return 'delivered';
   if (order.status === 'PAYMENT_FAILED') return 'failed';
   if (order.status === 'PENDING_PAYMENT' && order.paymentProvider !== 'cod')
     return order.payment?.status === 'PENDING'
@@ -55,6 +66,12 @@ export function OrderStatusHero({ order, phase }: { order: OrderView; phase: Ord
     cancelled: (
       <XCircle aria-hidden="true" className="size-12 text-ink-secondary" strokeWidth={1.5} />
     ),
+    delivered: (
+      <PackageCheck aria-hidden="true" className="size-12 text-success-ink" strokeWidth={1.5} />
+    ),
+    returning: (
+      <Undo2 aria-hidden="true" className="size-12 text-ink-secondary" strokeWidth={1.5} />
+    ),
   }[phase];
   return (
     <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
@@ -68,6 +85,7 @@ export function OrderStatusHero({ order, phase }: { order: OrderView; phase: Ord
             number: order.number,
             email: order.email,
             reason: order.payment?.failureReason ?? '',
+            status: order.statusLabel,
           })}
         </p>
         {phase === 'confirmed' && order.estimatedDelivery ? (

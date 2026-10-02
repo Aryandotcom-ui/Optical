@@ -54,35 +54,56 @@ The source of truth is `packages/shared/src/api/errors.ts`; a test checks every 
 
 ## Endpoints available now
 
-| Method | Path                                | Description                                                                                                                         |
-| ------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/healthz`                          | Liveness probe.                                                                                                                     |
-| GET    | `/readyz`                           | Readiness probe with per-dependency status and latency.                                                                             |
-| GET    | `/docs`                             | Interactive API reference (disable with `API_DOCS_ENABLED=false`).                                                                  |
-| GET    | `/v1/products`                      | Listing with filters, disjunctive facet counts, sort and pagination. See below.                                                     |
-| GET    | `/v1/products/{slug}`               | Product detail: variants, images, stock state, measurements, face-shape fit, collections, SEO.                                      |
-| GET    | `/v1/products/{id}/related`         | Up to 8 similar products (same category; shape, material, style and price).                                                         |
-| GET    | `/v1/categories`                    | Categories with live product counts.                                                                                                |
-| GET    | `/v1/collections/{slug}`            | A collection with its products in editorial order.                                                                                  |
-| GET    | `/v1/search/suggest?q=`             | Instant, typo-tolerant suggestions: products, categories, collections, help articles.                                               |
-| GET    | `/v1/lens/options`                  | The full lens catalogue: lens types, materials, coatings, packages, tints and rules.                                                |
-| POST   | `/v1/lens/quote`                    | Prices a lens configuration for a frame; see below.                                                                                 |
-| GET    | `/v1/cart`                          | This browser's bag, priced for standard delivery.                                                                                   |
-| POST   | `/v1/cart/items`                    | Add to bag (frame, optional lens configuration, `expectedUnitPriceMinor`). Starts a guest session.                                  |
-| PATCH  | `/v1/cart/items/{id}`               | Change a quantity (checked against stock).                                                                                          |
-| DELETE | `/v1/cart/items/{id}`               | Remove a line.                                                                                                                      |
-| PUT    | `/v1/cart/coupon`                   | Apply a coupon; the error message says exactly why a code doesn't apply.                                                            |
-| DELETE | `/v1/cart/coupon`                   | Remove the coupon.                                                                                                                  |
-| POST   | `/v1/checkout/quote`                | Price the bag for a speed, PIN code and payment method; delivery dates; payment options.                                            |
-| POST   | `/v1/checkout/orders`               | Place an order. Requires `Idempotency-Key`; holds stock for 15 minutes; returns the order, its access token and the payment action. |
-| GET    | `/v1/orders/{number}`               | An order, with `x-order-token`.                                                                                                     |
-| POST   | `/v1/orders/track`                  | Guest tracking by order number and email; returns the order and its access token.                                                   |
-| POST   | `/v1/orders/{number}/payment`       | Try paying again after a failure (holds stock again if needed).                                                                     |
-| POST   | `/v1/orders/{number}/prescriptions` | Add a prescription (typed or uploaded) to an item ordered with "send it later".                                                     |
-| POST   | `/v1/prescriptions/uploads`         | Upload a prescription photo or PDF (multipart, 8 MB). Checked, stripped of metadata, private.                                       |
-| GET    | `/v1/files/rx/{name}`               | An uploaded file, through a five-minute signed link only.                                                                           |
-| POST   | `/v1/payments/mock/simulate`        | Local simulator: decide a mock payment's outcome (it arrives as a signed webhook).                                                  |
-| POST   | `/v1/webhooks/{provider}`           | Signed provider webhooks (`mock`, `razorpay`, `stripe`), applied exactly once.                                                      |
+| Method   | Path                                | Description                                                                                                                         |
+| -------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| GET      | `/healthz`                          | Liveness probe.                                                                                                                     |
+| GET      | `/readyz`                           | Readiness probe with per-dependency status and latency.                                                                             |
+| GET      | `/docs`                             | Interactive API reference (disable with `API_DOCS_ENABLED=false`).                                                                  |
+| GET      | `/v1/products`                      | Listing with filters, disjunctive facet counts, sort and pagination. See below.                                                     |
+| GET      | `/v1/products/{slug}`               | Product detail: variants, images, stock state, measurements, face-shape fit, collections, SEO.                                      |
+| GET      | `/v1/products/{id}/related`         | Up to 8 similar products (same category; shape, material, style and price).                                                         |
+| GET      | `/v1/categories`                    | Categories with live product counts.                                                                                                |
+| GET      | `/v1/collections/{slug}`            | A collection with its products in editorial order.                                                                                  |
+| GET      | `/v1/search/suggest?q=`             | Instant, typo-tolerant suggestions: products, categories, collections, help articles.                                               |
+| GET      | `/v1/lens/options`                  | The full lens catalogue: lens types, materials, coatings, packages, tints and rules.                                                |
+| POST     | `/v1/lens/quote`                    | Prices a lens configuration for a frame; see below.                                                                                 |
+| GET      | `/v1/cart`                          | This browser's bag, priced for standard delivery.                                                                                   |
+| POST     | `/v1/cart/items`                    | Add to bag (frame, optional lens configuration, `expectedUnitPriceMinor`). Starts a guest session.                                  |
+| PATCH    | `/v1/cart/items/{id}`               | Change a quantity (checked against stock).                                                                                          |
+| DELETE   | `/v1/cart/items/{id}`               | Remove a line.                                                                                                                      |
+| PUT      | `/v1/cart/coupon`                   | Apply a coupon; the error message says exactly why a code doesn't apply.                                                            |
+| DELETE   | `/v1/cart/coupon`                   | Remove the coupon.                                                                                                                  |
+| POST     | `/v1/checkout/quote`                | Price the bag for a speed, PIN code and payment method; delivery dates; payment options.                                            |
+| POST     | `/v1/checkout/orders`               | Place an order. Requires `Idempotency-Key`; holds stock for 15 minutes; returns the order, its access token and the payment action. |
+| GET      | `/v1/orders/{number}`               | An order, for its signed-in owner or with `x-order-token`.                                                                          |
+| POST     | `/v1/orders/track`                  | Guest tracking by order number and email; returns the order and its access token.                                                   |
+| POST     | `/v1/orders/{number}/payment`       | Try paying again after a failure (holds stock again if needed).                                                                     |
+| POST     | `/v1/orders/{number}/prescriptions` | Add a prescription (typed or uploaded) to an item ordered with "send it later".                                                     |
+| POST     | `/v1/prescriptions/uploads`         | Upload a prescription photo or PDF (multipart, 8 MB). Checked, stripped of metadata, private.                                       |
+| GET      | `/v1/files/rx/{name}`               | An uploaded file, through a five-minute signed link only.                                                                           |
+| POST     | `/v1/payments/mock/simulate`        | Local simulator: decide a mock payment's outcome (it arrives as a signed webhook).                                                  |
+| POST     | `/v1/webhooks/{provider}`           | Signed provider webhooks (`mock`, `razorpay`, `stripe`), applied exactly once.                                                      |
+| POST     | `/v1/orders/{number}/cancel`        | Cancel before production: stock and coupon back, online payment refunded.                                                           |
+| POST     | `/v1/orders/{number}/return`        | Ask to return within the window after delivery (`reason`, optional `note`).                                                         |
+| POST     | `/v1/orders/{number}/reorder`       | Buy again: adds the items to the bag at today's prices; lists what couldn't be added.                                               |
+| GET      | `/v1/orders/{number}/invoice`       | Tax invoice as a PDF, once paid (cash on delivery: once shipped).                                                                   |
+| POST     | `/v1/auth/register`                 | Create an account and sign in; the guest bag and uploads move in.                                                                   |
+| POST     | `/v1/auth/login`                    | Sign in. Five wrong passwords pause sign-in for 1, 2, 4 … 60 minutes (`RATE_LIMITED`).                                              |
+| POST     | `/v1/auth/refresh`                  | Rotate the refresh cookie and issue a new access cookie. Reusing a rotated token ends the sign-in.                                  |
+| POST     | `/v1/auth/logout`                   | End this device's sign-in.                                                                                                          |
+| GET      | `/v1/auth/me`                       | The signed-in customer.                                                                                                             |
+| POST     | `/v1/auth/forgot-password`          | Email a single-use, 30-minute reset link. Always `202`.                                                                             |
+| POST     | `/v1/auth/reset-password`           | Set a new password from the link; signs out every device.                                                                           |
+| POST     | `/v1/auth/register-from-order`      | Create an account from a guest order (its token and one password).                                                                  |
+| PATCH    | `/v1/account/profile`               | Name, phone, marketing preference.                                                                                                  |
+| POST     | `/v1/account/password`              | Change password; other devices are signed out.                                                                                      |
+| GET      | `/v1/account/orders?page=`          | Order history, newest first.                                                                                                        |
+| GET/POST | `/v1/account/addresses`             | Saved addresses; `PUT`/`DELETE /{id}`, `POST /{id}/default`.                                                                        |
+| GET/POST | `/v1/account/prescriptions`         | Saved prescriptions with history and expiry; `PUT /{id}` adds a version, `PATCH /{id}` renames, `DELETE /{id}`.                     |
+| GET      | `/v1/account/wishlist`              | The account wishlist and its share token; `POST /merge`, `PUT`/`DELETE /items/{productId}`, `POST /share` (new link).               |
+| GET      | `/v1/wishlists/{token}`             | A shared wishlist, read-only, anonymous.                                                                                            |
+| GET      | `/v1/account/export`                | Everything held about the customer, as a JSON download.                                                                             |
+| POST     | `/v1/account/delete`                | Delete the account (password required).                                                                                             |
 
 ### Buying: how the pieces fit
 
@@ -95,8 +116,16 @@ The source of truth is `packages/shared/src/api/errors.ts`; a test checks every 
 4. The provider's webhook marks the order paid; the worker sends the confirmation email. The order
    page follows the status with `GET /v1/orders/{number}`.
 
-Writes that carry the session cookie must come from an allowed `Origin`. Coupon, upload, tracking
-and order endpoints are rate limited per IP (`429` with `retry-after`).
+Writes that carry the session cookie must come from an allowed `Origin`; writes to `/v1/auth/*`
+and `/v1/account/*` need one even without cookies. Coupon, upload, tracking, order and sign-in
+endpoints are rate limited per IP (`429` with `retry-after`).
+
+### Signing in
+
+Sign-in sets `lo_access` (15-minute JWT), `lo_refresh` (30 days, sent only to `/v1/auth`) and the
+readable `lo_auth=1` hint (see ADR-037). When a call answers `401` while signed in, call
+`POST /v1/auth/refresh` once and repeat it; if the refresh fails, the cookies are cleared and the
+customer is a guest again. Concurrent refreshes from one browser should share one request.
 
 ### Listing parameters (`GET /v1/products`)
 

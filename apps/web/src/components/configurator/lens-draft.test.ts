@@ -6,6 +6,7 @@ import {
   emptyDraft,
   evaluateDraft,
   recommendedIndex,
+  rxDraftFrom,
   stepComplete,
   stepsFor,
   toLensConfig,
@@ -116,5 +117,42 @@ describe('pricing', () => {
     expect(recommendedIndex(catalog, typed, evaluateDraft(typed, catalog, frame), frame)).toBe(
       '1.61',
     );
+  });
+});
+
+describe('saved prescriptions', () => {
+  const saved: LensDraft = {
+    ...typed,
+    rxMode: 'saved',
+    saved: { id: '0199a1b2-0000-7000-8000-000000000001', label: 'Everyday', hasValues: true },
+  };
+
+  it('sends the saved prescription by id, and uses its values for advice', () => {
+    const evaluation = evaluateDraft(saved, catalog, frame);
+    expect(evaluation.config?.prescription).toEqual({
+      mode: 'saved',
+      prescriptionId: '0199a1b2-0000-7000-8000-000000000001',
+    });
+    expect(evaluation.signedPower).toBe(-2.75);
+    expect(stepComplete('prescription', saved, evaluation)).toBe(true);
+  });
+
+  it('needs a choice before moving on, and copes with a photo-only prescription', () => {
+    const none = { ...saved, saved: null };
+    expect(stepComplete('prescription', none, evaluateDraft(none, catalog, frame))).toBe(false);
+    const photo = { ...saved, saved: { ...saved.saved!, hasValues: false } };
+    const evaluation = evaluateDraft(photo, catalog, frame);
+    expect(evaluation.signedPower).toBeNull();
+    expect(stepComplete('prescription', photo, evaluation)).toBe(true);
+  });
+
+  it('turns saved values back into the entry form', () => {
+    const draft = rxDraftFrom({
+      right: { sph: -1, cyl: null, axis: null, add: null },
+      left: { sph: -1.25, cyl: null, axis: null, add: null },
+      pd: { kind: 'dual', right: 31, left: 32 },
+    });
+    expect(draft).toMatchObject({ pdKind: 'dual', pd: null, pdRight: 31, pdLeft: 32 });
+    expect(draftPrescription(draft)?.pd).toEqual({ kind: 'dual', right: 31, left: 32 });
   });
 });

@@ -6,9 +6,10 @@ plain language, honest pricing, and on-device virtual try-on.
 This repository is a TypeScript monorepo with a Next.js storefront, a Fastify API and shared
 packages. It runs fully locally with no paid services or API keys.
 
-> **Status: Phase 3 (buying).** Browse, choose lenses with live pricing, and buy: bag, a
-> single-page checkout, a local test payment (or cash on delivery), a confirmation email in
-> Mailpit, and guest order tracking. Accounts arrive in Phase 4; see [the roadmap](#roadmap).
+> **Status: Phase 4 (accounts).** Browse, choose lenses with live pricing, and buy as a guest or
+> with an account: saved prescriptions and addresses, order history with invoices, cancellations,
+> returns and "buy again", a synced, shareable wishlist, and password reset by email. Try-on
+> arrives in Phase 5; see [the roadmap](#roadmap).
 
 ## Quick start
 
@@ -78,6 +79,22 @@ See [docs/TESTING.md](docs/TESTING.md) for what each suite covers and the perfor
    webhook through the worker, as a real one would. **Cash on delivery** confirms at once.
 4. Read the confirmation email at http://localhost:8025, and find the order again at
    http://localhost:3000/track with its number and your email.
+
+## Accounts locally
+
+Checkout never needs an account. To try one, sign in at http://localhost:3000/sign-in as
+`asha@example.com` / `Asha#Lumen2026` (she has past orders), or create your own at `/register`
+(anything in your bag comes with you). From **Account** you can:
+
+- save prescriptions (each edit keeps the earlier version) and choose one when adding lenses,
+- keep delivery addresses and pick one at checkout,
+- open any order to download its invoice, cancel it before production, request a return after
+  delivery (orders are marked delivered by staff; the admin arrives in Phase 6), or buy
+  it again,
+- change your password, download your data, or delete the account.
+
+**Forgot your password?** sends a link to Mailpit (http://localhost:8025). After a guest order, the
+confirmation page offers to create an account with one password.
 
 Razorpay and Stripe switch on when their keys are set in `.env` (hosted payment pages; see
 `.env.example`). Nothing is charged locally.
@@ -150,6 +167,14 @@ Brand name, currency, tax rate, shipping thresholds and store policies live in
 **`APP_SECRET: is required but not set`.** Run `pnpm run setup` again (it adds one to an existing
 `.env` without touching anything else), or add `APP_SECRET=` followed by `openssl rand -hex 32`.
 
+**Signed in, but the account page keeps sending you to sign in.** The shop and API must share a
+site: `http://localhost:3000` with `http://localhost:4000` works; mixing `localhost` and
+`127.0.0.1` does not, because the cookies belong to one host name. Use the same name for both
+(`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_API_URL`).
+
+**"Too many incorrect passwords".** Five wrong passwords pause sign-in for that account for a
+minute, doubling each time. Reset the password from the email in Mailpit, which lifts the pause.
+
 **A test payment stays on "Waiting for the payment provider".** The worker delivers payment results
 and emails; check that `pnpm dev` shows `Worker started`, and that Redis is running.
 
@@ -186,8 +211,8 @@ the site at a LAN IP address (for example from a phone), try-on needs HTTPS. Try
 | 1     | Data model, seed, catalogue/search/lens-quote API, pricing engine         | Done  |
 | 2     | Storefront browsing: shell, home, listings, product pages, 3D viewer      | Done  |
 | 3     | Lens configurator, cart, checkout, payments, emails                       | Done  |
-| 4     | Auth and account area                                                     | Next  |
-| 5     | Virtual try-on and Frame Finder                                           |       |
+| 4     | Auth and account area                                                     | Done  |
+| 5     | Virtual try-on and Frame Finder                                           | Next  |
 | 6     | Admin panel                                                               |       |
 | 7     | Hardening and polish                                                      |       |
 | 8     | Deployment readiness and handoff                                          |       |

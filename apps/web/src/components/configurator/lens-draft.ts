@@ -20,7 +20,7 @@ import {
   type RxIssue,
 } from '@optical/shared/lens/engine';
 
-export type RxMode = 'manual' | 'upload' | 'later';
+export type RxMode = 'manual' | 'upload' | 'later' | 'saved';
 
 export interface RxDraft {
   right: EyeRx;
@@ -37,6 +37,8 @@ export interface LensDraft {
   rxMode: RxMode;
   rx: RxDraft;
   upload: { id: string; name: string } | null;
+  /** A prescription saved to the account; its values (if typed) are copied into `rx`. */
+  saved: { id: string; label: string; hasValues: boolean } | null;
   indexCode: string | null;
   packageCode: string | null;
   extraCoatingCodes: string[];
@@ -50,6 +52,7 @@ export const emptyDraft: LensDraft = {
   rxMode: 'manual',
   rx: { right: plano(), left: plano(), pdKind: 'single', pd: null, pdRight: null, pdLeft: null },
   upload: null,
+  saved: null,
   indexCode: null,
   packageCode: null,
   extraCoatingCodes: [],
@@ -97,6 +100,18 @@ export function recommendedIndex(
   );
 }
 
+/** A saved prescription's values in the entry form's shape. */
+export function rxDraftFrom(rx: Prescription): RxDraft {
+  return {
+    right: rx.right,
+    left: rx.left,
+    pdKind: rx.pd.kind,
+    pd: rx.pd.kind === 'single' ? rx.pd.value : null,
+    pdRight: rx.pd.kind === 'dual' ? rx.pd.right : null,
+    pdLeft: rx.pd.kind === 'dual' ? rx.pd.left : null,
+  };
+}
+
 /** The prescription as typed, or null while the PD is still missing. */
 export function draftPrescription(rx: RxDraft): Prescription | null {
   if (rx.pdKind === 'single')
@@ -119,6 +134,8 @@ export function toLensConfig(draft: LensDraft, catalog: LensCatalog): LensConfig
     if (draft.rxMode === 'later') prescription = { mode: 'later' };
     else if (draft.rxMode === 'upload' && draft.upload)
       prescription = { mode: 'upload', uploadId: draft.upload.id };
+    else if (draft.rxMode === 'saved' && draft.saved)
+      prescription = { mode: 'saved', prescriptionId: draft.saved.id };
     else if (draft.rxMode === 'manual') {
       const rx = draftPrescription(draft.rx);
       prescription = rx ? { mode: 'manual', rx } : null;
@@ -154,15 +171,14 @@ export function evaluateDraft(
 ): DraftEvaluation {
   const purpose = catalog.purposes.find((option) => option.code === draft.purpose);
   const rx = draftPrescription(draft.rx);
+  // Typed values: entered here, or copied from a saved prescription.
+  const typed =
+    draft.rxMode === 'manual' || (draft.rxMode === 'saved' && draft.saved?.hasValues === true);
   const rxIssues =
-    purpose?.requiresPrescription && draft.rxMode === 'manual' && rx
+    purpose?.requiresPrescription && typed && rx
       ? validatePrescription(rx, { requiresAdd: purpose.requiresAdd })
       : [];
-  const usable =
-    purpose?.requiresPrescription &&
-    draft.rxMode === 'manual' &&
-    rx &&
-    !hasBlockingIssues(rxIssues);
+  const usable = purpose?.requiresPrescription && typed && rx && !hasBlockingIssues(rxIssues);
   const selected: OptionRef[] = [
     ...(draft.indexCode ? [{ type: 'index' as const, code: draft.indexCode }] : []),
     ...(draft.packageCode ? [{ type: 'package' as const, code: draft.packageCode }] : []),
@@ -209,6 +225,8 @@ export function stepComplete(step: StepId, draft: LensDraft, evaluation: DraftEv
     case 'prescription':
       if (draft.rxMode === 'later') return true;
       if (draft.rxMode === 'upload') return draft.upload !== null;
+      if (draft.rxMode === 'saved')
+        return draft.saved !== null && !hasBlockingIssues(evaluation.rxIssues);
       return draftPrescription(draft.rx) !== null && !hasBlockingIssues(evaluation.rxIssues);
     case 'thickness':
       return draft.indexCode !== null && !errorsAt('indexCode');

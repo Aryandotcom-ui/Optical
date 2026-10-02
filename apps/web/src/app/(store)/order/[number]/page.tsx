@@ -22,7 +22,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const [{ number }, { token }] = await Promise.all([params, searchParams]);
   return (
     <div className="mx-auto max-w-content px-gutter pt-10 pb-section">
-      <WithMessages namespaces={['order', 'configurator']}>
+      <WithMessages namespaces={['order', 'configurator', 'auth']}>
         <OrderPageView
           number={decodeURIComponent(number).toUpperCase()}
           token={typeof token === 'string' ? token : ''}

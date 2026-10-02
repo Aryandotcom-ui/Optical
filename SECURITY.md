@@ -32,7 +32,22 @@ information.
 - Prescription uploads are typed by content, capped at 8 MB, stripped of EXIF/XMP, stored privately
   under random names and read only through five-minute signed links.
 - Order links carry an HMAC token; tracking answers the same for a wrong number or email.
-- Coupon, upload, tracking and order endpoints are rate limited per IP (Redis, failing open).
+- Coupon, upload, tracking, order and auth endpoints are rate limited per IP (Redis, failing open).
 
-Authentication, admin access control and the full CSP are introduced in their phases (see the
-roadmap in README.md) and documented here as they land.
+- Passwords are hashed with Argon2id (19 MiB, 2 iterations). New passwords need 10+ characters,
+  are checked against common passwords and must not contain the email name.
+- Sign-in uses a 15-minute JWT and a rotating refresh token in `httpOnly`, `SameSite=Strict`
+  cookies; the refresh cookie is sent only to `/v1/auth`. Reusing a rotated refresh token ends
+  that sign-in on every device. Sign-out, password changes and resets end sessions immediately.
+- Five wrong passwords pause an account's sign-in with exponential backoff (up to an hour);
+  sign-in, registration, refresh and reset endpoints have stricter per-address limits.
+- Sign-in answers identically for an unknown email and a wrong password (with equal hashing
+  work). Reset links are single-use, expire in 30 minutes, travel in the URL fragment, are stored
+  hashed and are limited to three per hour per account.
+- Security events (lockouts, resets, password changes, refresh-token reuse, account deletion)
+  are written to the audit log.
+- Customers can export their data and delete their account; orders are kept for tax records,
+  unlinked, and unused prescriptions are erased.
+
+Admin access control and the full CSP are introduced in their phases (see the roadmap in
+README.md) and documented here as they land.

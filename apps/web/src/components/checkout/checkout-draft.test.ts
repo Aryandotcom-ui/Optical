@@ -9,6 +9,7 @@ import {
   loadDraft,
   saveDraft,
   toPlaceOrder,
+  applyPrefill,
   withPostalLookup,
 } from './checkout-draft';
 
@@ -101,5 +102,28 @@ describe('never losing data', () => {
     const order = toPlaceOrder({ ...emptyCheckoutDraft, line2: '  ', provider: 'cod' }, 100);
     expect(order.address.line2).toBeNull();
     expect(order.paymentProvider).toBe('cod');
+  });
+});
+
+describe('account prefill', () => {
+  it('fills only empty fields', () => {
+    const typed = { ...emptyCheckoutDraft, phone: '98765 43210' };
+    const next = applyPrefill(typed, {
+      email: 'meera@example.com',
+      phone: '91234 56789',
+      line1: '7, 1st Main',
+      postalCode: '560041',
+      city: 'Bengaluru',
+    });
+    expect(next).toMatchObject({
+      email: 'meera@example.com',
+      phone: '98765 43210',
+      line1: '7, 1st Main',
+      postalCode: '560041',
+    });
+    const withAddress = { ...emptyCheckoutDraft, line1: 'My own street' };
+    expect(applyPrefill(withAddress, { line1: '7, 1st Main', city: 'Bengaluru' })).toEqual(
+      withAddress,
+    );
   });
 });

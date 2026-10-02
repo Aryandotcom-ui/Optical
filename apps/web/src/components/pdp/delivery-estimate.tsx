@@ -1,13 +1,17 @@
 'use client';
 
-import { commerce, isValidPostalCode, shippingZoneFor } from '@optical/config/commerce';
-import { estimateDelivery } from '@optical/shared/pricing/delivery';
+import { commerce, isValidPostalCode } from '@optical/config/commerce';
 import { Truck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useMemo, useState, type SyntheticEvent } from 'react';
+import dynamic from 'next/dynamic';
+import { useId, useState, type SyntheticEvent } from 'react';
 import { Button } from '@/components/ui/button';
-import { formatPrice, formatShortDate } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
 import { createLocalValue } from '@/lib/local-value';
+
+const DeliveryWindows = dynamic(() =>
+  import('./delivery-windows').then((module) => module.DeliveryWindows),
+);
 
 /** The last PIN checked, remembered in this browser only. */
 const savedPin = createLocalValue<string>(
@@ -42,19 +46,6 @@ export function DeliveryEstimate() {
     savedPin.set(value);
     setDraft(null);
   };
-
-  // Worked out once per PIN, not on every render of the purchase panel.
-  const { frameOnly, withLenses, zone } = useMemo(() => {
-    if (!checked) return { frameOnly: null, withLenses: null, zone: null };
-    const orderedAt = new Date();
-    const estimate = (needsLensProduction: boolean) =>
-      estimateDelivery({ orderedAt, speed: 'standard', postalCode: checked, needsLensProduction });
-    return {
-      frameOnly: estimate(false),
-      withLenses: estimate(true),
-      zone: shippingZoneFor(checked),
-    };
-  }, [checked]);
 
   return (
     <section aria-labelledby={`${id}-heading`} className="rounded-card bg-surface-muted p-5">
@@ -93,32 +84,8 @@ export function DeliveryEstimate() {
             {t('invalid', { label: commerce.postalCode.label })}
           </p>
         ) : null}
-        {frameOnly ? (
-          <dl className="space-y-1.5">
-            <div className="flex justify-between gap-4">
-              <dt className="text-ink-secondary">{t('frameOnly')}</dt>
-              <dd className="tabular font-medium">
-                {t('window', {
-                  from: formatShortDate(frameOnly.earliest),
-                  to: formatShortDate(frameOnly.latest),
-                })}
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-ink-secondary">{t('withLenses')}</dt>
-              <dd className="tabular font-medium">
-                {t('window', {
-                  from: formatShortDate(withLenses.earliest),
-                  to: formatShortDate(withLenses.latest),
-                })}
-              </dd>
-            </div>
-            {zone.surchargeMinor > 0 ? (
-              <p className="text-ink-secondary">
-                {t('remote', { amount: formatPrice(zone.surchargeMinor) })}
-              </p>
-            ) : null}
-          </dl>
+        {checked ? (
+          <DeliveryWindows pin={checked} />
         ) : !error ? (
           <p className="text-ink-secondary">
             {t('hint', { amount: formatPrice(commerce.shipping.freeShippingThresholdMinor) })}

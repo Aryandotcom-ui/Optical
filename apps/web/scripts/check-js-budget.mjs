@@ -29,6 +29,11 @@ const PAGES = [
   '/checkout',
   '/track',
   '/order/LO-26-001001',
+  '/sign-in',
+  '/register',
+  '/account',
+  '/account/prescriptions',
+  '/wishlist/shared/example-token-0000000000',
 ];
 
 const base = (process.argv[2] ?? 'http://localhost:3000').replace(/\/+$/, '');

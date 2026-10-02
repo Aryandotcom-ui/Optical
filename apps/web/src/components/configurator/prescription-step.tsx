@@ -4,10 +4,16 @@ import { FileCheck2, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { CommerceError, commerceApi } from '@/lib/commerce-api';
+import dynamic from 'next/dynamic';
+import { useSignedInHint } from '@/lib/signed-in';
 import { OptionCard } from './option-card';
 import { RecommendButton } from './recommend-button';
 import { RxEntry } from './rx-entry';
 import type { StepProps } from './step-props';
+
+const SavedPrescriptionPicker = dynamic(() =>
+  import('./saved-prescriptions').then((module) => module.SavedPrescriptionPicker),
+);
 
 const ACCEPT = 'image/jpeg,image/png,image/webp,application/pdf';
 
@@ -82,12 +88,43 @@ export function PrescriptionUpload({
 
 export function PrescriptionStep({ catalog, draft, evaluation, update }: StepProps) {
   const t = useTranslations('configurator.prescription');
+  const tSaved = useTranslations('configurator.saved');
+  const signedIn = useSignedInHint();
   const purpose = catalog.purposes.find((option) => option.code === draft.purpose);
   const modes = ['manual', 'upload', 'later'] as const;
   return (
     <div className="space-y-3">
       <fieldset className="space-y-3">
         <legend className="sr-only">{t('legend')}</legend>
+        {signedIn ? (
+          <OptionCard
+            type="radio"
+            name="rx-mode"
+            value="saved"
+            checked={draft.rxMode === 'saved'}
+            onChange={() => {
+              update({ rxMode: 'saved' });
+            }}
+            title={tSaved('title')}
+            description={tSaved('description')}
+          >
+            <SavedPrescriptionPicker
+              draft={draft}
+              onPick={(patch) => {
+                update({ ...patch, rxMode: 'saved' });
+              }}
+            />
+            {draft.rxMode === 'saved' && evaluation.rxIssues.length > 0 ? (
+              <ul className="mt-2 space-y-1 text-caption text-danger-ink">
+                {evaluation.rxIssues
+                  .filter((issue) => issue.severity === 'error')
+                  .map((issue) => (
+                    <li key={issue.path}>{issue.message}</li>
+                  ))}
+              </ul>
+            ) : null}
+          </OptionCard>
+        ) : null}
         {modes.map((mode) => (
           <OptionCard
             key={mode}

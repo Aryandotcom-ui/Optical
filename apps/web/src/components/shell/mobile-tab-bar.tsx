@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Home, LayoutGrid } from 'lucide-react';
+import { Heart, Home, LayoutGrid, UserRound } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -25,9 +25,11 @@ const tabs = [
   },
 ] as const;
 
+const accountPaths = ['/account', '/sign-in', '/register', '/forgot-password', '/reset-password'];
+
 /**
  * Bottom navigation for phones: large tap targets, safe-area aware. Try-on
- * and account join it when those features ship (Phases 5 and 4).
+ * joins it when that feature ships (Phase 5).
  */
 export function MobileTabBar() {
   const t = useTranslations('shell');
@@ -59,6 +61,12 @@ export function MobileTabBar() {
             active={tab.match(pathname)}
           />
         ))}
+        <TabLink
+          href="/account"
+          label={t('account')}
+          Icon={UserRound}
+          active={accountPaths.some((path) => pathname.startsWith(path))}
+        />
       </ul>
     </nav>
   );

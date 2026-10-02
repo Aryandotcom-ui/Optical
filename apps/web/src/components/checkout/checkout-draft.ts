@@ -17,6 +17,8 @@ export interface CheckoutDraft {
   provider: PaymentProviderCode | null;
   /** True while city and region hold values filled in from the PIN code. */
   autofilled: boolean;
+  /** Signed-in customers: keep this address in the account (ignored for guests). */
+  saveAddress: boolean;
 }
 
 export const emptyCheckoutDraft: CheckoutDraft = {
@@ -32,6 +34,7 @@ export const emptyCheckoutDraft: CheckoutDraft = {
   speed: 'standard',
   provider: null,
   autofilled: false,
+  saveAddress: true,
 };
 
 const DRAFT_KEY = 'checkout-draft';
@@ -110,6 +113,21 @@ export function withPostalLookup(draft: CheckoutDraft, postalCode: string): Chec
   };
 }
 
+/**
+ * Account details arriving after the form opened: only fields still empty
+ * take them, so nothing typed in the meantime is overwritten.
+ */
+export function applyPrefill(current: CheckoutDraft, patch: Partial<CheckoutDraft>): CheckoutDraft {
+  const next = { ...current };
+  if (!current.email && patch.email) next.email = patch.email;
+  if (!current.phone && patch.phone) next.phone = patch.phone;
+  if (!current.line1 && !current.postalCode && patch.line1) {
+    const { email: _email, phone: _phone, ...address } = patch;
+    Object.assign(next, address);
+  }
+  return next;
+}
+
 export type FieldErrors = Partial<Record<keyof CheckoutDraft, string>>;
 type ErrorKey = 'email' | 'phone' | 'fullName' | 'line1' | 'city' | 'region' | 'postalCode';
 /** The `checkout.errors` translator. */
@@ -155,6 +173,7 @@ export function toPlaceOrder(draft: CheckoutDraft, expectedTotalMinor: number): 
     shippingSpeed: draft.speed,
     paymentProvider: draft.provider ?? 'mock',
     expectedTotalMinor,
+    saveAddress: draft.saveAddress,
   };
 }
 
