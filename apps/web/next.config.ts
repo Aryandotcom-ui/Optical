@@ -27,11 +27,24 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: workspaceRoot,
   transpilePackages: ['@optical/config', '@optical/shared'],
   typedRoutes: true,
+  images: {
+    // AVIF is about a third smaller than WebP for the product renders.
+    formats: ['image/avif', 'image/webp'],
+  },
+  // `SOURCEMAPS=1 pnpm build` emits browser source maps, for attributing bundle bytes.
+  productionBrowserSourceMaps: process.env.SOURCEMAPS === '1',
   headers() {
     return Promise.resolve([{ source: '/:path*', headers: securityHeaders }]);
   },
 };
 
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+const withNextIntl = createNextIntlPlugin({
+  requestConfig: './src/i18n/request.ts',
+  experimental: {
+    // ICU messages are compiled at build time, so the browser never downloads
+    // the message parser (about 7 kB gzipped).
+    messages: { format: 'json', path: './messages', locales: 'infer', precompile: true },
+  },
+});
 
 export default withNextIntl(nextConfig);

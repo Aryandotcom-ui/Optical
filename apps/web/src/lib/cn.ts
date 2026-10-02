@@ -1,29 +1,12 @@
 import { clsx, type ClassValue } from 'clsx';
-import { extendTailwindMerge } from 'tailwind-merge';
 
 /**
- * tailwind-merge must know the custom type scale from the design tokens;
- * otherwise it reads `text-body-lg` as a colour and drops `text-on-accent`.
+ * Joins class names, dropping falsy values. It does not resolve conflicting
+ * utilities (that library costs about 8 kB in every page's JavaScript), so
+ * components never pass two utilities for the same property: they choose
+ * with a ternary or a variant, and `className` on a primitive is for layout
+ * additions such as margin, flex or position. See ADR-022.
  */
-const twMerge = extendTailwindMerge({
-  extend: {
-    theme: {
-      text: [
-        'display-xl',
-        'display-lg',
-        'display-md',
-        'title',
-        'headline',
-        'body-lg',
-        'body',
-        'caption',
-      ],
-      radius: ['control', 'card', 'media', 'pill'],
-    },
-  },
-});
-
-/** Joins class names and resolves conflicting Tailwind utilities (last one wins). */
 export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs));
+  return clsx(inputs);
 }

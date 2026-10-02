@@ -15,6 +15,12 @@ export interface ApiRequestOptions {
   acceptStatuses?: number[];
   timeoutMs?: number;
   requestId?: string;
+  /**
+   * Cache the response in the Next.js data cache for this many seconds,
+   * tagged for on-demand revalidation. Omit for no caching.
+   */
+  revalidate?: number;
+  tags?: string[];
   init?: RequestInit;
 }
 
@@ -41,7 +47,9 @@ export async function apiRequest<TSchema extends z.ZodType>(
       ...options.init,
       headers,
       signal: AbortSignal.timeout(options.timeoutMs ?? 3_000),
-      cache: 'no-store',
+      ...(options.revalidate === undefined
+        ? { cache: 'no-store' as const }
+        : { next: { revalidate: options.revalidate, tags: options.tags ?? [] } }),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Network error';

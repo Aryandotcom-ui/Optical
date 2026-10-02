@@ -21,6 +21,8 @@ export interface CatalogIndexEntry {
   size: string | null;
   fit: string | null;
   features: FrameFeature[];
+  /** Face shapes this frame suits (affinity at or above FACE_SHAPE_MATCH). */
+  faceShapes: string[];
   colourFamilies: string[];
   collections: string[];
   priceMinor: number;
@@ -45,6 +47,7 @@ type FacetKey =
   | 'colour'
   | 'fit'
   | 'feature'
+  | 'faceShape'
   | 'collection'
   | 'rating'
   | 'price';
@@ -69,6 +72,8 @@ function valuesFor(
       return entry.colourFamilies;
     case 'feature':
       return entry.features;
+    case 'faceShape':
+      return entry.faceShapes;
     case 'collection':
       return entry.collections;
   }
@@ -94,6 +99,7 @@ function matches(entry: CatalogIndexEntry, query: ListingQuery, except?: FacetKe
   if (!anyOf('colour', query.colour)) return false;
   if (!anyOf('fit', query.fit)) return false;
   if (!anyOf('collection', query.collection)) return false;
+  if (!anyOf('faceShape', query.faceShape)) return false;
   if (except !== 'feature' && !query.feature.every((feature) => entry.features.includes(feature)))
     return false;
   if (except !== 'price') {
@@ -149,6 +155,7 @@ export function computeFacets(
     colour: countValues(pool('colour'), 'colour'),
     fit: countValues(pool('fit'), 'fit'),
     feature: countValues(pool('feature'), 'feature'),
+    faceShape: countValues(pool('faceShape'), 'faceShape'),
     collection: countValues(pool('collection'), 'collection', index.collectionNames),
     rating: [4, 3]
       .map((min) => ({

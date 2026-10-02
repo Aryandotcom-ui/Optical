@@ -88,6 +88,82 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
+  e2e:
+    name: End-to-end, accessibility and performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: optical
+          POSTGRES_PASSWORD: optical
+          POSTGRES_DB: optical
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U optical -d optical"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      DATABASE_URL: postgresql://optical:optical@localhost:5432/optical
+      REDIS_URL: redis://localhost:6379
+      E2E_BASE_URL: http://localhost:3000
+      LHCI_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Chromium for Playwright, Lighthouse and image rendering
+        run: pnpm --filter @optical/web exec playwright install --with-deps chromium
+      - name: Migrate and seed the demo data
+        run: pnpm db:migrate && pnpm db:seed
+      # Rendering every product image takes several minutes, so renders are
+      # cached; the renderer only redraws images whose inputs changed.
+      - uses: actions/cache@v4
+        with:
+          path: apps/web/public/renders
+          key: renders-${{ hashFiles('packages/shared/src/frame-geometry/**', 'scripts/render-product-images/**', 'apps/api/prisma/seed/**') }}
+          restore-keys: renders-
+      - run: pnpm render:images
+      - run: pnpm build
+      - name: Start the API and the storefront
+        run: |
+          pnpm --filter @optical/api start > api.log 2>&1 &
+          pnpm --filter @optical/web start > web.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf http://localhost:4000/readyz > /dev/null && curl -sf http://localhost:3000/healthz > /dev/null && exit 0
+            sleep 1
+          done
+          echo "The apps did not start"; tail -50 api.log web.log; exit 1
+      - name: Initial JavaScript budget
+        run: pnpm --filter @optical/web budget:js http://localhost:3000
+      - name: Playwright (journeys, axe in light and dark, responsiveness)
+        run: pnpm --filter @optical/web test:e2e
+      - name: Lighthouse CI budgets (Home, listing, product page)
+        run: |
+          export CHROME_PATH="$(pnpm --filter @optical/web exec node -p "require('@playwright/test').chromium.executablePath()")"
+          pnpm --filter @optical/web lhci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-reports
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+            apps/web/.lighthouseci/
+            api.log
+            web.log
+          retention-days: 7
+
   audit:
     name: Dependency audit (advisory)
     runs-on: ubuntu-latest

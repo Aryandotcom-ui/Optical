@@ -28,6 +28,7 @@ export const openApiPlugin = fp(
           { name: 'catalogue', description: 'Products, categories and collections' },
           { name: 'search', description: 'Typo-tolerant search and suggestions' },
           { name: 'lenses', description: 'Lens options and pricing' },
+          { name: 'help', description: 'Help centre content' },
           { name: 'system', description: 'Health and readiness probes' },
         ],
       },

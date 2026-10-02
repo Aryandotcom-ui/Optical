@@ -29,6 +29,12 @@ const app = await buildApp(env, {
   redis,
 });
 
+// Connect Redis now rather than on first use, so caching works from the first
+// request. If Redis is down, the client keeps retrying and the cache fails open.
+redis.client.connect().catch((error: unknown) => {
+  app.log.warn({ err: error }, 'Redis is not reachable yet; caching is off until it is');
+});
+
 closeWithGrace({ delay: 10_000 }, async ({ signal, err }) => {
   if (err) app.log.error({ err }, 'Shutting down after an unexpected error');
   else app.log.info({ signal }, 'Shutting down');

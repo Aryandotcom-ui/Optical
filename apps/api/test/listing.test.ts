@@ -18,6 +18,7 @@ function entry(
     size: 'medium',
     fit: 'unisex',
     features: [],
+    faceShapes: [],
     colourFamilies: ['black'],
     collections: [],
     priceMinor: 2_000_00,
@@ -42,6 +43,7 @@ const index: CatalogIndex = {
       popularity: 90,
       collections: ['classics'],
       features: ['lightweight'],
+      faceShapes: ['square', 'oval'],
     }),
     entry({
       id: 'b',
@@ -101,6 +103,15 @@ describe('runListing', () => {
       { value: 'classics', count: 1, label: 'Everyday classics' },
     ]);
     expect(facets.price).toEqual({ minMinor: 1_500_00, maxMinor: 3_000_00 });
+  });
+
+  it('filters by face shape and counts face-shape facets', () => {
+    const result = run({ faceShape: 'square' });
+    expect(result.ids).toEqual(['a']);
+    expect(result.facets.faceShape).toEqual([
+      { value: 'oval', count: 1 },
+      { value: 'square', count: 1 },
+    ]);
   });
 
   it('requires every selected feature', () => {

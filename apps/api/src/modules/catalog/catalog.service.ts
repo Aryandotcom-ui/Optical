@@ -2,12 +2,16 @@ import type {
   Category,
   Collection,
   CategorySlug,
+  CollectionSummary,
   ListingQuery,
   ProductDetail,
   ProductListing,
   ProductSummary,
+  ReviewList,
+  ReviewSort,
   SearchSuggestions,
 } from '@optical/shared/catalog';
+import type { Prisma } from '../../generated/prisma/client';
 import { AppError } from '../../lib/app-error';
 import type { Cache } from '../../lib/cache';
 import type { CatalogRepository } from './catalog.repository';
@@ -17,6 +21,16 @@ import { relatedEntries, runListing, type CatalogIndex } from './listing';
 /** Cache namespace for catalogue reads; admin writes invalidate it (Phase 6). */
 export const CATALOG_CACHE = 'catalog';
 const INDEX_TTL_SECONDS = 60;
+/** Bump when the index entry shape changes, so stale cached copies are never read. */
+const INDEX_KEY = 'index:v2';
+export const REVIEWS_PAGE_SIZE = 10;
+
+const reviewOrder: Record<ReviewSort, Prisma.ReviewOrderByWithRelationInput[]> = {
+  recent: [{ createdAt: 'desc' }],
+  helpful: [{ helpfulCount: 'desc' }, { createdAt: 'desc' }],
+  'rating-high': [{ rating: 'desc' }, { createdAt: 'desc' }],
+  'rating-low': [{ rating: 'asc' }, { createdAt: 'desc' }],
+};
 /** Short, because product pages show live stock. */
 const PRODUCT_TTL_SECONDS = 30;
 
@@ -29,7 +43,7 @@ export class CatalogService {
 
   /** The filterable index of every published product. */
   index(): Promise<CatalogIndex> {
-    return this.cache.getOrSet(CATALOG_CACHE, 'index', INDEX_TTL_SECONDS, async () => {
+    return this.cache.getOrSet(CATALOG_CACHE, INDEX_KEY, INDEX_TTL_SECONDS, async () => {
       const rows = await this.repository.indexRows();
       const collectionNames: Record<string, string> = {};
       for (const row of rows)
@@ -81,6 +95,49 @@ export class CatalogService {
     return rows.map((row) => toSummary(row, now));
   }
 
+  /** Product cards by id, in the order requested; unknown or unpublished ids are skipped. */
+  async byIds(ids: readonly string[]): Promise<ProductSummary[]> {
+    const rows = await this.repository.summaries([...new Set(ids)]);
+    const now = this.now();
+    return rows.map((row) => toSummary(row, now));
+  }
+
+  /** Published reviews with a rating histogram. Throws NOT_FOUND for unknown products. */
+  async reviews(productId: string, sort: ReviewSort, page: number): Promise<ReviewList> {
+    if (!(await this.repository.productExists(productId)))
+      throw AppError.notFound('We could not find that product.');
+    const [rows, groups] = await this.repository.reviews(productId, {
+      orderBy: reviewOrder[sort],
+      skip: (page - 1) * REVIEWS_PAGE_SIZE,
+      take: REVIEWS_PAGE_SIZE,
+    });
+    const histogram = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+    let count = 0;
+    let sum = 0;
+    for (const group of groups) {
+      const key = String(group.rating) as keyof typeof histogram;
+      histogram[key] = group._count._all;
+      count += group._count._all;
+      sum += group.rating * group._count._all;
+    }
+    return {
+      items: rows.map((row) => ({
+        id: row.id,
+        authorName: row.authorName,
+        rating: row.rating,
+        title: row.title,
+        body: row.body,
+        verifiedPurchase: row.orderItemId !== null,
+        helpfulCount: row.helpfulCount,
+        createdAt: row.createdAt.toISOString(),
+      })),
+      page,
+      pageSize: REVIEWS_PAGE_SIZE,
+      total: count,
+      summary: { average: count ? Math.round((sum / count) * 10) / 10 : null, count, histogram },
+    };
+  }
+
   categories(): Promise<Category[]> {
     return this.cache.getOrSet(CATALOG_CACHE, 'categories', INDEX_TTL_SECONDS, async () => {
       const rows = await this.repository.categoriesWithCounts();
@@ -88,6 +145,19 @@ export class CatalogService {
         slug: row.slug as CategorySlug,
         name: row.name,
         description: row.description,
+        productCount: row._count.products,
+      }));
+    });
+  }
+
+  collections(): Promise<CollectionSummary[]> {
+    return this.cache.getOrSet(CATALOG_CACHE, 'collections', INDEX_TTL_SECONDS, async () => {
+      const rows = await this.repository.collections();
+      return rows.map((row) => ({
+        slug: row.slug,
+        name: row.name,
+        tagline: row.tagline,
+        isFeatured: row.isFeatured,
         productCount: row._count.products,
       }));
     });

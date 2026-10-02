@@ -85,14 +85,27 @@ export const frameSpecSchema = z
     rimType: rimTypeSchema,
     hinge: hingeTypeSchema,
     features: z.array(frameFeatureSchema),
+    nosePads: z.boolean(),
     /** Optional hand-made model that replaces the procedural geometry. */
     glbUrl: z.string().nullable(),
   })
   .meta({ id: 'FrameSpec' });
 export type FrameSpec = z.infer<typeof frameSpecSchema>;
 
+/** A colour option on the product page: its own price and what the 3D viewer needs to draw it. */
+export const variantDetailSchema = variantSummarySchema
+  .extend({
+    priceMinor: minor,
+    secondaryHex: z.string().nullable(),
+    hardwareHex: z.string().nullable(),
+    lensTintHex: z.string().nullable(),
+  })
+  .meta({ id: 'VariantDetail' });
+export type VariantDetail = z.infer<typeof variantDetailSchema>;
+
 export const productDetailSchema = productSummarySchema
   .extend({
+    variants: z.array(variantDetailSchema).min(1),
     description: z.string(),
     materialsAndCare: z.string(),
     frame: frameSpecSchema.nullable(),
@@ -122,6 +135,7 @@ export const listingFacetsSchema = z
     colour: z.array(facetOptionSchema),
     fit: z.array(facetOptionSchema),
     feature: z.array(facetOptionSchema),
+    faceShape: z.array(facetOptionSchema),
     collection: z.array(facetOptionSchema),
     rating: z.array(facetOptionSchema),
     price: z.object({ minMinor: minor.nullable(), maxMinor: minor.nullable() }),
@@ -161,6 +175,17 @@ export const collectionSchema = z
   .meta({ id: 'Collection' });
 export type Collection = z.infer<typeof collectionSchema>;
 
+export const collectionSummarySchema = z
+  .object({
+    slug: z.string(),
+    name: z.string(),
+    tagline: z.string(),
+    isFeatured: z.boolean(),
+    productCount: z.number().int().nonnegative(),
+  })
+  .meta({ id: 'CollectionSummary' });
+export type CollectionSummary = z.infer<typeof collectionSummarySchema>;
+
 export const searchSuggestionSchema = z
   .object({
     query: z.string(),
@@ -180,3 +205,43 @@ export const searchSuggestionSchema = z
   })
   .meta({ id: 'SearchSuggestions' });
 export type SearchSuggestions = z.infer<typeof searchSuggestionSchema>;
+
+export const reviewSchema = z
+  .object({
+    id: z.string(),
+    authorName: z.string(),
+    rating: z.number().int().min(1).max(5),
+    title: z.string(),
+    body: z.string(),
+    verifiedPurchase: z.boolean(),
+    helpfulCount: z.number().int().nonnegative(),
+    createdAt: z.iso.datetime(),
+  })
+  .meta({ id: 'Review' });
+export type Review = z.infer<typeof reviewSchema>;
+
+export const reviewListSchema = z
+  .object({
+    items: z.array(reviewSchema),
+    page: z.number().int().positive(),
+    pageSize: z.number().int().positive(),
+    total: z.number().int().nonnegative(),
+    summary: z.object({
+      average: z.number().min(0).max(5).nullable(),
+      count: z.number().int().nonnegative(),
+      /** Count of published reviews per star rating, keys "1" to "5". */
+      histogram: z.record(z.enum(['1', '2', '3', '4', '5']), z.number().int().nonnegative()),
+    }),
+  })
+  .meta({ id: 'ReviewList' });
+export type ReviewList = z.infer<typeof reviewListSchema>;
+
+export const helpArticleSchema = z
+  .object({
+    slug: z.string(),
+    title: z.string(),
+    topic: z.string(),
+    body: z.string(),
+  })
+  .meta({ id: 'HelpArticle' });
+export type HelpArticle = z.infer<typeof helpArticleSchema>;

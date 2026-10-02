@@ -59,6 +59,7 @@ export class CatalogRepository {
           },
         },
         collections: { select: { collection: { select: { slug: true, name: true } } } },
+        faceShapes: { select: { faceShape: true, score: true } },
       },
     });
   }
@@ -123,6 +124,40 @@ export class CatalogRepository {
     });
   }
 
+  /** Published reviews for a product, with sort and paging. */
+  reviews(
+    productId: string,
+    options: { orderBy: Prisma.ReviewOrderByWithRelationInput[]; skip: number; take: number },
+  ) {
+    const where = { productId, status: 'PUBLISHED' as const };
+    return Promise.all([
+      this.db.review.findMany({
+        where,
+        orderBy: options.orderBy,
+        skip: options.skip,
+        take: options.take,
+      }),
+      this.db.review.groupBy({ by: ['rating'], where, _count: { _all: true } }),
+    ]);
+  }
+
+  productExists(productId: string) {
+    return this.db.product
+      .count({ where: { id: productId, ...publishedProduct } })
+      .then((count) => count > 0);
+  }
+
+  helpArticles() {
+    return this.db.helpArticle.findMany({
+      where: { isPublished: true },
+      orderBy: [{ topic: 'asc' }, { sortOrder: 'asc' }],
+    });
+  }
+
+  helpArticle(slug: string) {
+    return this.db.helpArticle.findFirst({ where: { slug, isPublished: true } });
+  }
+
   categoriesWithCounts() {
     return this.db.category.findMany({
       orderBy: { sortOrder: 'asc' },
@@ -131,6 +166,19 @@ export class CatalogRepository {
         name: true,
         description: true,
         _count: { select: { products: { where: publishedProduct } } },
+      },
+    });
+  }
+
+  collections() {
+    return this.db.collection.findMany({
+      orderBy: { sortOrder: 'asc' },
+      select: {
+        slug: true,
+        name: true,
+        tagline: true,
+        isFeatured: true,
+        _count: { select: { products: { where: { product: publishedProduct } } } },
       },
     });
   }

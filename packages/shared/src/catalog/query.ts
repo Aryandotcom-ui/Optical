@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   categorySlugSchema,
   colourFamilySchema,
+  faceShapeSchema,
   frameFeatureSchema,
   frameFitSchema,
   frameMaterialSchema,
@@ -9,11 +10,7 @@ import {
   frameSizeSchema,
   listingSortSchema,
 } from './enums';
-
-export const DEFAULT_PAGE_SIZE = 24;
-export const MAX_PAGE_SIZE = 48;
-export const MAX_PAGE = 100;
-export const MAX_SEARCH_LENGTH = 80;
+import { DEFAULT_PAGE_SIZE, MAX_PAGE, MAX_PAGE_SIZE, MAX_SEARCH_LENGTH } from './constants';
 
 /**
  * Accepts `?shape=round&shape=square`, `?shape=round,square` or a single
@@ -56,6 +53,8 @@ export const listingQuerySchema = z
     colour: multi(colourFamilySchema),
     fit: multi(frameFitSchema),
     feature: multi(frameFeatureSchema),
+    /** Frames that suit any of these face shapes (affinity ≥ FACE_SHAPE_MATCH). */
+    faceShape: multi(faceShapeSchema),
     collection: multi(z.string().regex(/^[a-z0-9-]{1,64}$/)),
     minPrice: optionalInt(0, 10_000_000_00),
     maxPrice: optionalInt(0, 10_000_000_00),
@@ -75,54 +74,3 @@ export const listingQuerySchema = z
 
 export type ListingQuery = z.output<typeof listingQuerySchema>;
 export type ListingQueryInput = z.input<typeof listingQuerySchema>;
-
-/** Filters that narrow the result set (everything except sort and paging). */
-export const listingFilterKeys = [
-  'category',
-  'q',
-  'shape',
-  'material',
-  'size',
-  'colour',
-  'fit',
-  'feature',
-  'collection',
-  'minPrice',
-  'maxPrice',
-  'minRating',
-  'inStock',
-] as const satisfies readonly (keyof ListingQuery)[];
-
-/**
- * Serialises a query to canonical URL search params: stable key order,
- * sorted multi-values, defaults omitted. Equal filters always produce the
- * same URL, which keeps caches and shared links consistent.
- */
-export function toListingSearchParams(query: Partial<ListingQuery>): URLSearchParams {
-  const params = new URLSearchParams();
-  const keys = [...listingFilterKeys, 'sort', 'page', 'pageSize'] as const;
-  for (const key of keys) {
-    const value = query[key];
-    if (value === undefined || value === '' || value === false) continue;
-    if (Array.isArray(value)) {
-      if (value.length) params.set(key, [...value].sort().join(','));
-      continue;
-    }
-    if (key === 'sort' && value === 'recommended') continue;
-    if (key === 'page' && value === 1) continue;
-    if (key === 'pageSize' && value === DEFAULT_PAGE_SIZE) continue;
-    params.set(key, String(value));
-  }
-  return params;
-}
-
-/** Number of active filters, for the "Filters (3)" button and "Clear all". */
-export function countActiveFilters(query: ListingQuery): number {
-  let count = 0;
-  for (const key of listingFilterKeys) {
-    const value = query[key];
-    if (Array.isArray(value)) count += value.length;
-    else if (value !== undefined && value !== false && value !== '') count += 1;
-  }
-  return count;
-}

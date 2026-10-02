@@ -1,4 +1,4 @@
-import type { ListingQuery } from '@optical/shared/catalog';
+import type { ListingQuery, ReviewSort } from '@optical/shared/catalog';
 import type { FastifyReply } from 'fastify';
 import type { CatalogService } from './catalog.service';
 
@@ -25,9 +25,24 @@ export class CatalogController {
     return { items: await this.service.related(productId) };
   }
 
+  async byIds(ids: string[], reply: FastifyReply) {
+    void reply.header('cache-control', PUBLIC_CACHE);
+    return { items: await this.service.byIds(ids) };
+  }
+
+  reviews(productId: string, sort: ReviewSort, page: number, reply: FastifyReply) {
+    void reply.header('cache-control', PUBLIC_CACHE);
+    return this.service.reviews(productId, sort, page);
+  }
+
   async categories(reply: FastifyReply) {
     void reply.header('cache-control', PUBLIC_CACHE);
     return { items: await this.service.categories() };
+  }
+
+  async collections(reply: FastifyReply) {
+    void reply.header('cache-control', PUBLIC_CACHE);
+    return { items: await this.service.collections() };
   }
 
   collection(slug: string, reply: FastifyReply) {

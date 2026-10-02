@@ -38,11 +38,33 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('lets callers override conflicting utilities', () => {
-    render(<Button className="px-10">Wide</Button>);
-    const classes = screen.getByRole('button').className.split(' ');
-    expect(classes).toContain('px-10');
-    expect(classes).not.toContain('px-5');
+  it('adds caller classes for layout', () => {
+    render(<Button className="mt-6">Spaced</Button>);
+    expect(screen.getByRole('button').className.split(' ')).toContain('mt-6');
+  });
+
+  it('wraps long labels only when asked', () => {
+    render(
+      <>
+        <Button>Short</Button>
+        <Button wrap>A much longer label</Button>
+      </>,
+    );
+    const [short, long] = screen.getAllByRole('button');
+    expect(short?.className).toContain('whitespace-nowrap');
+    expect(long?.className).toContain('whitespace-normal');
+    expect(long?.className).not.toContain('whitespace-nowrap');
+  });
+
+  it('styles a child link when asChild is set', () => {
+    render(
+      <Button asChild size="lg">
+        <a href="#shop">Shop</a>
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: 'Shop' });
+    expect(link.className).toContain('min-h-12');
+    expect(link.getAttribute('type')).toBeNull();
   });
 });
 

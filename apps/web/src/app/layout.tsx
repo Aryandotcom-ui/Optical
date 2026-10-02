@@ -2,14 +2,34 @@ import { brand } from '@optical/config/brand';
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { NextIntlClientProvider } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { Providers } from '@/components/providers/providers';
 import { getEnv } from '@/env';
 import './globals.css';
 
+/**
+ * Message namespaces that client components read. Only these are sent to
+ * the browser; server components read the rest directly.
+ */
+const CLIENT_NAMESPACES = [
+  'common',
+  'error',
+  'product',
+  'wishlist',
+  'compare',
+  'search',
+  'shell',
+  'filters',
+  'listing',
+  'pdp',
+  'wishlistPage',
+  'comparePage',
+] as const;
+
 const inter = localFont({
   src: './fonts/InterVariable-latin.woff2',
-  weight: '100 900',
+  weight: '400 700',
   style: 'normal',
   display: 'swap',
   variable: '--font-inter',
@@ -40,7 +60,12 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const t = await getTranslations('common');
+  const [t, messages] = await Promise.all([getTranslations('common'), getMessages()]);
+  const clientMessages = {
+    ...Object.fromEntries(CLIENT_NAMESPACES.map((namespace) => [namespace, messages[namespace]])),
+    // The home page's only client string is the hero's pause button.
+    home: { hero: { pause: messages.home.hero.pause } },
+  };
   return (
     <html lang="en-IN" className={inter.variable}>
       <body className="bg-background text-ink">
@@ -50,7 +75,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         >
           {t('skipToContent')}
         </a>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

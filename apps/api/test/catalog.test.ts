@@ -1,6 +1,7 @@
 import {
   productDetailSchema,
   productListingSchema,
+  reviewListSchema,
   searchSuggestionSchema,
   type ProductListing,
 } from '@optical/shared/catalog';
@@ -173,6 +174,88 @@ describe('GET /v1/products/:slug', () => {
   });
 });
 
+describe('face-shape filter', () => {
+  it('returns frames that suit the chosen face shape', async () => {
+    const result = await list('?faceShape=round&category=eyeglasses&pageSize=48');
+    expect(result.total).toBeGreaterThan(5);
+    // Round frames do not suit round faces, so none should appear.
+    expect(result.items.some((item) => item.shape === 'round')).toBe(false);
+    expect(result.facets.faceShape.map((option) => option.value)).toContain('square');
+  });
+});
+
+describe('GET /v1/products/by-ids', () => {
+  it('returns cards in the requested order and skips unknown ids', async () => {
+    const harbour = productDetailSchema.parse(
+      (await app.inject({ method: 'GET', url: '/v1/products/harbour' })).json(),
+    );
+    const pike = productDetailSchema.parse(
+      (await app.inject({ method: 'GET', url: '/v1/products/pike' })).json(),
+    );
+    const unknown = '0192f4c8-0000-7000-8000-000000000000';
+    const response = await app.inject({
+      method: 'GET',
+      url: `/v1/products/by-ids?ids=${pike.id},${unknown},${harbour.id}`,
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json<{ items: { name: string }[] }>().items.map((item) => item.name)).toEqual([
+      'Pike',
+      'Harbour',
+    ]);
+  });
+
+  it('rejects malformed ids', async () => {
+    expect(
+      (await app.inject({ method: 'GET', url: '/v1/products/by-ids?ids=nope' })).statusCode,
+    ).toBe(422);
+  });
+});
+
+describe('GET /v1/products/:id/reviews', () => {
+  it('returns published reviews with a histogram that matches the summary', async () => {
+    const product = productDetailSchema.parse(
+      (await app.inject({ method: 'GET', url: '/v1/products/harbour' })).json(),
+    );
+    const response = await app.inject({
+      method: 'GET',
+      url: `/v1/products/${product.id}/reviews?sort=rating-low`,
+    });
+    expect(response.statusCode).toBe(200);
+    const reviews = reviewListSchema.parse(response.json());
+    const histogramTotal = Object.values(reviews.summary.histogram).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    expect(histogramTotal).toBe(reviews.summary.count);
+    expect(reviews.summary.count).toBe(product.rating.count);
+    expect(reviews.summary.average).toBe(product.rating.average);
+    const ratings = reviews.items.map((review) => review.rating);
+    expect([...ratings].sort((a, b) => a - b)).toEqual(ratings);
+    expect(reviews.items.some((review) => review.verifiedPurchase)).toBe(true);
+  });
+
+  it('404s for unknown products', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/v1/products/0192f4c8-0000-7000-8000-000000000000/reviews',
+    });
+    expect(response.statusCode).toBe(404);
+  });
+});
+
+describe('help articles', () => {
+  it('lists articles and returns one by slug', async () => {
+    const list = await app.inject({ method: 'GET', url: '/v1/help/articles' });
+    const items = list.json<{ items: { slug: string; topic: string }[] }>().items;
+    expect(items.length).toBe(12);
+    const article = await app.inject({ method: 'GET', url: '/v1/help/articles/returns' });
+    expect(article.json<{ title: string }>().title).toBe('How do returns work?');
+    expect((await app.inject({ method: 'GET', url: '/v1/help/articles/nope' })).statusCode).toBe(
+      404,
+    );
+  });
+});
+
 describe('GET /v1/products/:id/related', () => {
   it('suggests similar products from the same category', async () => {
     const product = productDetailSchema.parse(
@@ -218,6 +301,21 @@ describe('categories and collections', () => {
     const collection = response.json<{ name: string; products: { name: string }[] }>();
     expect(collection.name).toBe('Featherweight');
     expect(collection.products[0]?.name).toBe('Ulla');
+  });
+
+  it('lists collections with product counts', async () => {
+    const { items } = (await app.inject({ method: 'GET', url: '/v1/collections' })).json<{
+      items: { slug: string; productCount: number; isFeatured: boolean }[];
+    }>();
+    expect(items.map((item) => item.slug)).toEqual([
+      'everyday-classics',
+      'featherweight',
+      'titanium',
+      'sun-season',
+      'screen-time',
+      'statement',
+    ]);
+    expect(items.every((item) => item.productCount > 0)).toBe(true);
   });
 
   it('404s for unknown collections', async () => {

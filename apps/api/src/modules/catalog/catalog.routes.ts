@@ -2,11 +2,14 @@ import { apiErrorSchema } from '@optical/shared/api';
 import {
   categorySchema,
   collectionSchema,
+  collectionSummarySchema,
   listingQuerySchema,
   MAX_SEARCH_LENGTH,
   productDetailSchema,
   productListingSchema,
   productSummarySchema,
+  reviewListSchema,
+  reviewSortSchema,
   searchSuggestionSchema,
 } from '@optical/shared/catalog';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
@@ -35,6 +38,53 @@ export const catalogRoutes: FastifyPluginAsyncZod<{ controller: CatalogControlle
       },
     },
     (request, reply) => controller.list(request.query, reply),
+  );
+
+  // Registered before /products/:slug so "by-ids" is never read as a slug.
+  app.get(
+    '/products/by-ids',
+    {
+      schema: {
+        tags: ['catalogue'],
+        summary: 'Product cards by id',
+        description:
+          'For the wishlist and compare: up to 48 comma-separated ids, returned in the order given. Unknown ids are skipped.',
+        querystring: z.object({
+          ids: z.preprocess(
+            (value) =>
+              typeof value === 'string'
+                ? value
+                    .split(',')
+                    .map((id) => id.trim())
+                    .filter(Boolean)
+                : value,
+            z.array(z.uuid()).min(1).max(48),
+          ),
+        }),
+        response: { 200: z.object({ items: z.array(productSummarySchema) }), 422: apiErrorSchema },
+      },
+    },
+    (request, reply) => controller.byIds(request.query.ids, reply),
+  );
+
+  app.get(
+    '/products/:id/reviews',
+    {
+      schema: {
+        tags: ['catalogue'],
+        summary: 'Product reviews',
+        description:
+          'Published reviews, 10 per page, with the rating histogram. Verified purchases come from delivered orders.',
+        params: z.object({ id: z.uuid() }),
+        querystring: z.object({
+          sort: reviewSortSchema.default('recent'),
+          page: z.coerce.number().int().min(1).max(100).default(1),
+        }),
+        response: { 200: reviewListSchema, ...errors },
+      },
+    },
+    (request, reply) =>
+      controller.reviews(request.params.id, request.query.sort, request.query.page, reply),
   );
 
   app.get(
@@ -75,6 +125,18 @@ export const catalogRoutes: FastifyPluginAsyncZod<{ controller: CatalogControlle
       },
     },
     (_request, reply) => controller.categories(reply),
+  );
+
+  app.get(
+    '/collections',
+    {
+      schema: {
+        tags: ['catalogue'],
+        summary: 'List collections',
+        response: { 200: z.object({ items: z.array(collectionSummarySchema) }) },
+      },
+    },
+    (_request, reply) => controller.collections(reply),
   );
 
   app.get(

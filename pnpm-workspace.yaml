@@ -12,6 +12,8 @@ onlyBuiltDependencies:
 ignoredBuiltDependencies:
   - '@parcel/watcher'
   - '@swc/core'
+  # Prisma 7 runs without native engines; its install script only checks for them.
+  - prisma
 
 # Security patches for transitive dependencies of the Prisma CLI, which pins
 # vulnerable versions (GHSA-3f6p-5ww8-9rcr, GHSA-rgwj-5xj2-c3m3,

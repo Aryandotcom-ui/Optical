@@ -1,4 +1,5 @@
 import {
+  FACE_SHAPE_MATCH,
   frameSizeForWidth,
   stockStateFor,
   type CategorySlug,
@@ -46,6 +47,9 @@ export function toIndexEntry(row: IndexRow): CatalogIndexEntry {
     size: row.frame ? frameSizeForWidth(row.frame.totalWidthMm) : null,
     fit: row.fit,
     features: (row.frame?.features ?? []) as FrameFeature[],
+    faceShapes: row.faceShapes
+      .filter((affinity) => affinity.score >= FACE_SHAPE_MATCH)
+      .map((affinity) => affinity.faceShape),
     colourFamilies: [...new Set(row.variants.map((variant) => variant.colourFamily))],
     collections: row.collections.map(({ collection }) => collection.slug),
     priceMinor: effectivePrice(row.basePriceMinor, row.variants),
@@ -106,8 +110,19 @@ export function toSummary(row: ProductSummaryRow, now: Date): ProductSummary {
 
 export function toDetail(row: ProductDetailRow, now: Date): ProductDetail {
   const frame = row.frame;
+  const summary = toSummary(row, now);
   return {
-    ...toSummary(row, now),
+    ...summary,
+    variants: summary.variants.map((variant, index) => {
+      const source = row.variants[index];
+      return {
+        ...variant,
+        priceMinor: source?.priceOverrideMinor ?? row.basePriceMinor,
+        secondaryHex: source?.secondaryHex ?? null,
+        hardwareHex: source?.hardwareHex ?? null,
+        lensTintHex: source?.lensTintHex ?? null,
+      };
+    }),
     description: row.description,
     materialsAndCare: row.materialsAndCare,
     frame: frame
@@ -123,6 +138,7 @@ export function toDetail(row: ProductDetailRow, now: Date): ProductDetail {
           rimType: frame.rimType as RimType,
           hinge: frame.hinge as HingeType,
           features: frame.features as FrameFeature[],
+          nosePads: frame.nosePads,
           glbUrl: frame.glbUrl,
         }
       : null,

@@ -16,6 +16,8 @@ import { CatalogRepository } from './modules/catalog/catalog.repository';
 import { catalogRoutes } from './modules/catalog/catalog.routes';
 import { CatalogService } from './modules/catalog/catalog.service';
 import { healthRoutes } from './modules/health/health.routes';
+import { helpRoutes } from './modules/help/help.routes';
+import { HelpService } from './modules/help/help.service';
 import { HealthService } from './modules/health/health.service';
 import { LensController } from './modules/lens/lens.controller';
 import { LensRepository } from './modules/lens/lens.repository';
@@ -105,6 +107,7 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
     async (v1) => {
       await v1.register(catalogRoutes, { controller: new CatalogController(catalogService) });
       await v1.register(lensRoutes, { controller: new LensController(lensService) });
+      await v1.register(helpRoutes, { service: new HelpService(catalogRepository, cache) });
     },
     { prefix: '/v1' },
   );

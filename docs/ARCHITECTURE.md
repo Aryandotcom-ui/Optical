@@ -110,3 +110,20 @@ shipping thresholds) live in `packages/config` and become admin-editable in Phas
 | `GET api:/readyz`  | Readiness. `ready`, `degraded` (Redis down, still serving, HTTP 200) or `unavailable` (database down, HTTP 503). |
 | `GET web:/healthz` | Liveness of the Next.js server.                                                                                  |
 | `web:/status`      | Human-readable status page built from the API probes.                                                            |
+
+## The storefront (`apps/web`)
+
+| Path                     | What lives there                                                                                                                                                      |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/(store)`        | Store routes: home, `/shop`, `/shop/[category]`, `/collections/[slug]`, `/search`, `/p/[slug]`, wishlist, compare, help and legal pages. They share the shell layout. |
+| `src/components/shell`   | Header (disclosure mega menu, search launcher, mobile menu), announcement bar, footer, mobile tab bar.                                                                |
+| `src/components/listing` | Filters, toolbar and the server-rendered listing; the URL is the state (ADR-020).                                                                                     |
+| `src/components/pdp`     | Gallery, 3D viewer, purchase panel, fit guide, delivery estimate, reviews.                                                                                            |
+| `src/components/home`    | Hero (photo, then an optional 3D upgrade), lens story, face shapes, store promises.                                                                                   |
+| `src/lib/catalog.ts`     | Server-only data access: validated API calls through Next's fetch cache.                                                                                              |
+| `src/lib/browser-api.ts` | The few calls made from the browser (search suggestions, wishlist, compare).                                                                                          |
+| `src/content/legal`      | Policy pages as typed content built from settings (ADR-027).                                                                                                          |
+
+Server components render everything they can. Client components are limited to interaction, and
+anything not needed for the first paint (dialogs, the search palette, toasts, three.js) loads on
+demand, keeping each page within the 170 kB initial JavaScript budget (ADR-021).

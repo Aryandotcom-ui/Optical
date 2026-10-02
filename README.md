@@ -6,9 +6,9 @@ plain language, honest pricing, and on-device virtual try-on.
 This repository is a TypeScript monorepo with a Next.js storefront, a Fastify API and shared
 packages. It runs fully locally with no paid services or API keys.
 
-> **Status: Phase 1 (data and API core).** The data model, a deterministic demo catalogue of 64
-> frames, the catalogue, search and lens-pricing API, the shared pricing engine and procedurally
-> rendered product images are in place. The storefront UI arrives in Phase 2; see
+> **Status: Phase 2 (storefront browsing).** The storefront is browsable: home, listings with
+> filters in the URL, product pages with a 3D viewer and a to-scale fit guide, search, wishlist,
+> compare, help and policy pages. Lens selection, cart and checkout arrive in Phase 3; see
 > [the roadmap](#roadmap).
 
 ## Quick start
@@ -30,6 +30,8 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 | What                     | Where                                   |
 | ------------------------ | --------------------------------------- |
 | Storefront               | http://localhost:3000                   |
+| All frames               | http://localhost:3000/shop              |
+| A product page           | http://localhost:3000/p/harbour         |
 | System status            | http://localhost:3000/status            |
 | Design system (dev only) | http://localhost:3000/dev/design-system |
 | API                      | http://localhost:4000                   |
@@ -49,6 +51,9 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 | `pnpm test`                                      | Vitest in every package. API integration tests need `pnpm docker:up`.                |
 | `pnpm test:coverage`                             | Tests with coverage thresholds.                                                      |
 | `pnpm check`                                     | lint, typecheck, test, build. Run before pushing.                                    |
+| `pnpm --filter @optical/web test:e2e`            | Playwright journeys, axe in both themes and measured INP (needs `pnpm build`).       |
+| `pnpm --filter @optical/web budget:js`           | Initial JavaScript per page against the 170 kB gzipped budget.                       |
+| `pnpm --filter @optical/web lhci`                | Lighthouse CI budgets (set `CHROME_PATH` if Chrome isn't found).                     |
 | `pnpm format` / `format:check`                   | Prettier.                                                                            |
 | `pnpm docker:up` / `docker:down` / `docker:logs` | Local services.                                                                      |
 | `pnpm db:migrate`                                | Applies pending migrations (`prisma migrate deploy`).                                |
@@ -58,7 +63,7 @@ pnpm dev         # web on :3000, API on :4000, both with hot reload
 | `pnpm render:images`                             | Renders product images. `--force` redraws all, `--only=<slug>` one product.          |
 | `pnpm setup:assets`                              | Ensures Chromium is available, then renders images.                                  |
 
-End-to-end tests (`test:e2e`) arrive with the storefront in Phase 2.
+See [docs/TESTING.md](docs/TESTING.md) for what each suite covers and the performance budgets.
 
 ## Demo data
 
@@ -103,7 +108,8 @@ flowchart LR
   C[[packages/config]] -.-> W & A
 ```
 
-- `apps/web` is the storefront (and later the admin panel)
+- `apps/web` is the storefront (and later the admin panel): server components by default, with
+  client code kept under a 170 kB initial budget ([ADR-021](docs/DECISIONS.md))
 - `apps/api` is the REST API, with OpenAPI generated from Zod schemas
 - `packages/shared` holds the schemas, API contracts and money maths that both apps import
 - `packages/config` holds brand, market (currency, tax, postal codes, shipping zones), feature flags, env validation, design tokens, and the lint and TypeScript presets
@@ -154,9 +160,9 @@ the site at a LAN IP address (for example from a phone), try-on needs HTTPS. Try
 | Phase | Scope                                                                     | State |
 | ----- | ------------------------------------------------------------------------- | ----- |
 | 0     | Foundations: monorepo, tooling, tokens, env validation, health checks, CI | Done  |
-| 1     | Data model, seed, catalogue/search/lens-quote API, pricing engine         | Next  |
-| 2     | Storefront browsing: shell, home, listings, product pages, 3D viewer      |       |
-| 3     | Lens configurator, cart, checkout, payments, emails                       |       |
+| 1     | Data model, seed, catalogue/search/lens-quote API, pricing engine         | Done  |
+| 2     | Storefront browsing: shell, home, listings, product pages, 3D viewer      | Done  |
+| 3     | Lens configurator, cart, checkout, payments, emails                       | Next  |
 | 4     | Auth and account area                                                     |       |
 | 5     | Virtual try-on and Frame Finder                                           |       |
 | 6     | Admin panel                                                               |       |

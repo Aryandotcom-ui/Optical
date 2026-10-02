@@ -151,3 +151,92 @@ The seed uses a seeded PRNG and a fixed "today" (15 September 2026), so every ma
 run gets identical data, and tests can assert exact counts. It wipes the database first and refuses
 to run when `NODE_ENV=production`. Sample order totals come from the real pricing engine, and their
 timelines come from the state machine.
+
+## ADR-020: Dynamic storefront pages over a cached data layer
+
+**Status:** accepted · Phase 2
+Store pages render on the server per request (the shell reads cookies and listings read the URL),
+but every catalogue call goes through Next's fetch cache (`revalidate: 60`, tagged `catalog`) on
+top of the API's Redis cache, so a render is a few cached reads. Listing state lives entirely in
+the URL: filters are canonical query strings (`shape=round,square`), back and forward work, links
+reproduce results, and "show more" renders pages 1 to N on the server. Filtered variants get
+`noindex` with a canonical to the clean listing. Search queries are never cached.
+
+## ADR-021: A 170 kB budget for initial JavaScript, and how it is met
+
+**Status:** accepted · Phase 2
+The framework alone (React DOM, the Next.js router and React Server Components) is about 138 kB
+gzipped, which leaves roughly 30 kB for the store. `scripts/check-js-budget.mjs` enforces the
+limit on every main route in CI. To fit:
+
+- Browser code never imports Zod. Constants and URL helpers live in
+  `@optical/shared/catalog/lite` and `@optical/shared/pricing/delivery`, and a test fails if Zod
+  ever reaches those entry points.
+- Code that only runs after an interaction loads on demand: dialogs (Radix Dialog behind
+  `LazySheet`), the search palette (cmdk and TanStack Query), toasts (sonner, on the first toast),
+  the 3D viewer (three.js).
+- Native elements replace widgets where they do the job: `<details>` for filter groups, two
+  range inputs for the price slider, and a disclosure button for the desktop menu (the WAI-ARIA
+  pattern for site navigation) instead of Radix NavigationMenu.
+- ICU messages are precompiled at build time (next-intl `precompile`), and the browser only
+  receives the message namespaces client components use.
+- Reviews render on the server with link-based sorting and paging (ADR-025).
+- The Inter subset keeps weights 400 to 700 at the text optical size (39 kB instead of 87 kB).
+
+Motion (Framer Motion) is not used yet: Phase 2's transitions are CSS. It returns, loaded only
+where needed, when a feature calls for gestures, springs or shared-element fallbacks.
+
+## ADR-022: `cn` joins class names without resolving conflicts
+
+**Status:** accepted · Phase 2
+tailwind-merge (about 8 kB gzipped on every page) was replaced by plain `clsx`. Components never
+emit two utilities for the same property: they choose with a ternary or a `cva` variant (for
+example `Button`'s `wrap`), and `className` on a primitive is for layout additions such as margin,
+flex or position. `Skeleton` only applies its default radius when the caller doesn't pass one.
+
+## ADR-023: 3D viewer from the shared parametric geometry
+
+**Status:** accepted · Phase 2
+The product viewer uses React Three Fiber with the same `buildFrameGeometry`, materials and
+patterns as the renderer (ADR-017), so the model matches the photos. Lighting is generated in code
+(three's `RoomEnvironment` through a PMREM generator); nothing is downloaded, so it works offline.
+From drei only `OrbitControls` is used. The viewer is loaded on demand (three.js, React Three Fiber and drei, about 240 kB gzipped),
+is keyboard operable (arrow keys turn, plus and minus zoom, 0 resets) and has button
+alternatives to dragging (WCAG 2.5.7). The home hero upgrades from its photo to a gently swaying
+model only when the page is idle on a wide screen without reduced motion or data saver, and can
+be paused.
+
+## ADR-024: Lighthouse with applied throttling; INP measured in Playwright
+
+**Status:** accepted · Phase 2
+Lighthouse CI runs the mobile profile on Home, a listing and a product page, three runs each,
+with throttling applied in the browser. Lighthouse's default simulated throttling replays an
+unthrottled trace; against a local HTTP/1.1 server that trace runs hydration before the hero image
+paints, so the model reports an LCP of 3 s or more for a page a throttled browser paints in
+1.7 s. Applied throttling measures what a slow phone actually does. INP needs real interactions,
+so `e2e/responsiveness.spec.ts` measures Event Timing durations for filtering, choosing a colour
+and saving on a 4x slowed CPU against the 200 ms budget; Total Blocking Time stays in Lighthouse
+as a warning.
+
+## ADR-025: Reviews are server-rendered, with links for sorting and paging
+
+**Status:** accepted · Phase 2
+Sorting (`?reviews=helpful`) and "show more" (`?reviewPage=2`) are plain links, so reviews work
+without JavaScript, cost the product page no client code, and the first page is in the HTML for
+search engines. The product page's canonical URL ignores these parameters.
+
+## ADR-026: Features from later phases are not faked
+
+**Status:** accepted · Phase 2
+Until lens selection and checkout exist (Phase 3), product pages show no "Add to cart" or "Choose
+lenses" button; a short note says ordering is on its way and the wishlist keeps the frame. Try-on
+and Frame Finder links appear only when those features ship (Phase 5). Help copy that mentions
+later features (returns from your account, the PD tool) describes how the store will work.
+
+## ADR-027: Legal pages are typed content generated from settings
+
+**Status:** accepted · Phase 2
+Privacy, terms, returns and shipping pages are TypeScript content modules (`src/content/legal`),
+not message-catalogue strings: they are long-form documents, and every day, fee and threshold in
+them is read from `packages/config`, so a policy change in settings can't leave a stale number in
+a legal page. They are drafts for India and need legal review before launch (docs/LEGAL.md).

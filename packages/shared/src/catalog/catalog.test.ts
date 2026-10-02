@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { frameSizeForWidth, stockStateFor } from './enums';
-import {
-  countActiveFilters,
-  DEFAULT_PAGE_SIZE,
-  listingQuerySchema,
-  toListingSearchParams,
-} from './query';
+import { DEFAULT_PAGE_SIZE } from './constants';
+import { listingQuerySchema } from './query';
+import { countActiveFilters, toListingQueryString, toListingSearchParams } from './url';
 
 describe('listingQuerySchema', () => {
   it('applies defaults to an empty query', () => {
@@ -16,6 +13,7 @@ describe('listingQuerySchema', () => {
       colour: [],
       fit: [],
       feature: [],
+      faceShape: [],
       collection: [],
       sort: 'recommended',
       page: 1,
@@ -116,5 +114,16 @@ describe('stockStateFor', () => {
     expect(stockStateFor(0)).toBe('out-of-stock');
     expect(stockStateFor(3)).toBe('low-stock');
     expect(stockStateFor(4)).toBe('in-stock');
+  });
+});
+
+describe('toListingQueryString', () => {
+  it('keeps commas between multi-values readable', () => {
+    const query = listingQuerySchema.parse({ shape: 'square,round', material: 'titanium' });
+    expect(toListingQueryString(query)).toBe('shape=round,square&material=titanium');
+  });
+
+  it('still encodes other reserved characters', () => {
+    expect(toListingQueryString({ q: 'a&b' })).toBe('q=a%26b');
   });
 });

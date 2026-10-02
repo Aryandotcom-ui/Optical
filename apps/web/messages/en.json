@@ -10,11 +10,55 @@
     "opensInNewTab": "(opens in a new tab)"
   },
   "home": {
-    "eyebrow": "Development build",
-    "lede": "The foundations are in place: design tokens, the API, local services and the test pipeline. The storefront is built on top of these next.",
-    "statusCta": "Check system status",
-    "designSystemCta": "View the design system",
-    "apiDocsCta": "Open the API reference"
+    "metaDescription": "Prescription glasses, sunglasses and computer glasses with real measurements, lenses explained in plain language and honest prices.",
+    "hero": {
+      "lede": "Frames with real measurements, lenses explained in plain words, and prices that include the tax. Pick the shape; we'll help with the rest.",
+      "shopEyeglasses": "Shop eyeglasses",
+      "shopSunglasses": "Shop sunglasses",
+      "shown": "Shown: {name} in {colour}, {price}",
+      "pause": "Pause the rotating frame"
+    },
+    "categoriesTitle": "Shop by category",
+    "categoryCount": "{count, plural, one {# style} other {# styles}}",
+    "lens": {
+      "eyebrow": "Lenses, explained",
+      "title": "The part you look through deserves the most care.",
+      "thinEyebrow": "Thickness",
+      "thinTitle": "Thin where your prescription needs it.",
+      "thinBody": "Stronger prescriptions make thicker lenses. Higher-index materials bend light more, so the same power fits in a slimmer lens. {standard} is included with every frame; we suggest going up to {thinnest} only when your prescription calls for it.",
+      "thinPrice": "Up to {price} for the thinnest. Edge thickness shown for a −4.00 lens, 60 mm wide.",
+      "clarityEyebrow": "Clarity",
+      "clarityTitle": "Fewer reflections, clearer eyes.",
+      "addOn": "Add it for {price}, or as part of a coating package.",
+      "screensEyebrow": "Screens",
+      "screensTitle": "Honest about blue light.",
+      "screensPrice": "Computer lenses without power from {price}.",
+      "sunEyebrow": "Sun",
+      "sunTitle": "Sunglasses that fit your prescription.",
+      "sunBody": "Every pair of sunglasses blocks UV up to 400 nm. Polarised lenses cut the glare off water and roads, and photochromic lenses darken outdoors and clear up inside.",
+      "sunPrice": "Polarised lenses {price}.",
+      "without": "Without coating",
+      "with": "Anti-reflective"
+    },
+    "faces": {
+      "title": "Not sure what suits you?",
+      "body": "Start with your face shape. It's a guide, not a rule: the right pair is the one you like wearing.",
+      "count": "{count, plural, one {# frame} other {# frames}}"
+    },
+    "seeAll": "See all",
+    "collectionsTitle": "Collections",
+    "collectionCount": "{count, plural, one {# frame} other {# frames}}",
+    "trust": {
+      "title": "What you can count on",
+      "returnsTitle": "{days}-day returns",
+      "returnsBody": "Changed your mind? Send them back within the window, prescription lenses included.",
+      "warrantyTitle": "{months}-month warranty",
+      "warrantyBody": "Covers manufacturing faults on every frame.",
+      "deliveryTitle": "Free delivery over {amount}",
+      "deliveryBody": "Otherwise {fee}. Delivery dates are shown before you pay, by PIN code.",
+      "measureTitle": "Real measurements",
+      "measureBody": "Lens, bridge, temple and weight on every frame, with a to-scale drawing."
+    }
   },
   "status": {
     "title": "System status",
@@ -47,12 +91,15 @@
   "notFound": {
     "title": "We couldn’t find that page",
     "body": "The link may be out of date, or the page may have moved.",
-    "code": "Error 404"
+    "code": "Error 404",
+    "browse": "Browse all frames"
   },
   "error": {
     "title": "Something went wrong on our side",
     "body": "Your details are safe. Try again, and if the problem continues, contact us with the reference below.",
-    "reference": "Reference {digest}"
+    "reference": "Reference {digest}",
+    "storeTitle": "We couldn’t load this page",
+    "storeBody": "Our catalogue didn’t answer in time. This is usually brief: try again in a moment."
   },
   "designSystem": {
     "title": "Design system",
@@ -71,5 +118,546 @@
     "secondary": "Try on with camera",
     "ghost": "Add to wishlist",
     "disabled": "Unavailable"
+  },
+  "product": {
+    "cardLabel": "{name} in {colour}",
+    "new": "New",
+    "colours": "Colours",
+    "ratingLabel": "Rated {rating} out of 5 from {count, plural, one {# review} other {# reviews}}",
+    "outOfStock": "Out of stock in this colour",
+    "lowStock": "Only {count} left in this colour",
+    "fits": {
+      "small": "Fits smaller faces",
+      "medium": "Fits medium faces",
+      "large": "Fits larger faces"
+    },
+    "category": {
+      "eyeglasses": "Eyeglasses",
+      "sunglasses": "Sunglasses",
+      "computer-glasses": "Computer glasses",
+      "kids": "Kids",
+      "accessories": "Accessory"
+    }
+  },
+  "wishlist": {
+    "save": "Save",
+    "saved": "Saved",
+    "addNamed": "Save {name} to your wishlist",
+    "added": "{name} saved to your wishlist",
+    "removed": "{name} removed from your wishlist"
+  },
+  "search": {
+    "open": "Search",
+    "tab": "Search",
+    "title": "Search the store",
+    "placeholder": "Search frames, shapes, colours or help",
+    "hint": "Try “round tortoise”, “titanium” or “aviator sunglasses”. Typos are fine.",
+    "recent": "Recent searches",
+    "searchFor": "Search for “{query}”",
+    "products": "Frames",
+    "categories": "Categories",
+    "collections": "Collections",
+    "help": "Help",
+    "loading": "Searching",
+    "resultCount": "{count, plural, =0 {No frames found} one {# frame found} other {# frames found}}",
+    "noResults": "Nothing matches “{query}”. Try a shape, a colour or a material.",
+    "error": "Search is unavailable right now. Please try again in a moment."
+  },
+  "shell": {
+    "home": "Home",
+    "shop": "Shop",
+    "wishlist": "Wishlist",
+    "wishlistWithCount": "Wishlist, {count, plural, one {# frame} other {# frames}} saved",
+    "help": "Help",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "primaryNav": "Main",
+    "tabBar": "Quick navigation",
+    "byCategory": "Shop by category",
+    "byShape": "Shop by shape",
+    "collections": "Collections",
+    "dismissAnnouncement": "Dismiss this message",
+    "announcement": "Free delivery on orders over {amount} · {days}-day returns, no questions asked"
+  },
+  "footer": {
+    "shop": "Shop",
+    "help": "Help",
+    "company": "Policies",
+    "helpCentre": "Help centre",
+    "sizeGuide": "Size guide",
+    "readPrescription": "How to read a prescription",
+    "returnsWarranty": "Returns and warranty",
+    "privacy": "Privacy",
+    "terms": "Terms of use",
+    "returnsPolicy": "Returns policy",
+    "shippingPolicy": "Shipping policy",
+    "facts": {
+      "returns": "{days}-day returns, including prescription lenses",
+      "warranty": "{months}-month warranty on every frame",
+      "shipping": "Free delivery on orders over {amount}"
+    },
+    "copyright": "© {year} {name}",
+    "region": "{country} · {currency}",
+    "countryName": "India",
+    "payments": "Ways to pay",
+    "paymentMethods": {
+      "upi": "UPI",
+      "cards": "Cards",
+      "netbanking": "Netbanking",
+      "cod": "Cash on delivery"
+    }
+  },
+  "filters": {
+    "title": "Filters",
+    "shape": "Shape",
+    "material": "Material",
+    "size": "Frame size",
+    "colour": "Colour",
+    "fit": "Fit",
+    "feature": "Features",
+    "faceShape": "Suits face shape",
+    "collection": "Collection",
+    "price": "Price",
+    "rating": "Rating",
+    "category": "Category",
+    "inStock": "In stock only",
+    "shapeValues": {
+      "round": "Round",
+      "rectangle": "Rectangle",
+      "square": "Square",
+      "aviator": "Aviator",
+      "cat-eye": "Cat-eye",
+      "wayfarer": "Wayfarer",
+      "browline": "Browline",
+      "hexagon": "Hexagon"
+    },
+    "materialValues": {
+      "acetate": "Acetate",
+      "metal": "Metal",
+      "titanium": "Titanium",
+      "tr90": "TR90 (flexible)",
+      "mixed": "Acetate and metal"
+    },
+    "sizeValues": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "sizeHints": {
+      "small": "Under 132 mm wide",
+      "medium": "132–139 mm wide",
+      "large": "140 mm and wider"
+    },
+    "fitValues": {
+      "women": "Women",
+      "men": "Men",
+      "unisex": "Unisex",
+      "kids": "Kids"
+    },
+    "featureValues": {
+      "spring-hinges": "Spring hinges",
+      "nose-pads": "Nose pads",
+      "lightweight": "Lightweight (15 g or less)",
+      "adjustable": "Adjustable fit"
+    },
+    "faceShapeValues": {
+      "oval": "Oval",
+      "round": "Round",
+      "square": "Square",
+      "heart": "Heart",
+      "oblong": "Oblong",
+      "diamond": "Diamond"
+    },
+    "colourValues": {
+      "black": "Black",
+      "tortoise": "Tortoise",
+      "brown": "Brown",
+      "grey": "Grey",
+      "clear": "Clear",
+      "blue": "Blue",
+      "green": "Green",
+      "red": "Red",
+      "pink": "Pink",
+      "beige": "Beige",
+      "gold": "Gold",
+      "silver": "Silver",
+      "gunmetal": "Gunmetal",
+      "rose-gold": "Rose gold"
+    },
+    "ratingValues": {
+      "4": "4 stars and up",
+      "3": "3 stars and up"
+    },
+    "categoryValues": {
+      "eyeglasses": "Eyeglasses",
+      "sunglasses": "Sunglasses",
+      "computer-glasses": "Computer glasses",
+      "kids": "Kids",
+      "accessories": "Accessories"
+    }
+  },
+  "listing": {
+    "filters": "Filters",
+    "filtersWithCount": "Filters ({count})",
+    "closeFilters": "Close filters",
+    "showResults": "{count, plural, =0 {No frames match} one {Show # frame} other {Show # frames}}",
+    "clearAll": "Clear all",
+    "sortBy": "Sort by",
+    "sort": {
+      "recommended": "Recommended",
+      "newest": "Newest",
+      "price-asc": "Price: low to high",
+      "price-desc": "Price: high to low",
+      "rating": "Top rated"
+    },
+    "activeFilters": "Active filters",
+    "removeFilter": "Remove filter: {label}",
+    "removeToSee": "Remove “{label}” to see {count, plural, one {# frame} other {# frames}}",
+    "optionWithCount": "{label}, {count, plural, one {# frame} other {# frames}}",
+    "priceMin": "Minimum price",
+    "priceMax": "Maximum price",
+    "priceRangeHint": "Prices from {min} to {max}, including GST.",
+    "noPriceRange": "No prices to filter.",
+    "priceFrom": "From {amount}",
+    "priceUpTo": "Up to {amount}",
+    "results": "Results",
+    "showing": "Showing {shown} of {total, plural, one {# frame} other {# frames}}",
+    "loadMore": "Show more",
+    "emptyTitle": "No frames match those filters",
+    "emptyWithSuggestion": "One filter is ruling out most of the range. Remove it, or start again from the full collection.",
+    "emptyFiltered": "Try removing a filter or two.",
+    "emptyNone": "There is nothing here yet. Browse the full range instead.",
+    "browseAll": "Browse all frames"
+  },
+  "pages": {
+    "shop": {
+      "title": "All frames",
+      "description": "Eyeglasses, sunglasses, computer and kids frames, with real measurements on every pair.",
+      "eyebrow": "Shop"
+    },
+    "collection": {
+      "eyebrow": "Collection"
+    },
+    "search": {
+      "title": "Search",
+      "titleFor": "Results for “{query}”",
+      "eyebrow": "Search",
+      "hint": "Search by shape, colour, material or name. Press / anywhere to search."
+    }
+  },
+  "pdp": {
+    "breadcrumb": "Breadcrumb",
+    "shop": "Shop",
+    "ratingLabel": "Rated {rating} out of 5 from {count, plural, one {# review} other {# reviews}}",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "priceNoteFrame": "Frame price, {tax} included. Lenses are priced separately.",
+    "priceNote": "{tax} included.",
+    "colour": "Colour:",
+    "colourOut": "{colour}, out of stock",
+    "checkFit": "Check the fit",
+    "orderingSoon": "Lens selection and checkout are on their way. Save this frame and it will be waiting in your wishlist.",
+    "returns": "{days}-day returns",
+    "warranty": "{months}-month frame warranty",
+    "about": "About this frame",
+    "care": "Materials and care",
+    "suits": "Suits these face shapes",
+    "suitsNote": "A guide, not a rule. Wear what you love.",
+    "fitTitle": "Fit and measurements",
+    "fitIntro": "Every measurement is real. Compare them with a pair you already own to see how this one will sit.",
+    "sizeGuideLink": "How to find your size",
+    "reviewsTitle": "Reviews",
+    "completeTheLook": "Complete the look",
+    "related": "You might also like",
+    "stock": {
+      "inStock": "In stock, ready to dispatch",
+      "low": "Only {count} left in this colour",
+      "out": "Out of stock",
+      "outOtherColours": "Out of stock in this colour. Other colours are available."
+    },
+    "gallery": {
+      "new": "New",
+      "views": "Product views",
+      "showView": "Show {view}",
+      "view3d": "3D",
+      "kind": {
+        "front": "front view",
+        "angle": "three-quarter view",
+        "side": "side view",
+        "on-face": "on-face view",
+        "detail": "detail"
+      }
+    },
+    "viewer": {
+      "roleDescription": "3D viewer",
+      "label": "{name} in {colour}, interactive 3D view",
+      "keyboardHelp": "Drag to turn the frame, scroll or pinch to zoom. With the keyboard, use the arrow keys to turn, plus and minus to zoom, and 0 to reset.",
+      "controls": "3D view controls",
+      "rotateLeft": "Turn left",
+      "rotateRight": "Turn right",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "reset": "Reset view",
+      "unsupported": "Your browser can't show 3D graphics. The photos show every angle."
+    },
+    "delivery": {
+      "title": "Delivery estimate",
+      "label": "Your {label}",
+      "placeholder": "{label}, e.g. {example}",
+      "check": "Check",
+      "invalid": "Enter a 6-digit {label}.",
+      "frameOnly": "Frame only or non-prescription",
+      "withLenses": "With prescription lenses",
+      "window": "{from} – {to}",
+      "remote": "Remote-area delivery adds {amount} at checkout.",
+      "hint": "Free delivery on orders over {amount}. Enter your PIN code for dates."
+    },
+    "fit": {
+      "lensWidth": "Lens width",
+      "bridge": "Bridge",
+      "temple": "Temple length",
+      "lensHeight": "Lens height",
+      "totalWidth": "Frame width",
+      "weight": "Weight",
+      "grams": "{value} g",
+      "shape": "Shape",
+      "material": "Material",
+      "rim": "Rim",
+      "hinge": "Hinges",
+      "rimValues": {
+        "full-rim": "Full rim",
+        "half-rim": "Half rim",
+        "rimless": "Rimless"
+      },
+      "hingeValues": {
+        "standard": "Standard",
+        "spring": "Spring hinges"
+      },
+      "diagramLabel": "Front of the frame drawn to scale beside a bank card. Total width {total} mm.",
+      "diagramNote": "Drawn to scale beside a standard bank card (85.6 × 54 mm).",
+      "card": "Bank card",
+      "yoursLegend": "- - your glasses",
+      "compareTitle": "Compare with your glasses",
+      "compareHint": "Look inside the arm of a pair that fits you well. You'll find three numbers like 52□18 140: lens width, bridge and temple length.",
+      "yours": {
+        "lensWidthMm": "Lens (mm)",
+        "bridgeMm": "Bridge (mm)",
+        "templeMm": "Temple (mm)"
+      },
+      "compareIncomplete": "Enter all three numbers to compare.",
+      "same": "same",
+      "verdict": {
+        "same": "About the same width as your glasses.",
+        "slightlyWider": "About {diff} wider than your glasses: a touch roomier.",
+        "slightlyNarrower": "About {diff} narrower than your glasses: a touch snugger.",
+        "wider": "About {diff} wider than your glasses. It may feel loose.",
+        "narrower": "About {diff} narrower than your glasses. It may feel tight."
+      },
+      "diffLens": "Lens width: {diff}",
+      "diffBridge": "Bridge: {diff}",
+      "diffTemple": "Temple: {diff}"
+    },
+    "reviews": {
+      "breakdown": "Rating breakdown",
+      "stars": "{count, plural, one {# star} other {# stars}}",
+      "histogramRow": "{stars} stars: {count, plural, one {# review} other {# reviews}}",
+      "averageLabel": "Average rating {rating} out of 5 from {count, plural, one {# review} other {# reviews}}",
+      "count": "{count, plural, one {# review} other {# reviews}}",
+      "sortBy": "Sort by",
+      "sort": {
+        "recent": "Most recent",
+        "helpful": "Most helpful",
+        "rating-high": "Highest rated",
+        "rating-low": "Lowest rated"
+      },
+      "reviewRating": "Rated {rating} out of 5",
+      "verified": "Verified purchase",
+      "helpful": "{count, plural, one {# person} other {# people}} found this helpful",
+      "more": "Show more reviews",
+      "noneTitle": "No reviews yet",
+      "noneBody": "Nobody has reviewed {name} yet."
+    }
+  },
+  "compare": {
+    "add": "Compare",
+    "inCompare": "In compare",
+    "added": "{name} added to compare",
+    "removed": "{name} removed from compare",
+    "full": "You can compare up to {limit} frames. Remove one first.",
+    "view": "View"
+  },
+  "wishlistPage": {
+    "title": "Wishlist",
+    "count": "{count, plural, one {# saved frame} other {# saved frames}}",
+    "emptyTitle": "Nothing saved yet",
+    "emptyBody": "Tap the heart on any frame to keep it here while you decide.",
+    "browse": "Browse frames",
+    "missing": "{count, plural, one {# saved item is} other {# saved items are}} no longer sold, so {count, plural, one {it isn't} other {they aren't}} shown.",
+    "deviceNote": "Your wishlist is saved in this browser. Signing in to keep it across devices is coming soon.",
+    "error": "Your wishlist couldn't be loaded. Check your connection and try again."
+  },
+  "comparePage": {
+    "title": "Compare frames",
+    "intro": "Measurements side by side. Rows that differ are marked with a dot.",
+    "emptyTitle": "Nothing to compare yet",
+    "emptyBody": "Add up to {limit} frames with the Compare button on any product page.",
+    "browse": "Browse frames",
+    "onlyDifferences": "Show only differences",
+    "clear": "Clear all",
+    "caption": "Frame comparison",
+    "remove": "Remove {name} from compare",
+    "differs": "(differs)",
+    "price": "Price",
+    "rating": "Rating",
+    "noRating": "No reviews yet",
+    "ratingValue": "{rating} ({count})",
+    "size": "Size",
+    "features": "Features",
+    "suits": "Suits",
+    "colours": "Colours",
+    "addMore": "You can add {count, plural, one {# more frame} other {# more frames}}.",
+    "error": "These frames couldn't be loaded. Check your connection and try again."
+  },
+  "help": {
+    "nav": {
+      "label": "Help topics",
+      "centre": "Help centre",
+      "sizeGuide": "Size guide",
+      "prescription": "Reading a prescription",
+      "returns": "Returns and warranty"
+    },
+    "centre": {
+      "title": "Help centre",
+      "intro": "Short answers to the questions people ask most. Can't find yours? Email us and a person will reply.",
+      "topics": "Jump to a topic",
+      "topicNames": {
+        "care": "Care",
+        "delivery": "Delivery",
+        "lenses": "Lenses",
+        "ordering": "Ordering and payment",
+        "prescriptions": "Prescriptions",
+        "returns": "Returns and warranty"
+      }
+    },
+    "sizeGuide": {
+      "title": "Find your frame size",
+      "intro": "The easiest way is to copy a pair that already fits. Three numbers printed on its arm tell you almost everything.",
+      "numbersTitle": "Read the numbers on your glasses",
+      "numbersBody": "Look on the inside of an arm (sometimes the bridge). You'll see something like 52□18 140. All three are in millimetres.",
+      "armLabel": "Inside of a temple arm printed with 52, a small square, 18 and 140.",
+      "terms": {
+        "lens": {
+          "name": "52: lens width",
+          "body": "The width of one lens. Most adult frames are 46 to 58 mm."
+        },
+        "bridge": {
+          "name": "18: bridge",
+          "body": "The gap between the lenses, over your nose. A narrower bridge sits higher."
+        },
+        "temple": {
+          "name": "140: temple",
+          "body": "The arm's length, hinge to tip. 135 to 150 mm suits most adults."
+        }
+      },
+      "sizesTitle": "Our sizes",
+      "sizesBody": "We group frames by their total front width. Within 2 to 3 mm of a pair you like will feel very similar.",
+      "sizeColumn": "Size",
+      "widthColumn": "Frame width",
+      "shopColumn": "Shop",
+      "sizeNames": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "under": "Under {max} mm",
+      "between": "{min}–{max} mm",
+      "over": "{min} mm and over",
+      "shopSize": {
+        "small": "Shop small frames",
+        "medium": "Shop medium frames",
+        "large": "Shop large frames"
+      },
+      "noGlassesTitle": "No glasses to copy?",
+      "noGlassesSteps": {
+        "one": "Stand in front of a mirror with a ruler or tape measure.",
+        "two": "Measure straight across your face from temple to temple, just beside your eyes.",
+        "three": "Choose frames whose width is within a few millimetres of that number. Each product page shows its width and a to-scale drawing."
+      },
+      "comfortTitle": "Comfort tips",
+      "comfortTips": {
+        "bridge": "If glasses slide down your nose, try a narrower bridge or frames with adjustable nose pads.",
+        "temples": "Arms that press behind your ears are too short; ones that stick out past them are too long.",
+        "pads": "Metal and titanium frames have adjustable pads, which any optician can fine-tune in a minute."
+      }
+    },
+    "prescription": {
+      "title": "How to read your prescription",
+      "intro": "A prescription looks cryptic, but it's only a few numbers per eye. Here's what each one means.",
+      "exampleTitle": "An example",
+      "exampleCaption": "Example prescription with sphere, cylinder, axis and addition for each eye",
+      "exampleNote": "Minus numbers correct short sight (distance is blurry); plus numbers correct long sight. Your prescription may leave some boxes empty.",
+      "eyes": {
+        "od": "OD (right eye)",
+        "os": "OS (left eye)"
+      },
+      "termsTitle": "What the terms mean",
+      "terms": {
+        "sph": {
+          "short": "SPH",
+          "name": "SPH (sphere)",
+          "body": "The main power of the lens, in dioptres. Minus for short sight, plus for long sight."
+        },
+        "cyl": {
+          "short": "CYL",
+          "name": "CYL (cylinder)",
+          "body": "Extra power for astigmatism, when the eye focuses differently in one direction. Empty means none."
+        },
+        "axis": {
+          "short": "AXIS",
+          "name": "AXIS",
+          "body": "The direction of the cylinder, from 1 to 180 degrees. It only appears with a CYL value."
+        },
+        "add": {
+          "short": "ADD",
+          "name": "ADD (addition)",
+          "body": "Extra magnification for reading, used for progressive and reading lenses. It is usually the same for both eyes."
+        },
+        "pd": {
+          "short": "PD",
+          "name": "PD (pupillary distance)",
+          "body": "The distance between the centres of your pupils, so the optical centre of each lens sits in front of each eye."
+        }
+      },
+      "range": "We can make {min} to {max}.",
+      "rangeDegrees": "From {min} to {max} degrees.",
+      "rangeMm": "Usually {min} to {max} mm for adults.",
+      "validityTitle": "How recent should it be?",
+      "validityBody": "Eye-care professionals generally recommend an eye test every one to two years. If your vision has changed since your last test, get a new prescription before ordering."
+    },
+    "returns": {
+      "title": "Returns and warranty",
+      "intro": "Not right? Return any order within {days} days of delivery for a full refund, prescription lenses included.",
+      "howTitle": "How to return",
+      "steps": {
+        "one": "Within {days} days of delivery, email {email} with your order number and what you'd like to return.",
+        "two": "We reply within one working day with a free pickup slot.",
+        "three": "Pack the glasses in their case and box. Our courier collects them from your address.",
+        "four": "We check them when they arrive and refund you straight away."
+      },
+      "refundsTitle": "Refunds",
+      "refundsBody": "Refunds go back to the way you paid, within 5 to 7 working days of the return reaching us. Cash-on-delivery orders are refunded to a UPI ID or bank account you give us.",
+      "warrantyTitle": "{months}-month warranty",
+      "warrantyBody": "Every frame is covered for {months} months from delivery against manufacturing faults. We repair or replace it free, including shipping.",
+      "warrantyList": {
+        "covered": "Covered: loose or broken hinges, peeling coatings, cracks that appear without an impact.",
+        "notCovered": "Not covered: accidental damage, scratches from wear, or loss."
+      },
+      "policyLink": "The full terms are in our",
+      "policyLinkText": "returns policy"
+    }
+  },
+  "legal": {
+    "nav": "Policies",
+    "updated": "Last updated {date}"
   }
 }
