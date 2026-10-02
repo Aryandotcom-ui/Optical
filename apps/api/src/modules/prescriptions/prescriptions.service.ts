@@ -3,6 +3,7 @@ import type { UploadedPrescription } from '@optical/shared/checkout';
 import type { Db } from '../../infra/prisma';
 import type { FileLinks, StorageProvider } from '../../infra/storage';
 import { AppError } from '../../lib/app-error';
+import type { Owner } from '../../plugins/auth';
 import {
   detectFileType,
   stripMetadata,
@@ -16,7 +17,7 @@ export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 /**
  * Prescription photos and scans. Each upload is checked by its contents,
  * stripped of metadata, scanned, stored privately under a random name and
- * tied to the browser session that sent it.
+ * tied to the account or browser session that sent it.
  */
 export class PrescriptionService {
   constructor(
@@ -26,7 +27,7 @@ export class PrescriptionService {
     private readonly scanner: MalwareScanner,
   ) {}
 
-  async upload(sessionHash: string, data: Buffer): Promise<UploadedPrescription> {
+  async upload(owner: Owner, data: Buffer): Promise<UploadedPrescription> {
     if (data.length === 0) throw new AppError('VALIDATION_FAILED', 'That file is empty.');
     const mime = detectFileType(data);
     if (!mime)
@@ -55,7 +56,8 @@ export class PrescriptionService {
         label: 'Uploaded prescription',
         fileKey: key,
         fileMime: mime,
-        ownerTokenHash: sessionHash,
+        ownerTokenHash: owner.sessionHash,
+        userId: owner.userId,
       },
     });
     return { id: record.id, mime, sizeBytes: clean.length, previewUrl: this.links.url(key) };

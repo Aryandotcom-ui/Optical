@@ -2,7 +2,7 @@ import type { FastifyBaseLogger } from 'fastify';
 import type { Db } from '../../infra/prisma';
 import { releaseCoupon, releaseHolds, transition } from './lifecycle';
 import { orderInclude } from './orders.repository';
-import { orderState } from '../payments/payment-gateway';
+import { orderState } from './orders.mapper';
 
 /** A bank still confirming a payment gets this long before its order's hold is released. */
 export const PENDING_PAYMENT_GRACE_MS = 2 * 60 * 60 * 1000;

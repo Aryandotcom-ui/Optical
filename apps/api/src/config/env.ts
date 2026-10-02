@@ -31,6 +31,8 @@ export const apiEnvSchema = z
     /** Storefront origin, for links in emails and payment return URLs. */
     NEXT_PUBLIC_SITE_URL: envField.httpUrl().default('http://localhost:3000'),
     COOKIE_SECURE: envField.boolean().optional(),
+    /** Parent domain for the readable "signed in" hint cookie when the shop and API are on different subdomains. */
+    COOKIE_DOMAIN: z.string().min(1).optional(),
     UPLOAD_DIR: z.string().default('.data/uploads'),
     SMTP_URL: z
       .url({ protocol: /^smtps?$/, error: 'must be an smtp:// or smtps:// URL' })

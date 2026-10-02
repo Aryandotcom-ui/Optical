@@ -2,8 +2,14 @@ import { commerce } from '@optical/config/commerce';
 import type { OrderView, PaymentProviderCode } from '@optical/shared/checkout';
 import type { LensConfig } from '@optical/shared/lens';
 import { localIsoDate } from '@optical/shared/pricing/delivery';
-import { happyPath, orderStatusCopy, type OrderStatus } from '@optical/shared/orders';
+import {
+  CUSTOMER_CANCELLABLE,
+  happyPath,
+  orderStatusCopy,
+  type OrderStatus,
+} from '@optical/shared/orders';
 import type { PriceLine } from '@optical/shared/pricing';
+import type { OrderState } from './lifecycle';
 import type { OrderRow } from './orders.repository';
 
 export const providerCode = (provider: OrderRow['paymentProvider']) =>
@@ -12,6 +18,17 @@ export const providerCode = (provider: OrderRow['paymentProvider']) =>
 /** True when any item has lenses, which are made to order. */
 export const needsProduction = (order: Pick<OrderRow, 'items'>) =>
   order.items.some((item) => item.lensConfig !== null);
+
+/** What the state machine needs to know about an order. */
+export function orderState(order: OrderRow): OrderState {
+  return {
+    id: order.id,
+    status: order.status,
+    paymentProvider: order.paymentProvider,
+    awaitingPrescription: order.awaitingPrescription,
+    needsProduction: needsProduction(order),
+  };
+}
 
 function statusCopy(order: OrderRow): { label: string; description: string } {
   // Cash-on-delivery orders go ahead unpaid; "awaiting payment" would alarm.
@@ -37,7 +54,41 @@ export function lensSummary(priceLines: unknown): string[] {
     .map((line) => line.label);
 }
 
-export function toOrderView(order: OrderRow): OrderView {
+const INVOICED_COD: readonly OrderStatus[] = [
+  'SHIPPED',
+  'DELIVERED',
+  'RETURN_REQUESTED',
+  'RETURNED',
+  'REFUNDED',
+];
+
+/** Last moment a return can be requested: the return window counted from delivery. */
+export function returnDeadline(order: OrderRow): Date | null {
+  const delivered = order.events.findLast((event) => event.toStatus === 'DELIVERED');
+  if (!delivered) return null;
+  return new Date(delivered.createdAt.getTime() + commerce.policies.returnWindowDays * 86_400_000);
+}
+
+/** An invoice exists once money was taken (or, for cash on delivery, once the order shipped). */
+export function hasInvoice(order: OrderRow): boolean {
+  const paid = order.payments.some((payment) =>
+    ['SUCCEEDED', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(payment.status),
+  );
+  return paid || (order.paymentProvider === 'COD' && INVOICED_COD.includes(order.status));
+}
+
+export function orderActions(order: OrderRow, now: Date): OrderView['actions'] {
+  const deadline = order.status === 'DELIVERED' ? returnDeadline(order) : null;
+  return {
+    cancel: CUSTOMER_CANCELLABLE.includes(order.status),
+    requestReturn: deadline !== null && deadline.getTime() > now.getTime(),
+    returnUntil: deadline?.toISOString() ?? null,
+    invoice: hasInvoice(order),
+    reorder: order.items.length > 0,
+  };
+}
+
+export function toOrderView(order: OrderRow, now = new Date()): OrderView {
   const address = order.shippingAddress as unknown as OrderView['shippingAddress'];
   const reached = new Set(order.events.map((event) => event.toStatus));
   const cod = order.paymentProvider === 'COD';
@@ -122,5 +173,6 @@ export function toOrderView(order: OrderRow): OrderView {
       order.carrier && order.trackingNumber
         ? { carrier: order.carrier, trackingNumber: order.trackingNumber }
         : null,
+    actions: orderActions(order, now),
   };
 }

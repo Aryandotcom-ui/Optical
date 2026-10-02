@@ -413,7 +413,8 @@ model LensRule {
 
 model Cart {
   id             String    @id @default(uuid(7)) @db.Uuid
-  userId         String?   @db.Uuid
+  /// A signed-in customer has one bag; a guest's bag is merged into it on sign-in.
+  userId         String?   @unique @db.Uuid
   /// SHA-256 of the guest cookie token.
   guestTokenHash String?   @unique
   couponCode     String?
@@ -423,8 +424,6 @@ model Cart {
 
   user  User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items CartItem[]
-
-  @@index([userId])
 }
 
 model CartItem {

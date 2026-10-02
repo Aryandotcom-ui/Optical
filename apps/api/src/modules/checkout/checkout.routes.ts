@@ -31,7 +31,7 @@ export const checkoutRoutes: FastifyPluginAsyncZod<{
         response: { 200: checkoutQuoteSchema, 409: apiErrorSchema, 422: apiErrorSchema },
       },
     },
-    (request) => service.quote(request.sessionHash, request.body),
+    async (request) => service.quote(await request.owner(), request.body),
   );
 
   app.post(
@@ -56,7 +56,7 @@ export const checkoutRoutes: FastifyPluginAsyncZod<{
     },
     async (request, reply) => {
       const placed = await service.placeOrder(
-        request.sessionHash,
+        await request.owner(),
         request.headers['idempotency-key'],
         request.body,
       );

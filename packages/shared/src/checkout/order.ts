@@ -39,6 +39,8 @@ export const placeOrderSchema = z
     /** The total the customer agreed to. A different server total returns `PRICE_CHANGED`. */
     expectedTotalMinor: z.number().int().nonnegative(),
     note: z.string().trim().max(500).optional(),
+    /** Signed-in customers: also save the delivery address to the account. */
+    saveAddress: z.boolean().default(false),
   })
   .meta({ id: 'PlaceOrder' });
 export type PlaceOrder = z.input<typeof placeOrderSchema>;
@@ -133,6 +135,15 @@ export const orderViewSchema = z
     /** Steps still to come on the normal route to delivery. */
     upcoming: z.array(z.object({ status: z.enum(orderStatuses), label: z.string() })),
     shipment: z.object({ carrier: z.string(), trackingNumber: z.string() }).nullable(),
+    /** What the customer can do with the order now. */
+    actions: z.object({
+      cancel: z.boolean(),
+      requestReturn: z.boolean(),
+      /** Last day of the return window, once delivered. */
+      returnUntil: z.iso.datetime().nullable(),
+      invoice: z.boolean(),
+      reorder: z.boolean(),
+    }),
   })
   .meta({ id: 'OrderView' });
 export type OrderView = z.infer<typeof orderViewSchema>;

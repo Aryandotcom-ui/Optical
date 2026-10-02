@@ -16,11 +16,13 @@ import { estimateDelivery } from '@optical/shared/pricing/delivery';
 import type { Prisma } from '../../generated/prisma/client';
 import type { Db } from '../../infra/prisma';
 import { AppError } from '../../lib/app-error';
+import type { Owner } from '../../plugins/auth';
 import { sha256Hex } from '../../lib/tokens';
 import type { CartRow } from '../cart/cart.repository';
 import { toPricingItems, type CartService } from '../cart/cart.service';
 import { holdStock, redeemCoupon, commitHolds, transition, type Tx } from '../orders/lifecycle';
 import type { PaymentGateway } from '../payments/payment-gateway';
+import { saveAddress } from '../account/addresses';
 import { isFirstOrder, loadCoupon } from './coupons';
 
 const IDEMPOTENCY_KEY = /^[A-Za-z0-9_-]{16,128}$/;
@@ -53,7 +55,7 @@ export class CheckoutService {
   ) {}
 
   private async priceCart(
-    sessionHash: string | null,
+    owner: Owner,
     options: {
       speed: 'standard' | 'express';
       postalCode?: string;
@@ -61,7 +63,7 @@ export class CheckoutService {
       email?: string;
     },
   ): Promise<PricedCart> {
-    const cart = sessionHash ? await this.carts.repository().find(sessionHash, this.now()) : null;
+    const cart = await this.carts.repository().find(owner, this.now());
     if (!cart || cart.items.length === 0) throw new AppError('CONFLICT', 'Your bag is empty.');
     const email = options.email ?? null;
     const coupon = cart.couponCode ? await loadCoupon(this.db, cart.couponCode, email) : null;
@@ -89,9 +91,9 @@ export class CheckoutService {
     );
   }
 
-  async quote(sessionHash: string | null, input: CheckoutQuoteRequest): Promise<CheckoutQuote> {
+  async quote(owner: Owner, input: CheckoutQuoteRequest): Promise<CheckoutQuote> {
     const request = checkoutQuoteRequestSchema.parse(input);
-    const { cart, pricing } = await this.priceCart(sessionHash, {
+    const { cart, pricing } = await this.priceCart(owner, {
       speed: request.shippingSpeed,
       ...(request.postalCode ? { postalCode: request.postalCode } : {}),
       ...(request.paymentProvider ? { provider: request.paymentProvider } : {}),
@@ -120,7 +122,7 @@ export class CheckoutService {
    * are recomputed here and must match what the customer agreed to.
    */
   async placeOrder(
-    sessionHash: string | null,
+    owner: Owner,
     idempotencyKey: string | undefined,
     input: PlaceOrder,
   ): Promise<PlacedOrder> {
@@ -130,7 +132,9 @@ export class CheckoutService {
         'Send an Idempotency-Key header (16 to 128 letters, digits, - or _).',
       );
     const request = placeOrderSchema.parse(input);
-    const requestHash = sha256Hex(stableJson({ request, sessionHash }));
+    const requestHash = sha256Hex(
+      stableJson({ request, sessionHash: owner.sessionHash, userId: owner.userId }),
+    );
 
     const previous = await this.db.order.findUnique({
       where: { idempotencyKey },
@@ -149,7 +153,7 @@ export class CheckoutService {
       throw new AppError('VALIDATION_FAILED', 'That payment method is not available.', [
         { path: 'paymentProvider', message: 'Choose another way to pay.' },
       ]);
-    const { cart, pricing, coupon } = await this.priceCart(sessionHash, {
+    const { cart, pricing, coupon } = await this.priceCart(owner, {
       speed: request.shippingSpeed,
       postalCode: request.address.postalCode,
       provider: request.paymentProvider,
@@ -180,7 +184,7 @@ export class CheckoutService {
           coupon,
           idempotencyKey,
           requestHash,
-          sessionHash,
+          owner,
         }),
       { timeout: 15_000 },
     );
@@ -196,7 +200,7 @@ export class CheckoutService {
       coupon: PricedCart['coupon'];
       idempotencyKey: string;
       requestHash: string;
-      sessionHash: string | null;
+      owner: Owner;
     },
   ): Promise<string> {
     const { request, cart, pricing, coupon } = input;
@@ -204,9 +208,12 @@ export class CheckoutService {
     const cod = request.paymentProvider === 'cod';
     const needsLensProduction = cart.items.some((item) => item.lensConfig !== null);
     const configs = cart.items.map((item) => item.lensConfig as LensConfig | null);
-    const awaitingPrescription = configs.some(
-      (config) => config?.prescription?.mode === 'later' || config?.prescription?.mode === 'upload',
-    );
+    const saved = await this.savedPrescriptions(tx, configs, input.owner.userId);
+    const awaitingPrescription = configs.some((config) => {
+      const source = config?.prescription;
+      if (source?.mode === 'saved') return !saved.get(source.prescriptionId);
+      return source?.mode === 'later' || source?.mode === 'upload';
+    });
     const estimate = estimateDelivery({
       orderedAt: now,
       speed: request.shippingSpeed,
@@ -224,12 +231,14 @@ export class CheckoutService {
       configs.map(async (config) => {
         const source = config?.prescription;
         if (source?.mode === 'upload') return source.uploadId;
+        if (source?.mode === 'saved') return source.prescriptionId;
         if (source?.mode !== 'manual') return null;
         const created = await tx.prescription.create({
           data: {
             label: `${request.address.fullName}, ${now.toISOString().slice(0, 10)}`,
             values: source.rx,
-            ownerTokenHash: input.sessionHash,
+            ownerTokenHash: input.owner.sessionHash,
+            userId: input.owner.userId,
           },
         });
         return created.id;
@@ -239,6 +248,7 @@ export class CheckoutService {
     const order = await tx.order.create({
       data: {
         number,
+        userId: input.owner.userId,
         email: request.contact.email,
         phone: request.contact.phone,
         currency: pricing.currency,
@@ -311,6 +321,12 @@ export class CheckoutService {
         discountMinor: pricing.discountMinor,
       });
 
+    if (request.saveAddress && input.owner.userId)
+      await saveAddress(tx, input.owner.userId, {
+        ...request.address,
+        phone: request.contact.phone,
+      });
+
     if (cod) {
       // Nothing to pay online: the sale is final now, and fulfilment can start.
       await commitHolds(tx, order.id, now);
@@ -328,5 +344,33 @@ export class CheckoutService {
         );
     }
     return order.id;
+  }
+
+  /**
+   * Saved prescriptions used by the bag, re-checked at checkout (one may
+   * have been deleted since it was chosen). Maps id → has typed values.
+   */
+  private async savedPrescriptions(
+    tx: Tx,
+    configs: (LensConfig | null)[],
+    userId: string | null,
+  ): Promise<Map<string, boolean>> {
+    const ids = configs.flatMap((config) =>
+      config?.prescription?.mode === 'saved' ? [config.prescription.prescriptionId] : [],
+    );
+    if (ids.length === 0) return new Map();
+    const rows = userId
+      ? await tx.prescription.findMany({
+          where: { id: { in: ids }, userId, deletedAt: null },
+          select: { id: true, values: true },
+        })
+      : [];
+    const found = new Map(rows.map((row) => [row.id, row.values !== null]));
+    if (ids.some((id) => !found.has(id)))
+      throw new AppError(
+        'VALIDATION_FAILED',
+        'A saved prescription in your bag is no longer in your account. Remove that item and add it again.',
+      );
+    return found;
   }
 }

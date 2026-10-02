@@ -10,15 +10,10 @@ import type { Db } from '../../infra/prisma';
 import { queueEmail } from '../../infra/email/outbox';
 import type { JobQueue } from '../../infra/queue';
 import { AppError } from '../../lib/app-error';
-import { commitHolds, holdStock, transition, type OrderState, type Tx } from '../orders/lifecycle';
+import { commitHolds, holdStock, transition, type Tx } from '../orders/lifecycle';
 import { orderAccessToken, verifyOrderAccess } from '../orders/order-access';
 import { orderEmailData, orderUrl } from '../orders/order-email';
-import {
-  canRetryPayment,
-  needsProduction,
-  providerCode,
-  toOrderView,
-} from '../orders/orders.mapper';
+import { canRetryPayment, orderState, providerCode, toOrderView } from '../orders/orders.mapper';
 import { orderInclude, type OrderRow } from '../orders/orders.repository';
 import { simulateMockPayment } from './simulate';
 import type { PaymentEvent, PaymentProvider } from './provider';
@@ -34,16 +29,6 @@ export interface GatewayOptions {
 
 const toDbProvider = (code: PaymentProviderCode) =>
   code.toUpperCase() as 'MOCK' | 'RAZORPAY' | 'STRIPE' | 'COD';
-
-export function orderState(order: OrderRow): OrderState {
-  return {
-    id: order.id,
-    status: order.status,
-    paymentProvider: order.paymentProvider,
-    awaitingPrescription: order.awaitingPrescription,
-    needsProduction: needsProduction(order),
-  };
-}
 
 /**
  * Everything between "place order" and "paid": starting and retrying
@@ -78,10 +63,19 @@ export class PaymentGateway {
     return orderAccessToken(this.options.secret, orderId);
   }
 
-  /** An order for a customer holding its access token; NOT_FOUND otherwise, so numbers can't be probed. */
-  async authorisedOrder(number: string, token: string | undefined): Promise<OrderRow> {
+  /**
+   * An order for its signed-in owner or a holder of its access token;
+   * NOT_FOUND otherwise, so order numbers can't be probed.
+   */
+  async authorisedOrder(
+    number: string,
+    token: string | undefined,
+    userId: string | null = null,
+  ): Promise<OrderRow> {
     const order = await this.loadOrder({ number });
-    if (!order || !token || !verifyOrderAccess(this.options.secret, order.id, token))
+    const owner = order?.userId !== null && order?.userId !== undefined && order.userId === userId;
+    const linked = order && token ? verifyOrderAccess(this.options.secret, order.id, token) : false;
+    if (!order || !(owner || linked))
       throw AppError.notFound(
         'We could not find that order. Check the link in your confirmation email.',
       );
@@ -169,8 +163,9 @@ export class PaymentGateway {
     number: string,
     token: string | undefined,
     code: Exclude<PaymentProviderCode, 'cod'>,
+    userId: string | null = null,
   ): Promise<PlacedOrder> {
-    const order = await this.authorisedOrder(number, token);
+    const order = await this.authorisedOrder(number, token, userId);
     this.provider(code);
     if (!canRetryPayment(order))
       throw new AppError(
@@ -213,6 +208,7 @@ export class PaymentGateway {
     paymentId: string,
     outcome: MockOutcome,
     token: string | undefined,
+    userId: string | null = null,
   ): Promise<OrderView> {
     const orderId = await simulateMockPayment(
       {
@@ -226,6 +222,7 @@ export class PaymentGateway {
       paymentId,
       outcome,
       token,
+      userId,
     );
     const order = await this.loadOrder({ id: orderId });
     if (!order) throw AppError.notFound();

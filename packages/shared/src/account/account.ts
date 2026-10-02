@@ -43,8 +43,11 @@ export const savedPrescriptionSchema = z
     version: z.number().int(),
     values: prescriptionSchema.nullable(),
     hasFile: z.boolean(),
+    /** Short-lived private link to the uploaded photo or PDF. */
+    previewUrl: z.string().nullable(),
     status: z.enum(['PENDING_REVIEW', 'VERIFIED', 'NEEDS_CORRECTION']),
     prescribedAt: isoDate.nullable(),
+    /** The date on the prescription, or 24 months after it was written. */
     expiresAt: isoDate.nullable(),
     /** Expired, or expiring within the reminder window. */
     expiry: z.enum(['valid', 'expiring', 'expired', 'unknown']),
@@ -64,8 +67,12 @@ export const prescriptionInputSchema = z
     prescribedAt: isoDate.nullable().default(null),
     expiresAt: isoDate.nullable().default(null),
   })
-  .meta({ id: 'PrescriptionInput' });
+  .meta({ id: 'PrescriptionDetails' });
 export type SavedPrescriptionInput = z.input<typeof prescriptionInputSchema>;
+
+export const renamePrescriptionSchema = z.object({
+  label: z.string().trim().min(1, 'Give it a name, like "Reading glasses".').max(60),
+});
 
 // ─── Orders ─────────────────────────────────────────────────────────────────
 

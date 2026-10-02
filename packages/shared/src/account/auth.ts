@@ -96,6 +96,16 @@ export const userSchema = z
   .meta({ id: 'User' });
 export type User = z.infer<typeof userSchema>;
 
+/** The answer to signing in, registering or refreshing. */
+export const authSessionSchema = z
+  .object({
+    user: userSchema,
+    /** Items moved from this browser's guest bag into the account's bag. */
+    mergedCartItems: z.number().int(),
+  })
+  .meta({ id: 'AuthSession' });
+export type AuthSession = z.infer<typeof authSessionSchema>;
+
 export const updateProfileSchema = z
   .object({
     name: nameSchema,

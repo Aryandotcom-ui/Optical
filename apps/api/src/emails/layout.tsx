@@ -1,5 +1,15 @@
 import { brand } from '@optical/config/brand';
-import { Body, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Hr,
+  Html,
+  Preview,
+  Section,
+  Text,
+} from '@react-email/components';
 import type { ReactNode } from 'react';
 
 export const colours = {
@@ -61,5 +71,24 @@ export function EmailLayout({ preview, children }: { preview: string; children: 
         </Container>
       </Body>
     </Html>
+  );
+}
+
+/** The one call to action in an email. */
+export function EmailButton({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Button
+      href={href}
+      style={{
+        backgroundColor: colours.accent,
+        borderRadius: '999px',
+        color: '#FFFFFF',
+        fontSize: '15px',
+        fontWeight: 600,
+        padding: '12px 24px',
+      }}
+    >
+      {children}
+    </Button>
   );
 }

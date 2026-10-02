@@ -4,6 +4,8 @@ import type { LensConfig } from '@optical/shared/lens';
 import { hasBlockingIssues, validatePrescription } from '@optical/shared/rx';
 import type { Db } from '../../infra/prisma';
 import { AppError } from '../../lib/app-error';
+import type { Owner } from '../../plugins/auth';
+import { ownedBy } from '../cart/cart.repository';
 import type { PaymentGateway } from '../payments/payment-gateway';
 import { toOrderView } from './orders.mapper';
 
@@ -14,8 +16,8 @@ export class OrdersService {
     private readonly gateway: PaymentGateway,
   ) {}
 
-  async view(number: string, token: string | undefined): Promise<OrderView> {
-    return toOrderView(await this.gateway.authorisedOrder(number, token));
+  async view(number: string, token: string | undefined, userId: string | null = null) {
+    return toOrderView(await this.gateway.authorisedOrder(number, token, userId));
   }
 
   /** Same answer for a wrong number and a wrong email, so neither can be guessed. */
@@ -40,11 +42,11 @@ export class OrdersService {
   async attachPrescription(
     number: string,
     token: string | undefined,
-    sessionHash: string | null,
+    owner: Owner,
     input: AttachPrescription,
   ): Promise<OrderView> {
     const request = attachPrescriptionSchema.parse(input);
-    const order = await this.gateway.authorisedOrder(number, token);
+    const order = await this.gateway.authorisedOrder(number, token, owner.userId);
     const item = order.items.find((entry) => entry.id === request.itemId);
     const config = item?.lensConfig as LensConfig | null | undefined;
     if (!item || !config?.prescription)
@@ -57,12 +59,14 @@ export class OrdersService {
 
     let prescriptionId: string;
     if (request.source.mode === 'upload') {
-      const upload = sessionHash
+      const owners = ownedBy(owner);
+      const upload = owners.length
         ? await this.db.prescription.findFirst({
             where: {
               id: request.source.uploadId,
-              ownerTokenHash: sessionHash,
               fileKey: { not: null },
+              deletedAt: null,
+              OR: owners,
             },
             select: { id: true },
           })
@@ -86,7 +90,8 @@ export class OrdersService {
         data: {
           label: `Order ${order.number}`,
           values: request.source.rx,
-          ownerTokenHash: sessionHash,
+          ownerTokenHash: owner.sessionHash,
+          userId: order.userId,
         },
       });
       prescriptionId = created.id;
@@ -103,6 +108,6 @@ export class OrdersService {
         },
       }),
     ]);
-    return this.view(number, token);
+    return this.view(number, token, owner.userId);
   }
 }

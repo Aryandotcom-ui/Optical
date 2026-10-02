@@ -34,7 +34,7 @@ export const prescriptionRoutes: FastifyPluginAsyncZod<{
       const file = await request.file();
       if (!file) throw new AppError('VALIDATION_FAILED', 'Choose a file to upload.');
       const data = await file.toBuffer();
-      const uploaded = await service.upload(reply.ensureSession(), data);
+      const uploaded = await service.upload(await reply.ensureOwner(), data);
       void reply.header('cache-control', 'no-store');
       return reply.status(201).send(uploaded);
     },

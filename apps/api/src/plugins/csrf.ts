@@ -8,6 +8,8 @@ export interface CsrfOptions {
   allowedOrigins: string[];
   /** Path prefixes that never carry cookies and authenticate otherwise (signed webhooks). */
   exemptPrefixes: string[];
+  /** Path prefixes whose writes must always come from an allowed Origin, cookies or not (sign-in). */
+  strictPrefixes?: string[];
 }
 
 /**
@@ -16,6 +18,7 @@ export interface CsrfOptions {
  * JSON and multipart bodies, so a plain HTML form can't send one it
  * accepts; and any state-changing request that carries cookies must come
  * from an allowed Origin (browsers always send Origin on such requests).
+ * Sign-in and account writes need an allowed Origin even without cookies.
  */
 export const csrfPlugin = fp(
   (app: FastifyInstance, options: CsrfOptions) => {
@@ -29,7 +32,11 @@ export const csrfPlugin = fp(
         done();
         return;
       }
-      if (!request.headers.cookie) {
+      // Sign-in endpoints are checked even without cookies, which rules out login CSRF.
+      const strict = (options.strictPrefixes ?? []).some((prefix) =>
+        request.url.startsWith(prefix),
+      );
+      if (!request.headers.cookie && !strict) {
         done();
         return;
       }

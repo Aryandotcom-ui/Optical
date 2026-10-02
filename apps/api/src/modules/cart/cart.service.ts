@@ -3,9 +3,11 @@ import { addCartItemSchema } from '@optical/shared/checkout';
 import { quoteLens, type LensConfig, type LensFrameContext } from '@optical/shared/lens';
 import { formatMoney } from '@optical/shared/money';
 import { MAX_ITEM_QUANTITY, priceOrder, type PricingItem } from '@optical/shared/pricing';
+import { hasBlockingIssues, validatePrescription, type Prescription } from '@optical/shared/rx';
 import type { Prisma } from '../../generated/prisma/client';
 import type { Db } from '../../infra/prisma';
 import { AppError } from '../../lib/app-error';
+import type { Owner } from '../../plugins/auth';
 import { isFirstOrder, loadCoupon } from '../checkout/coupons';
 import type { LensService } from '../lens/lens.service';
 import {
@@ -112,9 +114,8 @@ export class CartService {
     return this.carts;
   }
 
-  async view(sessionHash: string | null): Promise<Cart> {
-    const cart = sessionHash ? await this.carts.find(sessionHash, this.now()) : null;
-    return this.toCart(cart);
+  async view(owner: Owner): Promise<Cart> {
+    return this.toCart(await this.carts.find(owner, this.now()));
   }
 
   async toCart(cart: CartRow | null): Promise<Cart> {
@@ -141,7 +142,7 @@ export class CartService {
   private async price(
     variant: VariantRow,
     lensConfig: LensConfig | null,
-    sessionHash: string,
+    owner: Owner,
   ): Promise<{ snapshot: CartPriceSnapshot; config: LensConfig | null; unitPriceMinor: number }> {
     const framePriceMinor = variantPrice(variant);
     if (!lensConfig)
@@ -163,17 +164,7 @@ export class CartService {
         'Some lens choices need attention.',
         quote.errors.map((error) => ({ path: `lensConfig.${error.path}`, message: error.message })),
       );
-    const source = quote.config.prescription;
-    if (source?.mode === 'saved')
-      throw new AppError('VALIDATION_FAILED', 'Sign in to use a saved prescription.', [
-        { path: 'lensConfig.prescription', message: 'Saved prescriptions need an account.' },
-      ]);
-    if (source?.mode === 'upload' && !(await this.carts.ownedUpload(source.uploadId, sessionHash)))
-      throw new AppError(
-        'VALIDATION_FAILED',
-        'We could not find that prescription upload. Upload it again.',
-        [{ path: 'lensConfig.prescription.uploadId', message: 'Upload not found.' }],
-      );
+    await this.checkPrescriptionSource(quote.config, owner);
     return {
       snapshot: { framePriceMinor, lensLines: quote.lines },
       config: quote.config,
@@ -181,11 +172,48 @@ export class CartService {
     };
   }
 
-  async addItem(sessionHash: string, input: AddCartItem): Promise<Cart> {
+  /** Uploads and saved prescriptions must belong to whoever is adding them. */
+  private async checkPrescriptionSource(config: LensConfig, owner: Owner): Promise<void> {
+    const source = config.prescription;
+    if (source?.mode === 'saved') {
+      const saved = owner.userId
+        ? await this.carts.savedPrescription(source.prescriptionId, owner.userId)
+        : null;
+      if (!saved)
+        throw new AppError(
+          'VALIDATION_FAILED',
+          owner.userId
+            ? 'We could not find that saved prescription. Choose another.'
+            : 'Sign in to use a saved prescription.',
+          [{ path: 'lensConfig.prescription', message: 'Saved prescription not found.' }],
+        );
+      if (saved.values) {
+        const issues = validatePrescription(saved.values as unknown as Prescription, {
+          requiresAdd: config.purpose === 'progressive',
+        });
+        if (hasBlockingIssues(issues))
+          throw new AppError(
+            'VALIDATION_FAILED',
+            'That saved prescription does not suit these lenses. Update it or choose another.',
+            issues
+              .filter((issue) => issue.severity === 'error')
+              .map((issue) => ({ path: `lensConfig.prescription`, message: issue.message })),
+          );
+      }
+    }
+    if (source?.mode === 'upload' && !(await this.carts.ownedUpload(source.uploadId, owner)))
+      throw new AppError(
+        'VALIDATION_FAILED',
+        'We could not find that prescription upload. Upload it again.',
+        [{ path: 'lensConfig.prescription.uploadId', message: 'Upload not found.' }],
+      );
+  }
+
+  async addItem(owner: Owner, input: AddCartItem): Promise<Cart> {
     const request = addCartItemSchema.parse(input);
     const variant = await this.carts.variant(request.variantId);
     if (!variant) throw AppError.notFound('That frame or colour is no longer available.');
-    const priced = await this.price(variant, request.lensConfig, sessionHash);
+    const priced = await this.price(variant, request.lensConfig, owner);
 
     if (
       request.expectedUnitPriceMinor !== undefined &&
@@ -198,7 +226,7 @@ export class CartService {
       );
     }
 
-    const cart = await this.carts.findOrCreate(sessionHash, this.now());
+    const cart = await this.carts.findOrCreate(owner, this.now());
     const sameConfig = JSON.stringify(priced.config);
     const existing = cart.items.find(
       (item) =>
@@ -237,15 +265,11 @@ export class CartService {
         unitPriceMinor: priced.unitPriceMinor,
       });
     }
-    return this.view(sessionHash);
+    return this.view(owner);
   }
 
-  async updateQuantity(
-    sessionHash: string | null,
-    itemId: string,
-    quantity: number,
-  ): Promise<Cart> {
-    const cart = sessionHash ? await this.carts.find(sessionHash, this.now()) : null;
+  async updateQuantity(owner: Owner, itemId: string, quantity: number): Promise<Cart> {
+    const cart = await this.carts.find(owner, this.now());
     const item = cart?.items.find((entry) => entry.id === itemId);
     if (!cart || !item) throw AppError.notFound('That item is no longer in your bag.');
     if (quantity > item.quantity) {
@@ -259,18 +283,18 @@ export class CartService {
         );
     }
     await this.carts.updateQuantity(cart.id, itemId, quantity);
-    return this.view(sessionHash);
+    return this.view(owner);
   }
 
-  async removeItem(sessionHash: string | null, itemId: string): Promise<Cart> {
-    const cart = sessionHash ? await this.carts.find(sessionHash, this.now()) : null;
+  async removeItem(owner: Owner, itemId: string): Promise<Cart> {
+    const cart = await this.carts.find(owner, this.now());
     if (cart) await this.carts.removeItem(cart.id, itemId);
-    return this.view(sessionHash);
+    return this.view(owner);
   }
 
   /** Applies a coupon if it would take something off now; otherwise explains why not. */
-  async applyCoupon(sessionHash: string | null, code: string): Promise<Cart> {
-    const cart = sessionHash ? await this.carts.find(sessionHash, this.now()) : null;
+  async applyCoupon(owner: Owner, code: string): Promise<Cart> {
+    const cart = await this.carts.find(owner, this.now());
     if (!cart || cart.items.length === 0)
       throw new AppError('VALIDATION_FAILED', 'Add something to your bag before using a code.');
     const coupon = await loadCoupon(this.db, code, null);
@@ -293,12 +317,12 @@ export class CartService {
         { path: 'code', message: pricing.coupon.message },
       ]);
     await this.carts.setCoupon(cart.id, coupon.code);
-    return this.view(sessionHash);
+    return this.view(owner);
   }
 
-  async removeCoupon(sessionHash: string | null): Promise<Cart> {
-    const cart = sessionHash ? await this.carts.find(sessionHash, this.now()) : null;
+  async removeCoupon(owner: Owner): Promise<Cart> {
+    const cart = await this.carts.find(owner, this.now());
     if (cart) await this.carts.setCoupon(cart.id, null);
-    return this.view(sessionHash);
+    return this.view(owner);
   }
 }

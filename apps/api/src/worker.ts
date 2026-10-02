@@ -17,6 +17,7 @@ import { createRedisProbe } from './infra/redis';
 import {
   runMockWebhook,
   runOutbox,
+  runPrescriptionReminders,
   runReconcile,
   runReservations,
   type JobContext,
@@ -27,7 +28,8 @@ import { createPaymentRegistry } from './modules/payments/registry';
 
 /**
  * Background worker: sends emails from the outbox, releases expired stock
- * holds, reconciles pending payments and delivers mock payment webhooks.
+ * holds, reconciles pending payments, reminds customers of expiring
+ * prescriptions and delivers mock payment webhooks.
  * Run several for redundancy; jobs are claimed so none runs twice.
  */
 loadDotEnvFile();
@@ -79,6 +81,7 @@ const context: JobContext = {
   email,
   gateway,
   secret: env.APP_SECRET,
+  siteUrl: env.NEXT_PUBLIC_SITE_URL,
   apiUrl: env.API_INTERNAL_URL,
   log,
 };
@@ -93,6 +96,8 @@ const worker = new Worker(
         return runReservations(context);
       case jobNames.reconcile:
         return runReconcile(context);
+      case jobNames.prescriptionReminders:
+        return runPrescriptionReminders(context);
       case jobNames.mockWebhook:
         return runMockWebhook(context, job.data as MockWebhookJob);
       default:
@@ -110,7 +115,14 @@ const { queue } = jobs;
 await queue.upsertJobScheduler('outbox', { every: 15_000 }, { name: jobNames.outbox });
 await queue.upsertJobScheduler('reservations', { every: 60_000 }, { name: jobNames.reservations });
 await queue.upsertJobScheduler('reconcile', { every: 120_000 }, { name: jobNames.reconcile });
-log.info('Worker started: emails, stock holds, payment reconciliation, mock webhooks');
+await queue.upsertJobScheduler(
+  'prescription-reminders',
+  { every: 6 * 3_600_000 },
+  { name: jobNames.prescriptionReminders },
+);
+log.info(
+  'Worker started: emails, stock holds, payment reconciliation, prescription reminders, mock webhooks',
+);
 
 closeWithGrace({ delay: 10_000 }, async ({ signal, err }) => {
   if (err) log.error({ err }, 'Worker shutting down after an unexpected error');

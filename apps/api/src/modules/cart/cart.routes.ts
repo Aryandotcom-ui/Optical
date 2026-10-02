@@ -40,7 +40,7 @@ export const cartRoutes: FastifyPluginAsyncZod<{ service: CartService; limiter: 
         response: { 200: cartSchema },
       },
     },
-    (request) => service.view(request.sessionHash),
+    async (request) => service.view(await request.owner()),
   );
 
   app.post(
@@ -56,7 +56,7 @@ export const cartRoutes: FastifyPluginAsyncZod<{ service: CartService; limiter: 
         response: { 200: cartSchema, ...errors },
       },
     },
-    (request, reply) => service.addItem(reply.ensureSession(), request.body),
+    async (request, reply) => service.addItem(await reply.ensureOwner(), request.body),
   );
 
   app.patch(
@@ -71,8 +71,8 @@ export const cartRoutes: FastifyPluginAsyncZod<{ service: CartService; limiter: 
         response: { 200: cartSchema, ...errors },
       },
     },
-    (request) =>
-      service.updateQuantity(request.sessionHash, request.params.itemId, request.body.quantity),
+    async (request) =>
+      service.updateQuantity(await request.owner(), request.params.itemId, request.body.quantity),
   );
 
   app.delete(
@@ -86,7 +86,7 @@ export const cartRoutes: FastifyPluginAsyncZod<{ service: CartService; limiter: 
         response: { 200: cartSchema, ...errors },
       },
     },
-    (request) => service.removeItem(request.sessionHash, request.params.itemId),
+    async (request) => service.removeItem(await request.owner(), request.params.itemId),
   );
 
   app.put(
@@ -102,7 +102,7 @@ export const cartRoutes: FastifyPluginAsyncZod<{ service: CartService; limiter: 
         response: { 200: cartSchema, ...errors },
       },
     },
-    (request) => service.applyCoupon(request.sessionHash, request.body.code),
+    async (request) => service.applyCoupon(await request.owner(), request.body.code),
   );
 
   app.delete(
@@ -110,7 +110,7 @@ export const cartRoutes: FastifyPluginAsyncZod<{ service: CartService; limiter: 
     {
       schema: { tags: ['cart'], summary: 'Remove the coupon', response: { 200: cartSchema } },
     },
-    (request) => service.removeCoupon(request.sessionHash),
+    async (request) => service.removeCoupon(await request.owner()),
   );
 
   return Promise.resolve();

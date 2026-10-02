@@ -110,6 +110,29 @@ export async function releaseHolds(
   return [...new Set(holds.map((hold) => hold.orderId).filter((id) => id !== null))];
 }
 
+/**
+ * Puts sold units back in stock when an order whose stock was already
+ * committed is cancelled, recording each as a stock adjustment. Runs once:
+ * callers hold the order's row lock and move it out of a cancellable status.
+ */
+export async function restockCommitted(tx: Tx, order: { id: string; number: string }) {
+  const sold = await tx.stockReservation.findMany({
+    where: { orderId: order.id, committedAt: { not: null } },
+  });
+  for (const hold of sold) {
+    await tx.$executeRaw`
+      UPDATE "StockItem" SET "onHand" = "onHand" + ${hold.quantity}, "updatedAt" = now()
+      WHERE "variantId" = ${hold.variantId}::uuid`;
+    await tx.stockAdjustment.create({
+      data: {
+        variantId: hold.variantId,
+        delta: hold.quantity,
+        reason: `Order ${order.number} cancelled`,
+      },
+    });
+  }
+}
+
 /** Gives a cancelled order's coupon use back, so the customer can use it again. */
 export async function releaseCoupon(tx: Tx, orderId: string): Promise<void> {
   const redemption = await tx.couponRedemption.findUnique({ where: { orderId } });

@@ -3,6 +3,7 @@ import { dispatchOutbox } from '../infra/email/outbox';
 import type { EmailProvider } from '../infra/email/provider';
 import type { Db } from '../infra/prisma';
 import type { MockWebhookJob } from '../infra/queue';
+import { remindExpiringPrescriptions } from '../modules/account/reminders';
 import { expireHolds } from '../modules/orders/expiry';
 import { buildMockWebhook } from '../modules/payments/mock';
 import type { PaymentGateway } from '../modules/payments/payment-gateway';
@@ -12,6 +13,8 @@ export interface JobContext {
   email: EmailProvider;
   gateway: PaymentGateway;
   secret: string;
+  /** The shop, for links in emails. */
+  siteUrl: string;
   /** Where the worker reaches the API, for mock webhooks. */
   apiUrl: string;
   log: Pick<FastifyBaseLogger, 'info' | 'warn' | 'error'>;
@@ -31,6 +34,10 @@ export async function runOutbox(context: JobContext): Promise<number> {
 
 export function runReservations(context: JobContext) {
   return expireHolds(context.db, context.log);
+}
+
+export function runPrescriptionReminders(context: JobContext) {
+  return remindExpiringPrescriptions(context.db, { siteUrl: context.siteUrl });
 }
 
 export function runReconcile(context: JobContext) {

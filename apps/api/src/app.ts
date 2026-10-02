@@ -45,6 +45,17 @@ import {
   MAX_UPLOAD_BYTES,
   PrescriptionService,
 } from './modules/prescriptions/prescriptions.service';
+import { accountRoutes } from './modules/account/account.routes';
+import { AccountService } from './modules/account/account.service';
+import { AddressService } from './modules/account/addresses';
+import { AccountPrescriptions } from './modules/account/prescriptions';
+import { WishlistService } from './modules/account/wishlist';
+import { AccessTokens } from './modules/auth/access-token';
+import { authRoutes } from './modules/auth/auth.routes';
+import { AuthService } from './modules/auth/auth.service';
+import { RefreshTokens } from './modules/auth/refresh-tokens';
+import { OrderActions } from './modules/orders/order-actions';
+import { authPlugin } from './plugins/auth';
 import { csrfPlugin } from './plugins/csrf';
 import { errorHandlerPlugin } from './plugins/error-handler';
 import { openApiPlugin } from './plugins/openapi';
@@ -125,10 +136,20 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
 
   await app.register(errorHandlerPlugin);
   await app.register(securityPlugin, { allowedOrigins: env.CORS_ALLOWED_ORIGINS });
+  const now = deps.now ?? (() => new Date());
+  const accessTokens = new AccessTokens(env.APP_SECRET, now);
+  const refreshTokens = new RefreshTokens(deps.db, now);
   await app.register(sessionPlugin, { secure: env.COOKIE_SECURE });
+  await app.register(authPlugin, {
+    tokens: accessTokens,
+    refreshTokens,
+    secure: env.COOKIE_SECURE,
+    hintDomain: env.COOKIE_DOMAIN,
+  });
   await app.register(csrfPlugin, {
     allowedOrigins: env.CORS_ALLOWED_ORIGINS,
     exemptPrefixes: ['/v1/webhooks/'],
+    strictPrefixes: ['/v1/auth/', '/v1/account/'],
   });
   await app.register(multipart, {
     limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 0, parts: 1 },
@@ -152,7 +173,6 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
   const catalogRepository = new CatalogRepository(deps.db);
   const catalogService = new CatalogService(catalogRepository, cache);
   const lensService = new LensService(new LensRepository(deps.db), catalogRepository, cache);
-  const now = deps.now ?? (() => new Date());
   const limiter =
     deps.rateLimiter ??
     (deps.cacheClient
@@ -172,11 +192,25 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
     app.log,
     now,
   );
-  const prescriptions = new PrescriptionService(
+  const storage = deps.storage ?? new LocalDiskStorage(resolveUploadDir(env.UPLOAD_DIR));
+  const fileLinks = new FileLinks(env.APP_SECRET, env.API_PUBLIC_URL);
+  const prescriptions = new PrescriptionService(deps.db, storage, fileLinks, noScanner);
+  const authService = new AuthService(
     deps.db,
-    deps.storage ?? new LocalDiskStorage(resolveUploadDir(env.UPLOAD_DIR)),
-    new FileLinks(env.APP_SECRET, env.API_PUBLIC_URL),
-    noScanner,
+    accessTokens,
+    refreshTokens,
+    { secret: env.APP_SECRET, siteUrl: env.NEXT_PUBLIC_SITE_URL },
+    now,
+  );
+  const accountPrescriptions = new AccountPrescriptions(deps.db, storage, fileLinks, now);
+  const orderActions = new OrderActions(
+    deps.db,
+    gateway,
+    cartService,
+    deps.jobs,
+    { siteUrl: env.NEXT_PUBLIC_SITE_URL },
+    app.log,
+    now,
   );
   await app.register(
     async (v1) => {
@@ -190,7 +224,17 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
       });
       await v1.register(orderRoutes, {
         service: new OrdersService(deps.db, gateway),
+        actions: orderActions,
         gateway,
+        limiter,
+      });
+      await v1.register(authRoutes, { service: authService, limiter });
+      await v1.register(accountRoutes, {
+        account: new AccountService(deps.db, accountPrescriptions, now),
+        auth: authService,
+        addresses: new AddressService(deps.db),
+        prescriptions: accountPrescriptions,
+        wishlist: new WishlistService(deps.db),
         limiter,
       });
       await v1.register(paymentRoutes, { gateway });

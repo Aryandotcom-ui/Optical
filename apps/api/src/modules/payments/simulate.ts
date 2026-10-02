@@ -20,7 +20,7 @@ export interface SimulationDeps {
 /**
  * The local payment simulator: records what the pretend bank decided and
  * queues the matching signed webhook(s) for the worker to deliver. Only the
- * holder of the order's access token can decide its payment. Returns the
+ * order's owner, or the holder of its access token, can decide its payment. Returns the
  * order id.
  */
 export async function simulateMockPayment(
@@ -28,15 +28,22 @@ export async function simulateMockPayment(
   paymentId: string,
   outcome: MockOutcome,
   token: string | undefined,
+  userId: string | null = null,
 ): Promise<string> {
-  const payment = await deps.db.payment.findUnique({ where: { id: paymentId } });
+  const payment = await deps.db.payment.findUnique({
+    where: { id: paymentId },
+    include: { order: { select: { userId: true } } },
+  });
   const provider = deps.provider;
+  const holder =
+    payment !== null &&
+    ((userId !== null && payment.order.userId === userId) ||
+      (token !== undefined && verifyOrderAccess(deps.secret, payment.orderId, token)));
   const authorised =
     payment?.provider === 'MOCK' &&
     payment.providerRef !== null &&
     provider instanceof MockProvider &&
-    token !== undefined &&
-    verifyOrderAccess(deps.secret, payment.orderId, token);
+    holder;
   if (!authorised || !payment.providerRef)
     throw AppError.notFound('We could not find that payment.');
   if (payment.status === 'SUCCEEDED' || payment.status === 'FAILED')

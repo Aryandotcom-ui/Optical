@@ -10,6 +10,8 @@ export const jobNames = {
   reservations: 'reservations:expire',
   /** Ask providers about payments that are still pending. */
   reconcile: 'payments:reconcile',
+  /** Email customers whose saved prescription is about to expire. */
+  prescriptionReminders: 'prescriptions:remind',
   /** Deliver a simulated payment webhook (mock provider only). */
   mockWebhook: 'payments:mock-webhook',
 } as const;

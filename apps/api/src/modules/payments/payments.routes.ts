@@ -31,11 +31,12 @@ export const paymentRoutes: FastifyPluginAsyncZod<{ gateway: PaymentGateway }> =
         },
       },
     },
-    (request) =>
+    async (request) =>
       gateway.simulate(
         request.body.paymentId,
         request.body.outcome,
         request.headers[ORDER_TOKEN_HEADER],
+        (await request.signedInUser())?.userId ?? null,
       ),
   );
 

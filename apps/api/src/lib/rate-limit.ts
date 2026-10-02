@@ -88,4 +88,13 @@ export const rateLimits = {
   placeOrder: { name: 'place-order', max: 10, windowSeconds: 300 },
   paymentRetry: { name: 'payment-retry', max: 10, windowSeconds: 300 },
   cartWrite: { name: 'cart-write', max: 60, windowSeconds: 60 },
+  // Sign-in is also locked per account after repeated failures (see AuthService).
+  login: { name: 'login', max: 10, windowSeconds: 300 },
+  register: { name: 'register', max: 5, windowSeconds: 3600 },
+  refresh: { name: 'refresh', max: 30, windowSeconds: 60 },
+  forgotPassword: { name: 'forgot-password', max: 5, windowSeconds: 900 },
+  resetPassword: { name: 'reset-password', max: 10, windowSeconds: 900 },
+  // Endpoints that check the current password.
+  passwordCheck: { name: 'password-check', max: 5, windowSeconds: 900 },
+  accountWrite: { name: 'account-write', max: 60, windowSeconds: 60 },
 } satisfies Record<string, RateLimitRule>;
