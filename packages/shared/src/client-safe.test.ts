@@ -29,6 +29,8 @@ describe.each([
   'frame-geometry/index.ts',
   'lens/engine.ts',
   'money/index.ts',
+  'face/index.ts',
+  'frame-finder/index.ts',
 ])('%s', (entry) => {
   it('does not pull Zod into client bundles', () => {
     const graph = runtimeImportGraph(resolve(root, entry));
