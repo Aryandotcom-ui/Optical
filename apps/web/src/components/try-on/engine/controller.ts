@@ -86,13 +86,24 @@ export class TryOnController {
   async startCamera(): Promise<void> {
     this.clearPhoto();
     this.set({ phase: 'starting', problem: null });
-    if (!(await this.engine()) || !this.tracker || !this.renderer) return;
+    if (!this.renderer && !webgl2Available()) {
+      this.fail('webgl');
+      return;
+    }
+    // Ask for the camera while the tracker loads, so a refusal shows at once.
+    const engine = this.engine();
+    let stream: MediaStream;
     try {
-      this.stream = await openCamera(this.video);
+      stream = await openCamera(this.video);
     } catch (error) {
       this.fail(error instanceof CameraError ? error.problem : 'unknown');
       return;
     }
+    if (!(await engine) || !this.tracker || !this.renderer) {
+      stopCamera(stream, this.video);
+      return;
+    }
+    this.stream = stream;
     this.loop = new TryOnLoop({
       video: this.video,
       tracker: this.tracker,
