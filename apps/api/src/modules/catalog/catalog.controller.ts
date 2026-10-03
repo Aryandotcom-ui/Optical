@@ -1,3 +1,4 @@
+import type { FinderAnswers } from '@optical/shared/frame-finder';
 import type { ListingQuery, ReviewSort } from '@optical/shared/catalog';
 import type { FastifyReply } from 'fastify';
 import type { CatalogService } from './catalog.service';
@@ -28,6 +29,11 @@ export class CatalogController {
   async byIds(ids: string[], reply: FastifyReply) {
     void reply.header('cache-control', PUBLIC_CACHE);
     return { items: await this.service.byIds(ids) };
+  }
+
+  /** Deterministic for given answers, so shared caches may keep it briefly. */
+  recommend(answers: FinderAnswers) {
+    return this.service.recommend(answers);
   }
 
   reviews(productId: string, sort: ReviewSort, page: number, reply: FastifyReply) {

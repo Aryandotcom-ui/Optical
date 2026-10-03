@@ -375,3 +375,42 @@ describe('GET /v1/search/suggest', () => {
     expect(response.statusCode).toBe(200);
   });
 });
+
+describe('frame finder', () => {
+  it('ranks frames for the answers, with reasons, and never returns accessories', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/frame-finder/recommendations',
+      payload: { faceShape: 'round', vibes: ['retro'], budget: 'mid', faceWidthMm: 140 },
+    });
+    expect(response.statusCode).toBe(200);
+    const body = response.json<{
+      items: {
+        product: { category: string; priceMinor: number };
+        score: number;
+        reasons: { criterion: string }[];
+      }[];
+    }>();
+    expect(body.items.length).toBeGreaterThan(5);
+    expect(body.items.length).toBeLessThanOrEqual(24);
+    const scores = body.items.map((item) => item.score);
+    expect([...scores].sort((a, b) => b - a)).toEqual(scores);
+    expect(body.items.every((item) => item.product.category !== 'accessories')).toBe(true);
+    expect(body.items[0]?.reasons.length).toBeGreaterThan(0);
+  });
+
+  it('works with every question skipped, and rejects unknown answers', async () => {
+    const empty = await app.inject({
+      method: 'POST',
+      url: '/v1/frame-finder/recommendations',
+      payload: {},
+    });
+    expect(empty.statusCode).toBe(200);
+    const invalid = await app.inject({
+      method: 'POST',
+      url: '/v1/frame-finder/recommendations',
+      payload: { faceShape: 'triangle' },
+    });
+    expect(invalid.statusCode).toBe(422);
+  });
+});

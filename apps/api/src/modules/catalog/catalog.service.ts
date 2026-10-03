@@ -1,3 +1,5 @@
+import { rankFrames, type FinderAnswers, type FinderCandidate } from '@optical/shared/frame-finder';
+import type { FinderResults } from '@optical/shared/frame-finder/schemas';
 import type {
   Category,
   Collection,
@@ -22,7 +24,7 @@ import { relatedEntries, runListing, type CatalogIndex } from './listing';
 export const CATALOG_CACHE = 'catalog';
 const INDEX_TTL_SECONDS = 60;
 /** Bump when the index entry shape changes, so stale cached copies are never read. */
-const INDEX_KEY = 'index:v2';
+const INDEX_KEY = 'index:v3';
 export const REVIEWS_PAGE_SIZE = 10;
 
 const reviewOrder: Record<ReviewSort, Prisma.ReviewOrderByWithRelationInput[]> = {
@@ -93,6 +95,37 @@ export class CatalogService {
     );
     const now = this.now();
     return rows.map((row) => toSummary(row, now));
+  }
+
+  /**
+   * Frame Finder results: every published frame scored against the answers
+   * by the shared, documented scoring, best first, with the reasons.
+   */
+  async recommend(answers: FinderAnswers, limit = 24): Promise<FinderResults> {
+    const index = await this.index();
+    const candidates: FinderCandidate[] = index.entries
+      .filter((entry) => entry.shape !== null && entry.category !== 'accessories')
+      .map((entry) => ({
+        id: entry.id,
+        category: entry.category,
+        material: entry.material as FinderCandidate['material'],
+        priceMinor: entry.priceMinor,
+        totalWidthMm: entry.totalWidthMm,
+        styleTags: entry.styleTags,
+        faceShapes: entry.faceShapeScores as FinderCandidate['faceShapes'],
+        colourFamilies: entry.colourFamilies as FinderCandidate['colourFamilies'],
+        rating: entry.ratingAverage ?? 0,
+      }));
+    const ranked = rankFrames(candidates, answers, limit);
+    const products = new Map(
+      (await this.byIds(ranked.map((entry) => entry.id))).map((p) => [p.id, p]),
+    );
+    return {
+      items: ranked.flatMap((entry) => {
+        const product = products.get(entry.id);
+        return product ? [{ product, score: entry.score, reasons: entry.reasons }] : [];
+      }),
+    };
   }
 
   /** Product cards by id, in the order requested; unknown or unpublished ids are skipped. */

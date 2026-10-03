@@ -19,6 +19,8 @@ function entry(
     fit: 'unisex',
     features: [],
     faceShapes: [],
+    faceShapeScores: [],
+    totalWidthMm: 138,
     colourFamilies: ['black'],
     collections: [],
     priceMinor: 2_000_00,

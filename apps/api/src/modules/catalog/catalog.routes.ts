@@ -12,6 +12,7 @@ import {
   reviewSortSchema,
   searchSuggestionSchema,
 } from '@optical/shared/catalog';
+import { finderAnswersSchema, finderResultsSchema } from '@optical/shared/frame-finder/schemas';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import type { CatalogController } from './catalog.controller';
@@ -165,6 +166,21 @@ export const catalogRoutes: FastifyPluginAsyncZod<{ controller: CatalogControlle
       },
     },
     (request, reply) => controller.suggest(request.query.q, reply),
+  );
+
+  app.post(
+    '/frame-finder/recommendations',
+    {
+      schema: {
+        tags: ['catalogue'],
+        summary: 'Frame Finder recommendations',
+        description:
+          'Scores every published frame against the answers (all optional) with the documented scoring in `@optical/shared/frame-finder`: face-shape affinity, size against a measured face width, style, use, budget, material and colour. Skipped answers drop out of the score. Returns up to 24 frames, best first, each with the reasons it matches. Nothing is stored.',
+        body: finderAnswersSchema,
+        response: { 200: finderResultsSchema, 422: apiErrorSchema },
+      },
+    },
+    (request) => controller.recommend(request.body),
   );
 
   return Promise.resolve();

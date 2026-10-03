@@ -50,6 +50,11 @@ export function toIndexEntry(row: IndexRow): CatalogIndexEntry {
     faceShapes: row.faceShapes
       .filter((affinity) => affinity.score >= FACE_SHAPE_MATCH)
       .map((affinity) => affinity.faceShape),
+    faceShapeScores: row.faceShapes.map((affinity) => ({
+      faceShape: affinity.faceShape,
+      score: affinity.score,
+    })),
+    totalWidthMm: row.frame?.totalWidthMm ?? null,
     colourFamilies: [...new Set(row.variants.map((variant) => variant.colourFamily))],
     collections: row.collections.map(({ collection }) => collection.slug),
     priceMinor: effectivePrice(row.basePriceMinor, row.variants),

@@ -23,6 +23,9 @@ export interface CatalogIndexEntry {
   features: FrameFeature[];
   /** Face shapes this frame suits (affinity at or above FACE_SHAPE_MATCH). */
   faceShapes: string[];
+  /** Every face-shape affinity, for the Frame Finder's scoring. */
+  faceShapeScores: { faceShape: string; score: number }[];
+  totalWidthMm: number | null;
   colourFamilies: string[];
   collections: string[];
   priceMinor: number;
