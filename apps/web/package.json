@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start --port 3000",
+    "dev": "node scripts/copy-mediapipe.mjs && next dev --port 3000",
+    "build": "node scripts/copy-mediapipe.mjs && next build",
+    "start": "node scripts/copy-mediapipe.mjs && next start --port 3000",
     "lint": "next typegen && eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",

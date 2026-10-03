@@ -16,8 +16,8 @@ hashes makes re-runs incremental. See ADR-017.
 
 The **MediaPipe WASM runtime** (`vision_wasm_internal.{js,wasm}` and the no-SIMD fallback, 23 MB on disk, of which a browser
 loads one 12 MB pair) is not committed: `scripts/copy-mediapipe.mjs` copies it from the installed
-`@mediapipe/tasks-vision@1.0.1` (Apache 2.0) into `apps/web/public/mediapipe/wasm/` before `dev`
-and `build`, so try-on loads nothing from a CDN and works offline. The package is patched
+`@mediapipe/tasks-vision@1.0.1` (Apache 2.0) into `apps/web/public/mediapipe/wasm/` as part of `dev`,
+`build` and `start`, so try-on loads nothing from a CDN and works offline. The package is patched
 (`patches/@mediapipe__tasks-vision@1.0.1.patch`) to turn off its usage logging; see ADR-045.
 
 The Chromium fake-camera video used by the try-on tests (`apps/web/e2e/.generated/face.y4m`) is

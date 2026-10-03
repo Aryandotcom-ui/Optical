@@ -4,7 +4,8 @@
  * the MediaPipe WASM files are copied from the installed
  * `@mediapipe/tasks-vision` package into `public/mediapipe/wasm`, and the
  * vendored face model (committed in `public/mediapipe`) is checked against
- * its known checksum. Runs before `dev` and `build`; needs no network.
+ * its known checksum. Runs as part of `dev`, `build` and `start` (pnpm skips
+ * pre-scripts, so they call it directly); needs no network.
  */
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
