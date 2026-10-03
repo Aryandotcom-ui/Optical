@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import { TryOnPage } from '@/components/try-on/try-on-page';
+import { getStoreSettings } from '@/lib/store-settings';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('tryOn');
@@ -19,7 +21,13 @@ export default async function TryOnRoute({
 }: {
   searchParams: Promise<{ frames?: string | string[]; frame?: string | string[] }>;
 }) {
-  const [t, params] = await Promise.all([getTranslations('tryOn'), searchParams]);
+  const [t, params, settings] = await Promise.all([
+    getTranslations('tryOn'),
+    searchParams,
+    getStoreSettings(),
+  ]);
+  // Switched off in the admin: the page is gone until it is switched back on.
+  if (!settings.flags.virtualTryOn) notFound();
   const frames = (typeof params.frames === 'string' ? params.frames.split(',') : [])
     .filter((slug) => SLUG.test(slug))
     .slice(0, 12);

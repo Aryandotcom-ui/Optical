@@ -85,7 +85,16 @@ function ColourSwatches() {
 }
 
 /** Name, price, colour choice, stock, saving and delivery: the right-hand column. */
-export function ProductPurchase({ categoryName }: { categoryName: string }) {
+export function ProductPurchase({
+  categoryName,
+  freeShippingThresholdMinor,
+  tryOn = true,
+}: {
+  categoryName: string;
+  freeShippingThresholdMinor: number;
+  /** Off when the admin has switched virtual try-on off. */
+  tryOn?: boolean;
+}) {
   const t = useTranslations('pdp');
   const tFits = useTranslations('product.fits');
   const { product, variant } = useProductView();
@@ -158,12 +167,14 @@ export function ProductPurchase({ categoryName }: { categoryName: string }) {
         />
         {frame ? (
           <>
-            <TryOnButton
-              slug={product.slug}
-              name={product.name}
-              variantId={variant.id}
-              className="flex-1 sm:flex-none"
-            />
+            {tryOn ? (
+              <TryOnButton
+                slug={product.slug}
+                name={product.name}
+                variantId={variant.id}
+                className="flex-1 sm:flex-none"
+              />
+            ) : null}
             <CompareButton
               id={product.id}
               slug={product.slug}
@@ -174,7 +185,7 @@ export function ProductPurchase({ categoryName }: { categoryName: string }) {
         ) : null}
       </div>
 
-      <DeliveryEstimate />
+      <DeliveryEstimate freeShippingThresholdMinor={freeShippingThresholdMinor} />
 
       <ul className="grid gap-2 text-caption text-ink-secondary sm:grid-cols-2">
         <li className="flex items-center gap-2">

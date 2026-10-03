@@ -86,7 +86,6 @@ reported as a warning above 200 ms.
 
 ## Coming in later phases
 
-- **Phase 5:** try-on e2e with Chromium's fake camera (`--use-fake-device-for-media-stream`).
 - **Phase 7:** visual regression baselines at three breakpoints in both themes.
 
 ## Try-on in tests
@@ -126,3 +125,12 @@ camera and read `data-fps` on the try-on element, or run the script above with `
 `/dev/try-on-debug` (development builds only) shows the tracker's own speed and delegate per frame.
 If a device falls short, the next step is running the tracker in a Web Worker, so drawing no longer
 waits for inference.
+
+## Admin
+
+- `apps/api/test/admin.test.ts`: RBAC (customer, staff and admin on every area), role changes,
+  catalogue create/publish/upload, lens edits, review moderation, prescription approve and
+  correction (with emails), settings and flags, coupons and help articles, and audit entries.
+- `e2e/admin.spec.ts` (desktop): a shopper orders and types a prescription; staff approve it and
+  the order moves into production with an email in Mailpit; staff can't open admin-only pages;
+  an admin adjusts stock and finds it in the audit log; axe runs on the admin pages.

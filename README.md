@@ -89,7 +89,7 @@ Checkout never needs an account. To try one, sign in at http://localhost:3000/si
 - save prescriptions (each edit keeps the earlier version) and choose one when adding lenses,
 - keep delivery addresses and pick one at checkout,
 - open any order to download its invoice, cancel it before production, request a return after
-  delivery (orders are marked delivered by staff; the admin arrives in Phase 6), or buy
+  delivery (orders are marked delivered by staff in the admin at `/admin`), or buy
   it again,
 - change your password, download your data, or delete the account.
 
@@ -142,7 +142,7 @@ flowchart LR
   C[[packages/config]] -.-> W & A
 ```
 
-- `apps/web` is the storefront (and later the admin panel): server components by default, with
+- `apps/web` is the storefront and the admin panel (`/admin`): server components by default, with
   client code kept under a 170 kB initial budget ([ADR-021](docs/DECISIONS.md))
 - `apps/api` is the REST API, with OpenAPI generated from Zod schemas
 - `packages/shared` holds the schemas, API contracts and money maths that both apps import

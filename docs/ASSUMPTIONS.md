@@ -77,6 +77,9 @@ follows.
 | E19 | Account pages render in the browser from the API; the shop's server never sees auth cookies or customer data.                                                                                                        | `account-shell.tsx`                     |
 | E20 | Try-on targets 30 fps on a laptop and 24 fps on a phone with a GPU. The CI container has no GPU, so CI checks that tracking and drawing work, not speed; speed is measured with `/dev/try-on-debug` (TESTING.md).    | ADR-043                                 |
 | E21 | The fake-camera tests use MediaPipe's own test face image, played as a still video by Chromium (`--use-file-for-fake-video-capture`).                                                                                | `e2e/fake-camera.ts`                    |
+| E22 | Demo team accounts are seeded: `admin@example.com` / `Admin#Lumen2026` (ADMIN) and `staff@example.com` / `Staff#Lumen2026` (STAFF). `pnpm db:seed` refuses to run with `NODE_ENV=production`.                        | ADR-051                                 |
+| E23 | Refunds go through the payment provider first; if it fails, the refund is recorded as failed and nothing changes on the order.                                                                                       | `orders-admin.ts`                       |
+| E24 | Prescription correction emails use five fixed templates plus an optional note, so customers get consistent, reviewed wording.                                                                                        | `correctionTemplates`                   |
 
 ## Git
 

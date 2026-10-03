@@ -498,3 +498,52 @@ shipping the lens-outline geometry (superellipse recipes, resampling) only to dr
 server already knew. The page now passes a 64-point unit outline, scaled in the browser to the
 frame's own size and to the customer's comparison size. That moves about 1 kB of JavaScript into
 about 1 kB of HTML and brings the page to 169.5 kB.
+
+## ADR-051: Admin access is a role map in shared code, checked by the API on every request
+
+**Status:** accepted · Phase 6
+Two team roles: **ADMIN** (everything) and **STAFF** (writes orders, prescriptions, inventory,
+reviews and help articles; reads the dashboard, products and customers). The map lives in
+`@optical/shared/admin` so the API and the admin UI agree. The API re-reads the user's role from
+the database on every admin request (a demoted user loses access at once, not when their token
+expires) and a `preValidation` hook refuses non-staff before any body is validated, so a customer
+probing `/v1/admin` learns nothing from validation errors. The UI hides what a role can't use;
+that is convenience, not security. Changing a role is an ADMIN action, can't be done to yourself,
+and signs the user out everywhere.
+
+## ADR-052: Every admin change writes an audit entry in the same transaction
+
+**Status:** accepted · Phase 6
+`audit(tx, actor, { action, entityType, entityId, before, after })` runs inside the transaction
+that makes the change, so a change without an audit entry cannot be committed. Entries keep the
+actor's email (not only the id), so the log still reads correctly after an account is deleted.
+The log is append-only from the application; it is readable by admins and exportable as CSV.
+
+## ADR-053: Market settings overlay code defaults; tax and delivery zones stay in code
+
+**Status:** accepted · Phase 6
+The free-delivery threshold, delivery fees, cash-on-delivery availability, fee and limit, and the
+default low-stock threshold are editable in the admin. They are stored as one `Setting` row and
+applied over the code defaults (`@optical/config/commerce`) with a 10-second cache; checkout
+prices with the merged values and the storefront reads them from `GET /v1/settings` (30 s).
+Tax rates, delivery zones and policy durations stay in code: they change legal copy and
+promises, so they go through review and a deploy. Runtime feature switches (virtual try-on,
+Frame Finder) are `FeatureFlag` rows over the `FEATURE_FLAGS` environment defaults; a switched-off
+feature's pages return 404 and its buttons disappear.
+
+## ADR-054: Admin tables page, sort and filter on the server; CSV is formula-safe
+
+**Status:** accepted · Phase 6
+Every list takes `page`, `pageSize` (≤ 100), `q`, `sort`, `dir` and table-specific filters, with
+the state in the URL so links and reloads work. `?format=csv` returns the same selection (up to
+5,000 rows). Cells beginning with `=`, `+`, `-` or `@` are prefixed with `'` so a spreadsheet
+never runs them as formulas (CSV injection).
+
+## ADR-055: The admin is English-only and rendered in the browser
+
+**Status:** accepted · Phase 6
+The admin is a tool for the store team, so it is not translated, and it renders client-side from
+the API like the account area (the web server never handles team credentials or customer data).
+It is `noindex`, disallowed in robots.txt, and sends `Cache-Control: no-store` on API responses.
+Uploaded product photos are served by the API from `catalog/` storage keys; the storefront skips
+Next's optimiser for them because they are already sized on upload.

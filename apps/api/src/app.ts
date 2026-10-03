@@ -46,6 +46,12 @@ import {
   PrescriptionService,
 } from './modules/prescriptions/prescriptions.service';
 import { accountRoutes } from './modules/account/account.routes';
+import { adminCatalogRoutes } from './modules/admin/admin-catalog.routes';
+import { adminOpsRoutes } from './modules/admin/admin-ops.routes';
+import { CatalogAdmin } from './modules/admin/catalog-admin';
+import { OrdersAdmin } from './modules/admin/orders-admin';
+import { StoreAdmin } from './modules/admin/store-admin';
+import { SettingsService } from './modules/settings/settings.service';
 import { AccountService } from './modules/account/account.service';
 import { AddressService } from './modules/account/addresses';
 import { AccountPrescriptions } from './modules/account/prescriptions';
@@ -179,6 +185,7 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
       ? new RedisRateLimiter(deps.cacheClient, app.log, env.RATE_LIMIT_SCALE)
       : new MemoryRateLimiter(Date.now, env.RATE_LIMIT_SCALE));
   const cartService = new CartService(deps.db, lensService, now);
+  const settings = new SettingsService(deps.db, commerce, env.featureFlags);
   const gateway = new PaymentGateway(
     deps.db,
     createPaymentRegistry(env, deps.mockBank),
@@ -219,7 +226,7 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
       await v1.register(helpRoutes, { service: new HelpService(catalogRepository, cache) });
       await v1.register(cartRoutes, { service: cartService, limiter });
       await v1.register(checkoutRoutes, {
-        service: new CheckoutService(deps.db, cartService, gateway, now),
+        service: new CheckoutService(deps.db, cartService, gateway, settings, now),
         limiter,
       });
       await v1.register(orderRoutes, {
@@ -239,6 +246,27 @@ export async function buildApp(env: ApiEnv, deps: AppDependencies) {
       });
       await v1.register(paymentRoutes, { gateway });
       await v1.register(prescriptionRoutes, { service: prescriptions, limiter });
+      const storeAdmin = new StoreAdmin(deps.db, cache, settings, now);
+      await v1.register(adminCatalogRoutes, {
+        db: deps.db,
+        catalog: new CatalogAdmin(deps.db, cache, storage, settings, env.API_PUBLIC_URL),
+        store: storeAdmin,
+        limiter,
+      });
+      await v1.register(adminOpsRoutes, {
+        db: deps.db,
+        orders: new OrdersAdmin(
+          deps.db,
+          gateway,
+          fileLinks,
+          deps.jobs,
+          { siteUrl: env.NEXT_PUBLIC_SITE_URL },
+          app.log,
+        ),
+        store: storeAdmin,
+        settings,
+        limiter,
+      });
     },
     { prefix: '/v1' },
   );

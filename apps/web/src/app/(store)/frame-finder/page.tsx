@@ -5,6 +5,8 @@ import { FinderResults } from '@/components/frame-finder/finder-results';
 import { WithMessages } from '@/components/providers/with-messages';
 import { getRecommendations } from '@/lib/catalog';
 import { parseFinderParams } from '@/lib/finder-params';
+import { notFound } from 'next/navigation';
+import { getStoreSettings } from '@/lib/store-settings';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -13,7 +15,12 @@ export async function generateMetadata({
 }: {
   searchParams: SearchParams;
 }): Promise<Metadata> {
-  const [t, params] = await Promise.all([getTranslations('frameFinder'), searchParams]);
+  const [t, params, settings] = await Promise.all([
+    getTranslations('frameFinder'),
+    searchParams,
+    getStoreSettings(),
+  ]);
+  if (!settings.flags.frameFinder) notFound();
   const answered = Object.keys(params).length > 0;
   return {
     title: t('metaTitle'),

@@ -25,7 +25,11 @@ const savedPin = createLocalValue<string>(
  * rules checkout uses. Nothing is sent anywhere; the PIN is remembered only
  * in this browser for next time.
  */
-export function DeliveryEstimate() {
+export function DeliveryEstimate({
+  freeShippingThresholdMinor,
+}: {
+  freeShippingThresholdMinor: number;
+}) {
   const t = useTranslations('pdp.delivery');
   const id = useId();
   const saved = savedPin.useValue();
@@ -88,7 +92,7 @@ export function DeliveryEstimate() {
           <DeliveryWindows pin={checked} />
         ) : !error ? (
           <p className="text-ink-secondary">
-            {t('hint', { amount: formatPrice(commerce.shipping.freeShippingThresholdMinor) })}
+            {t('hint', { amount: formatPrice(freeShippingThresholdMinor) })}
           </p>
         ) : null}
       </div>

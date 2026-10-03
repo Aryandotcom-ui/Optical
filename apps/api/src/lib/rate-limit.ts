@@ -97,4 +97,5 @@ export const rateLimits = {
   // Endpoints that check the current password.
   passwordCheck: { name: 'password-check', max: 5, windowSeconds: 900 },
   accountWrite: { name: 'account-write', max: 60, windowSeconds: 60 },
+  adminWrite: { name: 'admin-write', max: 120, windowSeconds: 60 },
 } satisfies Record<string, RateLimitRule>;

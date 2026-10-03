@@ -1,5 +1,6 @@
 import { brand } from '@optical/config/brand';
-import { commerce } from '@optical/config/commerce';
+import { commerce, type CommerceConfig } from '@optical/config/commerce';
+import type { SettingsService } from '../settings/settings.service';
 import type {
   CheckoutQuote,
   CheckoutQuoteRequest,
@@ -43,6 +44,7 @@ interface PricedCart {
   cart: CartRow;
   pricing: PricingResult;
   coupon: Awaited<ReturnType<typeof loadCoupon>>;
+  market: CommerceConfig;
 }
 
 /** Quotes delivery and payment options, and places orders from the bag. */
@@ -51,6 +53,7 @@ export class CheckoutService {
     private readonly db: Db,
     private readonly carts: CartService,
     private readonly payments: PaymentGateway,
+    private readonly settings: SettingsService,
     private readonly now: () => Date = () => new Date(),
   ) {}
 
@@ -67,7 +70,9 @@ export class CheckoutService {
     if (!cart || cart.items.length === 0) throw new AppError('CONFLICT', 'Your bag is empty.');
     const email = options.email ?? null;
     const coupon = cart.couponCode ? await loadCoupon(this.db, cart.couponCode, email) : null;
+    const market = await this.settings.market();
     const pricing = priceOrder({
+      market,
       items: toPricingItems(cart.items),
       coupon,
       now: this.now(),
@@ -75,17 +80,17 @@ export class CheckoutService {
       shipping: { speed: options.speed, postalCode: options.postalCode ?? null },
       paymentMethod: options.provider === 'cod' ? 'cod' : 'prepaid',
     });
-    return { cart, pricing, coupon };
+    return { cart, pricing, coupon, market };
   }
 
-  private paymentOptions(pricing: PricingResult): PaymentOption[] {
+  private paymentOptions(pricing: PricingResult, market: CommerceConfig): PaymentOption[] {
     return this.payments.codes().map((provider) =>
       provider === 'cod'
         ? {
             provider,
             available: pricing.cashOnDelivery.available,
             reason: pricing.cashOnDelivery.reason,
-            feeMinor: commerce.cashOnDelivery.feeMinor,
+            feeMinor: market.cashOnDelivery.feeMinor,
           }
         : { provider, available: true, reason: null, feeMinor: 0 },
     );
@@ -93,7 +98,7 @@ export class CheckoutService {
 
   async quote(owner: Owner, input: CheckoutQuoteRequest): Promise<CheckoutQuote> {
     const request = checkoutQuoteRequestSchema.parse(input);
-    const { cart, pricing } = await this.priceCart(owner, {
+    const { cart, pricing, market } = await this.priceCart(owner, {
       speed: request.shippingSpeed,
       ...(request.postalCode ? { postalCode: request.postalCode } : {}),
       ...(request.paymentProvider ? { provider: request.paymentProvider } : {}),
@@ -112,7 +117,7 @@ export class CheckoutService {
     return {
       pricing,
       delivery: { standard: window('standard'), express: window('express') },
-      paymentOptions: this.paymentOptions(pricing),
+      paymentOptions: this.paymentOptions(pricing, market),
     };
   }
 

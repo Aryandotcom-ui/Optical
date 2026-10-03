@@ -34,7 +34,11 @@ export default defineConfig({
       testIgnore: /responsiveness|camera\.spec/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
-    { name: 'mobile', testIgnore: /responsiveness|camera\.spec/, use: { ...devices['Pixel 7'] } },
+    {
+      name: 'mobile',
+      testIgnore: /responsiveness|camera\.spec|admin\.spec/,
+      use: { ...devices['Pixel 7'] },
+    },
     // Try-on, face shape and PD with Chromium's fake camera playing the test face,
     // and software WebGL so three.js and MediaPipe run without a GPU.
     {

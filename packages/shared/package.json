@@ -22,7 +22,8 @@
     "./account/password-policy": "./src/account/password-policy.ts",
     "./face": "./src/face/index.ts",
     "./frame-finder": "./src/frame-finder/index.ts",
-    "./frame-finder/schemas": "./src/frame-finder/schemas.ts"
+    "./frame-finder/schemas": "./src/frame-finder/schemas.ts",
+    "./admin": "./src/admin/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

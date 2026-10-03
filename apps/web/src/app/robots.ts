@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       // Personal, internal or endlessly parameterised pages.
       disallow: [
+        '/admin',
         '/dev/',
         '/status',
         '/search',

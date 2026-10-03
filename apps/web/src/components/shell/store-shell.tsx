@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { formatPrice } from '@/lib/format';
 import { getNavModel } from '@/lib/nav';
+import { getStoreSettings } from '@/lib/store-settings';
 import { ANNOUNCEMENT_COOKIE, ANNOUNCEMENT_VERSION, AnnouncementBar } from './announcement-bar';
 import { MobileTabBar } from './mobile-tab-bar';
 import { SiteFooter } from './site-footer';
@@ -11,10 +12,11 @@ import { SiteHeader } from './site-header';
 
 /** The storefront frame: announcement, header, main content, footer and mobile tabs. */
 export async function StoreShell({ children }: { children: ReactNode }) {
-  const [nav, t, cookieStore] = await Promise.all([
+  const [nav, t, cookieStore, settings] = await Promise.all([
     getNavModel(),
     getTranslations('shell'),
     cookies(),
+    getStoreSettings(),
   ]);
   const dismissed = cookieStore.get(ANNOUNCEMENT_COOKIE)?.value === ANNOUNCEMENT_VERSION;
   return (
@@ -22,7 +24,7 @@ export async function StoreShell({ children }: { children: ReactNode }) {
       {dismissed ? null : (
         <AnnouncementBar
           message={t('announcement', {
-            amount: formatPrice(commerce.shipping.freeShippingThresholdMinor),
+            amount: formatPrice(settings.market.freeShippingThresholdMinor),
             days: commerce.policies.returnWindowDays,
           })}
         />

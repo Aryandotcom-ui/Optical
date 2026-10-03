@@ -6,11 +6,12 @@ import { getTranslations } from 'next-intl/server';
 import { Wordmark } from '@/components/brand/wordmark';
 import { formatPrice } from '@/lib/format';
 import type { NavModel } from '@/lib/nav';
+import { getStoreSettings } from '@/lib/store-settings';
 
 /** Calm footer: link groups, real policy facts from config, accepted payment methods. */
 export async function SiteFooter({ nav }: { nav: NavModel }) {
-  const t = await getTranslations('footer');
-  const { policies, shipping } = commerce;
+  const [t, { market }] = await Promise.all([getTranslations('footer'), getStoreSettings()]);
+  const { policies } = commerce;
   const groups: { title: string; links: { href: string; label: string }[] }[] = [
     {
       title: t('shop'),
@@ -54,7 +55,7 @@ export async function SiteFooter({ nav }: { nav: NavModel }) {
             <li>{t('facts.returns', { days: policies.returnWindowDays })}</li>
             <li>{t('facts.warranty', { months: policies.frameWarrantyMonths })}</li>
             <li>
-              {t('facts.shipping', { amount: formatPrice(shipping.freeShippingThresholdMinor) })}
+              {t('facts.shipping', { amount: formatPrice(market.freeShippingThresholdMinor) })}
             </li>
           </ul>
         </div>

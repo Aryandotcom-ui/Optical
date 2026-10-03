@@ -33,10 +33,15 @@ export function ProductImage({ className, alt, ...props }: ImageProps) {
       </div>
     );
   }
+  // Photos uploaded in the admin are served by the API, already sized; the
+  // optimiser would refuse a private API host in development anyway.
+  const uploaded =
+    typeof props.src === 'string' && /^https?:\/\/[^/]+\/v1\/media\//.test(props.src);
   return (
     <Image
       alt={alt}
       className={className}
+      unoptimized={uploaded || props.unoptimized}
       onError={() => {
         setFailedSrc(props.src);
       }}

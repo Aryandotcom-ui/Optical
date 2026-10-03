@@ -17,8 +17,10 @@ import type { OrderEmailData } from './order-email';
 import { PaymentFailedEmail } from './payment-failed';
 import {
   OrderCancelledEmail,
+  PrescriptionUpdateEmail,
   ReturnUpdateEmail,
   type OrderCancelledData,
+  type PrescriptionUpdateData,
   type ReturnUpdateData,
 } from './order-updates';
 
@@ -28,6 +30,7 @@ export type EmailMessage =
   | { template: 'payment-failed'; data: OrderEmailData; reason: string | null }
   | { template: 'order-cancelled'; data: OrderCancelledData }
   | { template: 'return-update'; data: ReturnUpdateData }
+  | { template: 'prescription-update'; data: PrescriptionUpdateData }
   | { template: 'welcome'; data: WelcomeData }
   | { template: 'password-reset'; data: PasswordResetData }
   | { template: 'password-changed'; data: PasswordChangedData }
@@ -59,6 +62,12 @@ export async function renderEmail(message: EmailMessage): Promise<RenderedEmail>
     case 'return-update':
       subject = `Return for order ${message.data.number}: ${message.data.stage}`;
       element = createElement(ReturnUpdateEmail, { data: message.data });
+      break;
+    case 'prescription-update':
+      subject = message.data.approved
+        ? `Prescription checked for order ${message.data.number}`
+        : `Action needed: prescription for order ${message.data.number}`;
+      element = createElement(PrescriptionUpdateEmail, { data: message.data });
       break;
     case 'welcome':
       subject = `Welcome to ${brand.name}`;

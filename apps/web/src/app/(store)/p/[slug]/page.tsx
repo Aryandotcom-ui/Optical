@@ -13,6 +13,7 @@ import { ProductRail } from '@/components/product/product-rail';
 import { WithMessages } from '@/components/providers/with-messages';
 import { getEnv } from '@/env';
 import { getCategories, getListing, getProduct, getRelated, getReviews } from '@/lib/catalog';
+import { getStoreSettings } from '@/lib/store-settings';
 import { jsonLdScript, productJsonLd } from '@/lib/structured-data';
 
 interface Props {
@@ -65,7 +66,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     : product.defaultVariantId;
   const isFrame = product.frame !== null;
 
-  const [t, related, reviews, categories, accessories] = await Promise.all([
+  const [t, related, reviews, categories, accessories, settings] = await Promise.all([
     getTranslations('pdp'),
     getRelated(product.id),
     Promise.all(
@@ -77,6 +78,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     isFrame
       ? getListing({ category: 'accessories', pageSize: 4 }).then((listing) => listing.items)
       : Promise.resolve([]),
+    getStoreSettings(),
   ]);
   const tFace = await getTranslations('filters.faceShapeValues');
   const categoryName =
@@ -117,7 +119,11 @@ export default async function ProductPage({ params, searchParams }: Props) {
             <div className="lg:sticky lg:top-24 lg:self-start">
               <ProductGallery />
             </div>
-            <ProductPurchase categoryName={categoryName} />
+            <ProductPurchase
+              categoryName={categoryName}
+              freeShippingThresholdMinor={settings.market.freeShippingThresholdMinor}
+              tryOn={settings.flags.virtualTryOn}
+            />
           </div>
 
           <div className="mt-20 space-y-20">

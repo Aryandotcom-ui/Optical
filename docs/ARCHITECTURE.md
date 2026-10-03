@@ -186,18 +186,19 @@ shipping thresholds) live in `packages/config` and become admin-editable in Phas
 
 ## The storefront (`apps/web`)
 
-| Path                          | What lives there                                                                                                                                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/app/(store)`             | Store routes: home, `/shop`, `/shop/[category]`, `/collections/[slug]`, `/search`, `/p/[slug]`, `/try-on`, `/frame-finder`, wishlist, compare, help and legal pages. They share the shell layout. |
-| `src/components/shell`        | Header (disclosure mega menu, search launcher, mobile menu), announcement bar, footer, mobile tab bar.                                                                                            |
-| `src/components/listing`      | Filters, toolbar and the server-rendered listing; the URL is the state (ADR-020).                                                                                                                 |
-| `src/components/pdp`          | Gallery, 3D viewer, purchase panel, fit guide, delivery estimate, reviews.                                                                                                                        |
-| `src/components/home`         | Hero (photo, then an optional 3D upgrade), lens story, the try-on illustration, face shapes, store promises.                                                                                      |
-| `src/components/try-on`       | Virtual try-on: the engine (camera, tracker, renderer, loop, controller), its UI, the dialog for product pages and cards, and the debug view.                                                     |
-| `src/components/frame-finder` | Frame Finder's question forms, results with the inline answer editor, and the camera face-shape detector.                                                                                         |
-| `src/lib/catalog.ts`          | Server-only data access: validated API calls through Next's fetch cache.                                                                                                                          |
-| `src/lib/browser-api.ts`      | The few calls made from the browser (search suggestions, wishlist, compare).                                                                                                                      |
-| `src/content/legal`           | Policy pages as typed content built from settings (ADR-027).                                                                                                                                      |
+| Path                                    | What lives there                                                                                                                                                                                  |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/(store)`                       | Store routes: home, `/shop`, `/shop/[category]`, `/collections/[slug]`, `/search`, `/p/[slug]`, `/try-on`, `/frame-finder`, wishlist, compare, help and legal pages. They share the shell layout. |
+| `src/components/shell`                  | Header (disclosure mega menu, search launcher, mobile menu), announcement bar, footer, mobile tab bar.                                                                                            |
+| `src/components/listing`                | Filters, toolbar and the server-rendered listing; the URL is the state (ADR-020).                                                                                                                 |
+| `src/components/pdp`                    | Gallery, 3D viewer, purchase panel, fit guide, delivery estimate, reviews.                                                                                                                        |
+| `src/components/home`                   | Hero (photo, then an optional 3D upgrade), lens story, the try-on illustration, face shapes, store promises.                                                                                      |
+| `src/components/try-on`                 | Virtual try-on: the engine (camera, tracker, renderer, loop, controller), its UI, the dialog for product pages and cards, and the debug view.                                                     |
+| `src/components/frame-finder`           | Frame Finder's question forms, results with the inline answer editor, and the camera face-shape detector.                                                                                         |
+| `src/lib/catalog.ts`                    | Server-only data access: validated API calls through Next's fetch cache.                                                                                                                          |
+| `src/lib/browser-api.ts`                | The few calls made from the browser (search suggestions, wishlist, compare).                                                                                                                      |
+| `src/app/admin`, `src/components/admin` | The store team's admin (ADR-051 to ADR-055): dashboard, orders, prescription review, products, inventory, lens catalogue, customers, coupons, reviews, help articles, settings and the audit log. |
+| `src/content/legal`                     | Policy pages as typed content built from settings (ADR-027).                                                                                                                                      |
 
 Server components render everything they can. Client components are limited to interaction, and
 anything not needed for the first paint (dialogs, the search palette, toasts, three.js) loads on
@@ -221,3 +222,18 @@ video track until it is visible again. The
 face maths (`@optical/shared/face`) is pure and unit-tested; the measuring tools (face shape, PD)
 reuse the camera and tracker through `FaceCamera` without the renderer. Nothing in the pipeline
 makes a network request (ADR-043, ADR-045).
+
+## Admin
+
+```
+browser (/admin, client-rendered) ──cookies──▶ /v1/admin/* ──preValidation: requireStaff (role from DB)
+                                                   │
+                                     route ─▶ CatalogAdmin / OrdersAdmin / StoreAdmin
+                                                   │ one transaction
+                                     change + AuditLog(before, after) ─▶ cache invalidation
+                                                   │                     (catalog, lens, help)
+                                     email outbox (prescription updates) ─▶ worker ─▶ SMTP
+```
+
+Settings (`SettingsService`) merge the `Setting` and `FeatureFlag` rows over the code defaults;
+checkout and `GET /v1/settings` read the merged values (ADR-053).

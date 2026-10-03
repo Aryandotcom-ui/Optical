@@ -77,3 +77,32 @@ export function ReturnUpdateEmail({ data }: { data: ReturnUpdateData }) {
     </EmailLayout>
   );
 }
+
+export interface PrescriptionUpdateData {
+  number: string;
+  customerName: string;
+  orderUrl: string;
+  approved: boolean;
+  /** The optician's note: the correction needed, or anything worth knowing. */
+  message: string;
+}
+
+/** Sent when an optician approves a prescription or asks for a correction. */
+export function PrescriptionUpdateEmail({ data }: { data: PrescriptionUpdateData }) {
+  const heading = data.approved ? 'Your prescription is checked' : 'Please check your prescription';
+  return (
+    <EmailLayout preview={`${heading}: order ${data.number}.`}>
+      <Text style={text.heading}>{heading}</Text>
+      <Text style={text.body}>Hi {data.customerName},</Text>
+      <Text style={text.body}>
+        {data.approved
+          ? `An optician has checked the prescription for order ${data.number}, and your lenses are going into production.`
+          : `An optician looked at the prescription for order ${data.number} and needs one thing fixed before we make your lenses:`}
+      </Text>
+      {data.message ? <Text style={text.body}>{data.message}</Text> : null}
+      <EmailButton href={data.orderUrl}>
+        {data.approved ? 'View the order' : 'Update the prescription'}
+      </EmailButton>
+    </EmailLayout>
+  );
+}

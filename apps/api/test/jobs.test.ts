@@ -101,10 +101,12 @@ describe('email outbox', () => {
 
   it('is drained by the worker job', async () => {
     const email = new MemoryEmailProvider();
+    // Other test files queue emails in parallel; only rows due before the run must be gone.
+    const cutoff = new Date();
     await runOutbox({ db: context.db, email } as unknown as JobContext);
     expect(
       await context.db.emailOutbox.count({
-        where: { status: 'PENDING', sendAfter: { lte: new Date() } },
+        where: { status: 'PENDING', sendAfter: { lte: cutoff } },
       }),
     ).toBe(0);
   });

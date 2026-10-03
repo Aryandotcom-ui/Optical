@@ -4,11 +4,12 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { formatPrice } from '@/lib/format';
+import { getStoreSettings } from '@/lib/store-settings';
 
 /** Store promises, read from the commerce settings, so they can't drift from checkout. */
 export async function TrustStrip() {
-  const t = await getTranslations('home.trust');
-  const { policies, shipping } = commerce;
+  const [t, { market }] = await Promise.all([getTranslations('home.trust'), getStoreSettings()]);
+  const { policies } = commerce;
   const items = [
     {
       icon: RotateCcw,
@@ -24,8 +25,8 @@ export async function TrustStrip() {
     },
     {
       icon: Truck,
-      title: t('deliveryTitle', { amount: formatPrice(shipping.freeShippingThresholdMinor) }),
-      body: t('deliveryBody', { fee: formatPrice(shipping.standardFeeMinor) }),
+      title: t('deliveryTitle', { amount: formatPrice(market.freeShippingThresholdMinor) }),
+      body: t('deliveryBody', { fee: formatPrice(market.standardFeeMinor) }),
       href: '/legal/shipping',
     },
     { icon: Ruler, title: t('measureTitle'), body: t('measureBody'), href: '/help/size-guide' },
