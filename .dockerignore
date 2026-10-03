@@ -1,0 +1,23 @@
+# Keep the build context small and free of secrets. Product renders
+# (apps/web/public/renders) are deliberately included when present.
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/coverage
+**/playwright-report
+**/test-results
+**/.lighthouseci
+**/*.tsbuildinfo
+**/*.log
+.git
+.env
+.env.*
+!.env.example
+.data
+**/.data
+uploads
+apps/api/storage
+apps/web/public/mediapipe/wasm
+apps/web/e2e/.generated
+apps/web/e2e/__screenshots__

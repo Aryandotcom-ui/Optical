@@ -237,3 +237,26 @@ browser (/admin, client-rendered) ──cookies──▶ /v1/admin/* ──preVa
 
 Settings (`SettingsService`) merge the `Setting` and `FeatureFlag` rows over the code defaults;
 checkout and `GET /v1/settings` read the merged values (ADR-053).
+
+## Deployment
+
+```mermaid
+flowchart LR
+  Proxy[TLS proxy / load balancer] --> Web[optical-web · Next.js standalone :3000]
+  Proxy --> API[optical-api · Fastify :4000]
+  Web -- API_INTERNAL_URL --> API
+  API --> PG[(Postgres)]
+  API --> RD[(Redis)]
+  Worker[optical-worker · BullMQ] --> PG
+  Worker --> RD
+  Worker --> SMTP[SMTP provider]
+  Worker -- API_INTERNAL_URL --> API
+  Migrate[optical-migrate · one-off] --> PG
+  API --- Vol[(uploads volume)]
+  Worker --- Vol
+  Pay[Payment provider] -- webhooks --> Proxy
+```
+
+All four images come from `infra/docker/Dockerfile`; configuration is environment variables only,
+except the two `NEXT_PUBLIC_*` origins, which are compiled into the web image. Details in
+[`infra/deploy/DEPLOYMENT.md`](../infra/deploy/DEPLOYMENT.md).

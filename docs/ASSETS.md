@@ -22,3 +22,11 @@ loads one 12 MB pair) is not committed: `scripts/copy-mediapipe.mjs` copies it f
 
 The Chromium fake-camera video used by the try-on tests (`apps/web/e2e/.generated/face.y4m`) is
 made from `face.png` on first use and is not committed.
+
+## Dependencies and images
+
+Runtime dependencies are open-source packages installed from npm (MIT, Apache 2.0, BSD and ISC
+licences); `pnpm licenses list --prod` prints each with its licence. The production images are
+based on the official `node:22-bookworm-slim` image (Debian packages under their own licences)
+and run the Postgres, Redis and Mailpit images unchanged. Visual-regression baselines in
+`apps/web/e2e/__screenshots__` are screenshots of this project's own pages.

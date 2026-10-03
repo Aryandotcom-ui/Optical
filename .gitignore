@@ -6,6 +6,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+infra/deploy/production.env
 
 # Build output
 .next/

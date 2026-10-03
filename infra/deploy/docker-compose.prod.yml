@@ -1,0 +1,100 @@
+# Production-mode stack: the three app images plus Postgres and Redis.
+# Run from the repository root:
+#
+#   cp infra/deploy/production.env.example infra/deploy/production.env   # then edit it
+#   docker compose -f infra/deploy/docker-compose.prod.yml up -d --build --wait
+#
+# Managed Postgres/Redis/SMTP work the same way: point the URLs in
+# production.env at them and remove the services you don't need.
+# See infra/deploy/DEPLOYMENT.md.
+name: optical-prod
+
+x-app: &app
+  restart: unless-stopped
+  env_file: ${ENV_FILE:-production.env}
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+    migrate: { condition: service_completed_successfully }
+
+x-build: &build
+  context: ../..
+  dockerfile: infra/docker/Dockerfile
+  args:
+    NODE_IMAGE: ${NODE_IMAGE:-node:22-bookworm-slim}
+    NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # POSTGRES_PASSWORD comes from the env file; it must match DATABASE_URL.
+    env_file: ${ENV_FILE:-production.env}
+    environment:
+      POSTGRES_USER: optical
+      POSTGRES_DB: optical
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Applies pending migrations, then exits; the apps start after it succeeds.
+  migrate:
+    build: { <<: *build, target: migrate }
+    image: optical-migrate:${TAG:-latest}
+    env_file: ${ENV_FILE:-production.env}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    <<: *app
+    build: { <<: *build, target: api }
+    image: optical-api:${TAG:-latest}
+    ports: ['${API_BIND:-127.0.0.1}:4000:4000']
+    volumes:
+      - uploads:/data/uploads
+
+  worker:
+    <<: *app
+    build: { <<: *build, target: worker }
+    image: optical-worker:${TAG:-latest}
+    volumes:
+      - uploads:/data/uploads
+
+  web:
+    <<: *app
+    build: { <<: *build, target: web }
+    image: optical-web:${TAG:-latest}
+    ports: ['${WEB_BIND:-127.0.0.1}:3000:3000']
+    depends_on:
+      api: { condition: service_healthy }
+
+  # Local trial only: catches every email (docker compose --profile local-mail up).
+  mailpit:
+    profiles: ['local-mail']
+    image: axllent/mailpit:v1.31
+    ports: ['127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025']
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+volumes:
+  postgres-data:
+  redis-data:
+  uploads:

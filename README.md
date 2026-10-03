@@ -6,14 +6,20 @@ plain language, honest pricing, and on-device virtual try-on.
 This repository is a TypeScript monorepo with a Next.js storefront, a Fastify API and shared
 packages. It runs fully locally with no paid services or API keys.
 
-> **Status: Phase 4 (accounts).** Browse, choose lenses with live pricing, and buy as a guest or
-> with an account: saved prescriptions and addresses, order history with invoices, cancellations,
-> returns and "buy again", a synced, shareable wishlist, and password reset by email. Try-on
-> arrives in Phase 5; see [the roadmap](#roadmap).
+> **Status: complete (Phases 0–8).** Browse, try frames on with your camera (on the device, no
+> images leave it), find frames for your face, choose lenses with live pricing, and buy as a guest
+> or with an account. The store team runs orders, prescription checks, stock, the catalogue, lens
+> prices and settings from the admin at `/admin`. Production images and a deployment guide are in
+> [`infra/deploy/DEPLOYMENT.md`](infra/deploy/DEPLOYMENT.md).
+
+**Five-minute tour** (after the quick start below): open http://localhost:3000, pick a frame and
+press **Try on**, choose **Choose lenses**, check out with **Test payment** → **Pay
+successfully**, then sign in at http://localhost:3000/admin as `admin@example.com` /
+`Admin#Lumen2026` to see the order, and open Mailpit at http://localhost:8025 for the emails.
 
 ## Quick start
 
-**Prerequisites:** Node 22.12+ (`nvm use` reads `.nvmrc`), pnpm 10 (`corepack enable`), Docker.
+**Prerequisites:** Node 22.22+ (`nvm use` reads `.nvmrc`), pnpm 10 (`corepack enable`), Docker.
 
 ```bash
 pnpm run setup   # install, .env, Docker services, migrate, seed, render product images
@@ -201,7 +207,7 @@ cards and galleries.
 and use the separate `optical_test` database. See [docs/TESTING.md](docs/TESTING.md).
 
 **Camera access.** Browsers allow the camera only on `https://` or `http://localhost`. If you open
-the site at a LAN IP address (for example from a phone), try-on needs HTTPS. Try-on arrives in Phase 5.
+the site at a LAN IP address (for example from a phone), try-on needs HTTPS.
 
 ## Roadmap
 
@@ -212,11 +218,20 @@ the site at a LAN IP address (for example from a phone), try-on needs HTTPS. Try
 | 2     | Storefront browsing: shell, home, listings, product pages, 3D viewer      | Done  |
 | 3     | Lens configurator, cart, checkout, payments, emails                       | Done  |
 | 4     | Auth and account area                                                     | Done  |
-| 5     | Virtual try-on and Frame Finder                                           | Next  |
-| 6     | Admin panel                                                               |       |
-| 7     | Hardening and polish                                                      |       |
-| 8     | Deployment readiness and handoff                                          |       |
+| 5     | Virtual try-on and Frame Finder                                           | Done  |
+| 6     | Admin panel                                                               | Done  |
+| 7     | Hardening and polish                                                      | Done  |
+| 8     | Deployment readiness and handoff                                          | Done  |
+
+## Deploying
+
+Production images (web, API, worker, migrations), a production Compose file, the environment
+reference and a release checklist are in [`infra/deploy/DEPLOYMENT.md`](infra/deploy/DEPLOYMENT.md).
+Run `pnpm preflight` before a release. Security controls are reviewed in
+[`docs/SECURITY-REVIEW.md`](docs/SECURITY-REVIEW.md); pushing and opening pull requests is
+described in [`GITHUB_PUSH.md`](GITHUB_PUSH.md).
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE). Third-party assets are listed in [docs/ASSETS.md](docs/ASSETS.md).
+MIT. See [LICENSE](LICENSE). Third-party assets and their licences are listed in
+[docs/ASSETS.md](docs/ASSETS.md); dependency licences can be listed with `pnpm licenses list --prod`.
