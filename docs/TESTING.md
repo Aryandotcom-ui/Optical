@@ -93,7 +93,8 @@ reported as a warning above 200 ms.
 
 The `camera` project launches Chromium with a fake camera that plays `e2e/fixtures/face.png` (made
 into `e2e/.generated/face.y4m` by the global setup on first run), grants the camera permission, and
-enables SwiftShader so WebGL 2 works without a GPU. A denied camera and a missing WebGL are
+runs full Chromium (new headless mode, not the headless shell) with ANGLE on SwiftShader, so WebGL 2
+works without a GPU. Its first test fails with a plain message if the browser has no WebGL 2. A denied camera and a missing WebGL are
 simulated with init scripts, so every fallback is exercised. In this setup MediaPipe runs on the
 CPU (ADR-043) and tracks within a few seconds.
 

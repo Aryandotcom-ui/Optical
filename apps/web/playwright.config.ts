@@ -44,13 +44,18 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 900 },
         permissions: ['camera'],
+        // Full Chromium in its new headless mode, not the headless shell: WebGL 2 on
+        // SwiftShader is what three.js and MediaPipe need, and the shell may lack it.
+        ...(executablePath ? {} : { channel: 'chromium' }),
         launchOptions: {
           ...(executablePath ? { executablePath } : {}),
           args: [
             '--use-fake-ui-for-media-stream',
             '--use-fake-device-for-media-stream',
             `--use-file-for-fake-video-capture=${FAKE_CAMERA_FILE}`,
+            '--use-angle=swiftshader',
             '--enable-unsafe-swiftshader',
+            '--ignore-gpu-blocklist',
           ],
         },
       },

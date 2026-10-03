@@ -22,6 +22,29 @@ function watchUploads(page: Page): string[] {
   return uploads;
 }
 
+// Everything below needs WebGL 2; say so plainly if the test browser lacks it.
+test('the test browser draws WebGL 2 in software', async ({ page }) => {
+  await page.goto('/try-on');
+  const renderer = await page.evaluate(() => {
+    const gl = document.createElement('canvas').getContext('webgl2');
+    if (!gl) return null;
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    return info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : 'unknown renderer';
+  });
+  expect(renderer, 'WebGL 2 is unavailable in the camera project browser').not.toBeNull();
+});
+
+/** Waits for a try-on phase, reporting the on-screen problem if it failed instead. */
+async function expectPhase(page: Page, phase: 'live' | 'photo') {
+  const experience = page.locator('[data-try-on-phase]').first();
+  await expect(experience).not.toHaveAttribute('data-try-on-phase', /^(intro|starting)$/, TRACKING);
+  if ((await experience.getAttribute('data-try-on-phase')) === 'error')
+    throw new Error(
+      `Try-on failed: ${(await page.getByRole('alert').allInnerTexts()).join(' | ')}`,
+    );
+  await expect(experience).toHaveAttribute('data-try-on-phase', phase);
+}
+
 test('try-on tracks the face, compares two frames and saves a photo, sending nothing', async ({
   page,
 }) => {
@@ -30,7 +53,7 @@ test('try-on tracks the face, compares two frames and saves a photo, sending not
   await page.getByRole('button', { name: 'Start camera' }).click();
 
   const experience = page.locator('[data-try-on-phase]');
-  await expect(experience).toHaveAttribute('data-try-on-phase', 'live', TRACKING);
+  await expectPhase(page, 'live');
   await expect(experience).toHaveAttribute('data-tracking', 'face', TRACKING);
   await expect(page.getByText('Wearing Harbour')).toBeVisible();
   await expect(page.getByText(/^This frame (suits|runs slightly)/)).toBeVisible();
@@ -112,6 +135,7 @@ test('try-on opens over the product page and keeps the session', async ({ page }
   await trigger.click();
   const dialog = page.getByRole('dialog', { name: 'Try frames on' });
   await dialog.getByRole('button', { name: 'Start camera' }).click();
+  await expectPhase(page, 'live');
   await expect(dialog.locator('[data-try-on-phase]')).toHaveAttribute(
     'data-tracking',
     'face',
