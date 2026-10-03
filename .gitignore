@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment: only the documented example is committed
+.env
+.env.*
+!.env.example
+infra/deploy/production.env
+
+# Build output
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+
+# Runtime data
+uploads/
+apps/api/storage/
+*.log
+logs/
+
+# Generated product renders (produced by `pnpm render:images`, never committed)
+apps/web/public/renders/
+
+# MediaPipe runtime, copied from node_modules before dev and build (the model itself is committed)
+apps/web/public/mediapipe/wasm/
+
+# Fake camera video for the try-on e2e tests, made from e2e/fixtures/face.png
+apps/web/e2e/.generated/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Generated Prisma client (rebuilt by `prisma generate` on install)
+apps/api/src/generated/
+
+# Local uploads and other runtime data (never commit customer files)
+.data/

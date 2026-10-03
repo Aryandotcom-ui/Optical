@@ -1,0 +1,1584 @@
+{
+  "metadata": {
+    "titleTemplate": "%s · {brand}",
+    "defaultTitle": "{brand}: {tagline}"
+  },
+  "common": {
+    "skipToContent": "Skip to content",
+    "goHome": "Go to the home page",
+    "tryAgain": "Try again",
+    "opensInNewTab": "(opens in a new tab)"
+  },
+  "home": {
+    "metaDescription": "Prescription glasses, sunglasses and computer glasses with real measurements, lenses explained in plain language and honest prices.",
+    "hero": {
+      "lede": "Frames with real measurements, lenses explained in plain words, and prices that include the tax. Pick the shape; we'll help with the rest.",
+      "shopEyeglasses": "Shop eyeglasses",
+      "shopSunglasses": "Shop sunglasses",
+      "shown": "Shown: {name} in {colour}, {price}",
+      "pause": "Pause the rotating frame",
+      "finder": "Not sure where to start? Find your frame in five questions",
+      "tryOn": "or try frames on with your camera"
+    },
+    "categoriesTitle": "Shop by category",
+    "categoryCount": "{count, plural, one {# style} other {# styles}}",
+    "lens": {
+      "eyebrow": "Lenses, explained",
+      "title": "The part you look through deserves the most care.",
+      "thinEyebrow": "Thickness",
+      "thinTitle": "Thin where your prescription needs it.",
+      "thinBody": "Stronger prescriptions make thicker lenses. Higher-index materials bend light more, so the same power fits in a slimmer lens. {standard} is included with every frame; we suggest going up to {thinnest} only when your prescription calls for it.",
+      "thinPrice": "Up to {price} for the thinnest. Edge thickness shown for a −4.00 lens, 60 mm wide.",
+      "clarityEyebrow": "Clarity",
+      "clarityTitle": "Fewer reflections, clearer eyes.",
+      "addOn": "Add it for {price}, or as part of a coating package.",
+      "screensEyebrow": "Screens",
+      "screensTitle": "Honest about blue light.",
+      "screensPrice": "Computer lenses without power from {price}.",
+      "sunEyebrow": "Sun",
+      "sunTitle": "Sunglasses that fit your prescription.",
+      "sunBody": "Every pair of sunglasses blocks UV up to 400 nm. Polarised lenses cut the glare off water and roads, and photochromic lenses darken outdoors and clear up inside.",
+      "sunPrice": "Polarised lenses {price}.",
+      "without": "Without coating",
+      "with": "Anti-reflective"
+    },
+    "faces": {
+      "title": "Not sure what suits you?",
+      "body": "Start with your face shape. It's a guide, not a rule: the right pair is the one you like wearing.",
+      "count": "{count, plural, one {# frame} other {# frames}}"
+    },
+    "seeAll": "See all",
+    "collectionsTitle": "Collections",
+    "collectionCount": "{count, plural, one {# frame} other {# frames}}",
+    "trust": {
+      "title": "What you can count on",
+      "returnsTitle": "{days}-day returns",
+      "returnsBody": "Changed your mind? Send them back within the window, prescription lenses included.",
+      "warrantyTitle": "{months}-month warranty",
+      "warrantyBody": "Covers manufacturing faults on every frame.",
+      "deliveryTitle": "Free delivery over {amount}",
+      "deliveryBody": "Otherwise {fee}. Delivery dates are shown before you pay, by PIN code.",
+      "measureTitle": "Real measurements",
+      "measureBody": "Lens, bridge, temple and weight on every frame, with a to-scale drawing."
+    },
+    "tryOn": {
+      "eyebrow": "Virtual try-on",
+      "title": "See it on you",
+      "body": "Try frames on with your camera, life-size and from every angle, and compare two pairs side by side. It all runs on your device: nothing is uploaded or saved.",
+      "start": "Try frames on",
+      "finder": "Find your frame",
+      "alt": "Illustration: a face trying on round, rectangle and aviator frames in turn",
+      "note": "An illustration. Try-on uses your camera only when you start it."
+    }
+  },
+  "status": {
+    "title": "System status",
+    "lede": "Live checks of every service this site depends on. The page refreshes its data on every load.",
+    "overall": {
+      "ready": "Everything is running.",
+      "degraded": "Running with reduced capability.",
+      "unavailable": "Some services are down."
+    },
+    "services": {
+      "web": "Storefront",
+      "api": "API",
+      "database": "Database",
+      "redis": "Cache and queues"
+    },
+    "state": {
+      "up": "Operational",
+      "down": "Unavailable",
+      "unknown": "Unknown"
+    },
+    "latency": "{ms} ms",
+    "version": "Version {version}",
+    "unknownBecauseApiDown": "Unknown while the API is unreachable.",
+    "redisDownImpact": "The site keeps working. Rate limits are relaxed and background jobs wait until the cache is back.",
+    "apiDownHint": "Start the API with pnpm dev, or check API_INTERNAL_URL in your .env file.",
+    "servicesDownHint": "Start local services with pnpm docker:up.",
+    "requestId": "Request ID {id}",
+    "checkedAt": "Checked at {time}"
+  },
+  "notFound": {
+    "title": "We couldn’t find that page",
+    "body": "The link may be out of date, or the page may have moved.",
+    "code": "Error 404",
+    "browse": "Browse all frames"
+  },
+  "error": {
+    "title": "Something went wrong on our side",
+    "body": "Your details are safe. Try again, and if the problem continues, contact us with the reference below.",
+    "reference": "Reference {digest}",
+    "storeTitle": "We couldn’t load this page",
+    "storeBody": "Our catalogue didn’t answer in time. This is usually brief: try again in a moment."
+  },
+  "designSystem": {
+    "title": "Design system",
+    "lede": "Tokens and primitives every screen is built from. Values come from packages/config and switch with your system’s light or dark setting.",
+    "colour": "Colour",
+    "contrastOnBackground": "{ratio}:1 on background",
+    "typography": "Typography",
+    "typeSample": "Glasses, made clear.",
+    "radius": "Radius",
+    "motion": "Motion",
+    "motionHint": "Hover or focus a tile to see each duration with the standard easing. Reduced-motion settings shorten these to a fade.",
+    "buttons": "Buttons",
+    "money": "Money formatting",
+    "moneyHint": "Integer minor units formatted with Intl.NumberFormat for {locale}.",
+    "primary": "Choose lenses",
+    "secondary": "Try on with camera",
+    "ghost": "Add to wishlist",
+    "disabled": "Unavailable"
+  },
+  "product": {
+    "cardLabel": "{name} in {colour}",
+    "new": "New",
+    "colours": "Colours",
+    "ratingLabel": "Rated {rating} out of 5 from {count, plural, one {# review} other {# reviews}}",
+    "outOfStock": "Out of stock in this colour",
+    "lowStock": "Only {count} left in this colour",
+    "fits": {
+      "small": "Fits smaller faces",
+      "medium": "Fits medium faces",
+      "large": "Fits larger faces"
+    },
+    "category": {
+      "eyeglasses": "Eyeglasses",
+      "sunglasses": "Sunglasses",
+      "computer-glasses": "Computer glasses",
+      "kids": "Kids",
+      "accessories": "Accessory"
+    }
+  },
+  "wishlist": {
+    "save": "Save",
+    "saved": "Saved",
+    "addNamed": "Save {name} to your wishlist",
+    "added": "{name} saved to your wishlist",
+    "removed": "{name} removed from your wishlist",
+    "syncFailed": "That change couldn't be saved to your account. Check your connection."
+  },
+  "search": {
+    "open": "Search",
+    "tab": "Search",
+    "title": "Search the store",
+    "placeholder": "Search frames, shapes, colours or help",
+    "hint": "Try “round tortoise”, “titanium” or “aviator sunglasses”. Typos are fine.",
+    "recent": "Recent searches",
+    "searchFor": "Search for “{query}”",
+    "products": "Frames",
+    "categories": "Categories",
+    "collections": "Collections",
+    "help": "Help",
+    "loading": "Searching",
+    "resultCount": "{count, plural, =0 {No frames found} one {# frame found} other {# frames found}}",
+    "noResults": "Nothing matches “{query}”. Try a shape, a colour or a material.",
+    "error": "Search is unavailable right now. Please try again in a moment."
+  },
+  "shell": {
+    "home": "Home",
+    "shop": "Shop",
+    "wishlist": "Wishlist",
+    "wishlistWithCount": "Wishlist, {count, plural, one {# frame} other {# frames}} saved",
+    "help": "Help",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "primaryNav": "Main",
+    "tabBar": "Quick navigation",
+    "byCategory": "Shop by category",
+    "byShape": "Shop by shape",
+    "collections": "Collections",
+    "dismissAnnouncement": "Dismiss this message",
+    "announcement": "Free delivery on orders over {amount} · {days}-day returns, no questions asked",
+    "bag": "Bag",
+    "bagWithCount": "Bag, {count, plural, one {# item} other {# items}}",
+    "account": "Account",
+    "tryOn": "Try on",
+    "frameFinder": "Frame Finder"
+  },
+  "footer": {
+    "shop": "Shop",
+    "help": "Help",
+    "company": "Policies",
+    "helpCentre": "Help centre",
+    "sizeGuide": "Size guide",
+    "readPrescription": "How to read a prescription",
+    "returnsWarranty": "Returns and warranty",
+    "privacy": "Privacy",
+    "terms": "Terms of use",
+    "returnsPolicy": "Returns policy",
+    "shippingPolicy": "Shipping policy",
+    "facts": {
+      "returns": "{days}-day returns, including prescription lenses",
+      "warranty": "{months}-month warranty on every frame",
+      "shipping": "Free delivery on orders over {amount}"
+    },
+    "copyright": "© {year} {name}",
+    "region": "{country} · {currency}",
+    "countryName": "India",
+    "payments": "Ways to pay",
+    "paymentMethods": {
+      "upi": "UPI",
+      "cards": "Cards",
+      "netbanking": "Netbanking",
+      "cod": "Cash on delivery"
+    },
+    "trackOrder": "Track your order",
+    "tryOn": "Virtual try-on",
+    "frameFinder": "Frame Finder"
+  },
+  "filters": {
+    "title": "Filters",
+    "shape": "Shape",
+    "material": "Material",
+    "size": "Frame size",
+    "colour": "Colour",
+    "fit": "Fit",
+    "feature": "Features",
+    "faceShape": "Suits face shape",
+    "collection": "Collection",
+    "price": "Price",
+    "rating": "Rating",
+    "category": "Category",
+    "inStock": "In stock only",
+    "shapeValues": {
+      "round": "Round",
+      "rectangle": "Rectangle",
+      "square": "Square",
+      "aviator": "Aviator",
+      "cat-eye": "Cat-eye",
+      "wayfarer": "Wayfarer",
+      "browline": "Browline",
+      "hexagon": "Hexagon"
+    },
+    "materialValues": {
+      "acetate": "Acetate",
+      "metal": "Metal",
+      "titanium": "Titanium",
+      "tr90": "TR90 (flexible)",
+      "mixed": "Acetate and metal"
+    },
+    "sizeValues": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "sizeHints": {
+      "small": "Under 132 mm wide",
+      "medium": "132–139 mm wide",
+      "large": "140 mm and wider"
+    },
+    "fitValues": {
+      "women": "Women",
+      "men": "Men",
+      "unisex": "Unisex",
+      "kids": "Kids"
+    },
+    "featureValues": {
+      "spring-hinges": "Spring hinges",
+      "nose-pads": "Nose pads",
+      "lightweight": "Lightweight (15 g or less)",
+      "adjustable": "Adjustable fit"
+    },
+    "faceShapeValues": {
+      "oval": "Oval",
+      "round": "Round",
+      "square": "Square",
+      "heart": "Heart",
+      "oblong": "Oblong",
+      "diamond": "Diamond"
+    },
+    "colourValues": {
+      "black": "Black",
+      "tortoise": "Tortoise",
+      "brown": "Brown",
+      "grey": "Grey",
+      "clear": "Clear",
+      "blue": "Blue",
+      "green": "Green",
+      "red": "Red",
+      "pink": "Pink",
+      "beige": "Beige",
+      "gold": "Gold",
+      "silver": "Silver",
+      "gunmetal": "Gunmetal",
+      "rose-gold": "Rose gold"
+    },
+    "ratingValues": {
+      "3": "3 stars and up",
+      "4": "4 stars and up"
+    },
+    "categoryValues": {
+      "eyeglasses": "Eyeglasses",
+      "sunglasses": "Sunglasses",
+      "computer-glasses": "Computer glasses",
+      "kids": "Kids",
+      "accessories": "Accessories"
+    }
+  },
+  "listing": {
+    "filters": "Filters",
+    "filtersWithCount": "Filters ({count})",
+    "closeFilters": "Close filters",
+    "showResults": "{count, plural, =0 {No frames match} one {Show # frame} other {Show # frames}}",
+    "clearAll": "Clear all",
+    "sortBy": "Sort by",
+    "sort": {
+      "recommended": "Recommended",
+      "newest": "Newest",
+      "price-asc": "Price: low to high",
+      "price-desc": "Price: high to low",
+      "rating": "Top rated"
+    },
+    "activeFilters": "Active filters",
+    "removeFilter": "Remove filter: {label}",
+    "removeToSee": "Remove “{label}” to see {count, plural, one {# frame} other {# frames}}",
+    "optionWithCount": "{label}, {count, plural, one {# frame} other {# frames}}",
+    "priceMin": "Minimum price",
+    "priceMax": "Maximum price",
+    "priceRangeHint": "Prices from {min} to {max}, including GST.",
+    "noPriceRange": "No prices to filter.",
+    "priceFrom": "From {amount}",
+    "priceUpTo": "Up to {amount}",
+    "results": "Results",
+    "showing": "Showing {shown} of {total, plural, one {# frame} other {# frames}}",
+    "loadMore": "Show more",
+    "emptyTitle": "No frames match those filters",
+    "emptyWithSuggestion": "One filter is ruling out most of the range. Remove it, or start again from the full collection.",
+    "emptyFiltered": "Try removing a filter or two.",
+    "emptyNone": "There is nothing here yet. Browse the full range instead.",
+    "browseAll": "Browse all frames"
+  },
+  "pages": {
+    "shop": {
+      "title": "All frames",
+      "description": "Eyeglasses, sunglasses, computer and kids frames, with real measurements on every pair.",
+      "eyebrow": "Shop"
+    },
+    "collection": {
+      "eyebrow": "Collection"
+    },
+    "search": {
+      "title": "Search",
+      "titleFor": "Results for “{query}”",
+      "eyebrow": "Search",
+      "hint": "Search by shape, colour, material or name. Press / anywhere to search."
+    }
+  },
+  "pdp": {
+    "breadcrumb": "Breadcrumb",
+    "shop": "Shop",
+    "ratingLabel": "Rated {rating} out of 5 from {count, plural, one {# review} other {# reviews}}",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "priceNoteFrame": "Frame price, {tax} included. Lenses are priced separately.",
+    "priceNote": "{tax} included.",
+    "colour": "Colour:",
+    "colourOut": "{colour}, out of stock",
+    "checkFit": "Check the fit",
+    "returns": "{days}-day returns",
+    "warranty": "{months}-month frame warranty",
+    "about": "About this frame",
+    "care": "Materials and care",
+    "suits": "Suits these face shapes",
+    "suitsNote": "A guide, not a rule. Wear what you love.",
+    "fitTitle": "Fit and measurements",
+    "fitIntro": "Every measurement is real. Compare them with a pair you already own to see how this one will sit.",
+    "sizeGuideLink": "How to find your size",
+    "reviewsTitle": "Reviews",
+    "completeTheLook": "Complete the look",
+    "related": "You might also like",
+    "stock": {
+      "inStock": "In stock, ready to dispatch",
+      "low": "Only {count} left in this colour",
+      "out": "Out of stock",
+      "outOtherColours": "Out of stock in this colour. Other colours are available."
+    },
+    "gallery": {
+      "new": "New",
+      "views": "Product views",
+      "showView": "Show {view}",
+      "view3d": "3D",
+      "kind": {
+        "front": "front view",
+        "angle": "three-quarter view",
+        "side": "side view",
+        "on-face": "on-face view",
+        "detail": "detail"
+      }
+    },
+    "viewer": {
+      "roleDescription": "3D viewer",
+      "label": "{name} in {colour}, interactive 3D view",
+      "keyboardHelp": "Drag to turn the frame, scroll or pinch to zoom. With the keyboard, use the arrow keys to turn, plus and minus to zoom, and 0 to reset.",
+      "controls": "3D view controls",
+      "rotateLeft": "Turn left",
+      "rotateRight": "Turn right",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "reset": "Reset view",
+      "unsupported": "Your browser can't show 3D graphics. The photos show every angle."
+    },
+    "delivery": {
+      "title": "Delivery estimate",
+      "label": "Your {label}",
+      "placeholder": "{label}, e.g. {example}",
+      "check": "Check",
+      "invalid": "Enter a 6-digit {label}.",
+      "frameOnly": "Frame only or non-prescription",
+      "withLenses": "With prescription lenses",
+      "window": "{from} – {to}",
+      "remote": "Remote-area delivery adds {amount} at checkout.",
+      "hint": "Free delivery on orders over {amount}. Enter your PIN code for dates."
+    },
+    "fit": {
+      "lensWidth": "Lens width",
+      "bridge": "Bridge",
+      "temple": "Temple length",
+      "lensHeight": "Lens height",
+      "totalWidth": "Frame width",
+      "weight": "Weight",
+      "grams": "{value} g",
+      "shape": "Shape",
+      "material": "Material",
+      "rim": "Rim",
+      "hinge": "Hinges",
+      "rimValues": {
+        "full-rim": "Full rim",
+        "half-rim": "Half rim",
+        "rimless": "Rimless"
+      },
+      "hingeValues": {
+        "standard": "Standard",
+        "spring": "Spring hinges"
+      },
+      "diagramLabel": "Front of the frame drawn to scale beside a bank card. Total width {total} mm.",
+      "diagramNote": "Drawn to scale beside a standard bank card (85.6 × 54 mm).",
+      "card": "Bank card",
+      "yoursLegend": "- - your glasses",
+      "compareTitle": "Compare with your glasses",
+      "compareHint": "Look inside the arm of a pair that fits you well. You'll find three numbers like 52□18 140: lens width, bridge and temple length.",
+      "yours": {
+        "lensWidthMm": "Lens (mm)",
+        "bridgeMm": "Bridge (mm)",
+        "templeMm": "Temple (mm)"
+      },
+      "compareIncomplete": "Enter all three numbers to compare.",
+      "same": "same",
+      "verdict": {
+        "same": "About the same width as your glasses.",
+        "slightlyWider": "About {diff} wider than your glasses: a touch roomier.",
+        "slightlyNarrower": "About {diff} narrower than your glasses: a touch snugger.",
+        "wider": "About {diff} wider than your glasses. It may feel loose.",
+        "narrower": "About {diff} narrower than your glasses. It may feel tight."
+      },
+      "diffLens": "Lens width: {diff}",
+      "diffBridge": "Bridge: {diff}",
+      "diffTemple": "Temple: {diff}"
+    },
+    "reviews": {
+      "breakdown": "Rating breakdown",
+      "stars": "{count, plural, one {# star} other {# stars}}",
+      "histogramRow": "{stars} stars: {count, plural, one {# review} other {# reviews}}",
+      "averageLabel": "Average rating {rating} out of 5 from {count, plural, one {# review} other {# reviews}}",
+      "count": "{count, plural, one {# review} other {# reviews}}",
+      "sortBy": "Sort by",
+      "sort": {
+        "recent": "Most recent",
+        "helpful": "Most helpful",
+        "rating-high": "Highest rated",
+        "rating-low": "Lowest rated"
+      },
+      "reviewRating": "Rated {rating} out of 5",
+      "verified": "Verified purchase",
+      "helpful": "{count, plural, one {# person} other {# people}} found this helpful",
+      "more": "Show more reviews",
+      "noneTitle": "No reviews yet",
+      "noneBody": "Nobody has reviewed {name} yet."
+    },
+    "buy": {
+      "chooseLenses": "Choose lenses",
+      "frameOnly": "Frame only",
+      "addToBag": "Add to bag",
+      "adding": "Adding…",
+      "soldOut": "Sold out in this colour",
+      "added": "{name} is in your bag.",
+      "viewBag": "View bag",
+      "failed": "We couldn't add that to your bag. Please try again."
+    }
+  },
+  "compare": {
+    "add": "Compare",
+    "inCompare": "In compare",
+    "added": "{name} added to compare",
+    "removed": "{name} removed from compare",
+    "full": "You can compare up to {limit} frames. Remove one first.",
+    "view": "View"
+  },
+  "wishlistPage": {
+    "title": "Wishlist",
+    "count": "{count, plural, one {# saved frame} other {# saved frames}}",
+    "emptyTitle": "Nothing saved yet",
+    "emptyBody": "Tap the heart on any frame to keep it here while you decide.",
+    "browse": "Browse frames",
+    "missing": "{count, plural, one {# saved item is} other {# saved items are}} no longer sold, so {count, plural, one {it isn't} other {they aren't}} shown.",
+    "deviceNote": "Your wishlist is saved in this browser. Sign in to keep it on every device.",
+    "error": "Your wishlist couldn't be loaded. Check your connection and try again.",
+    "syncedNote": "Your wishlist is saved to your account, on every device you sign in on.",
+    "share": "Share a read-only link",
+    "copied": "Link copied. Anyone with it can see these frames, but not who saved them.",
+    "copyFailed": "Copy this link: {url}",
+    "resetShare": "Stop sharing the old link",
+    "resetDone": "The old link no longer works. Share the new one when you like.",
+    "sharedTitle": "A shared wishlist",
+    "sharedIntro": "Someone shared these frames with you. Tap the heart to save any to your own wishlist.",
+    "sharedMissing": "This wishlist is no longer shared. Ask for a new link."
+  },
+  "comparePage": {
+    "title": "Compare frames",
+    "intro": "Measurements side by side. Rows that differ are marked with a dot.",
+    "emptyTitle": "Nothing to compare yet",
+    "emptyBody": "Add up to {limit} frames with the Compare button on any product page.",
+    "browse": "Browse frames",
+    "onlyDifferences": "Show only differences",
+    "clear": "Clear all",
+    "caption": "Frame comparison",
+    "remove": "Remove {name} from compare",
+    "differs": "(differs)",
+    "price": "Price",
+    "rating": "Rating",
+    "noRating": "No reviews yet",
+    "ratingValue": "{rating} ({count})",
+    "size": "Size",
+    "features": "Features",
+    "suits": "Suits",
+    "colours": "Colours",
+    "addMore": "You can add {count, plural, one {# more frame} other {# more frames}}.",
+    "error": "These frames couldn't be loaded. Check your connection and try again."
+  },
+  "help": {
+    "nav": {
+      "label": "Help topics",
+      "centre": "Help centre",
+      "sizeGuide": "Size guide",
+      "prescription": "Reading a prescription",
+      "returns": "Returns and warranty"
+    },
+    "centre": {
+      "title": "Help centre",
+      "intro": "Short answers to the questions people ask most. Can't find yours? Email us and a person will reply.",
+      "topics": "Jump to a topic",
+      "topicNames": {
+        "care": "Care",
+        "delivery": "Delivery",
+        "lenses": "Lenses",
+        "ordering": "Ordering and payment",
+        "prescriptions": "Prescriptions",
+        "returns": "Returns and warranty"
+      }
+    },
+    "sizeGuide": {
+      "title": "Find your frame size",
+      "intro": "The easiest way is to copy a pair that already fits. Three numbers printed on its arm tell you almost everything.",
+      "numbersTitle": "Read the numbers on your glasses",
+      "numbersBody": "Look on the inside of an arm (sometimes the bridge). You'll see something like 52□18 140. All three are in millimetres.",
+      "armLabel": "Inside of a temple arm printed with 52, a small square, 18 and 140.",
+      "terms": {
+        "lens": {
+          "name": "52: lens width",
+          "body": "The width of one lens. Most adult frames are 46 to 58 mm."
+        },
+        "bridge": {
+          "name": "18: bridge",
+          "body": "The gap between the lenses, over your nose. A narrower bridge sits higher."
+        },
+        "temple": {
+          "name": "140: temple",
+          "body": "The arm's length, hinge to tip. 135 to 150 mm suits most adults."
+        }
+      },
+      "sizesTitle": "Our sizes",
+      "sizesBody": "We group frames by their total front width. Within 2 to 3 mm of a pair you like will feel very similar.",
+      "sizeColumn": "Size",
+      "widthColumn": "Frame width",
+      "shopColumn": "Shop",
+      "sizeNames": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "under": "Under {max} mm",
+      "between": "{min}–{max} mm",
+      "over": "{min} mm and over",
+      "shopSize": {
+        "small": "Shop small frames",
+        "medium": "Shop medium frames",
+        "large": "Shop large frames"
+      },
+      "noGlassesTitle": "No glasses to copy?",
+      "noGlassesSteps": {
+        "one": "Stand in front of a mirror with a ruler or tape measure.",
+        "two": "Measure straight across your face from temple to temple, just beside your eyes.",
+        "three": "Choose frames whose width is within a few millimetres of that number. Each product page shows its width and a to-scale drawing."
+      },
+      "comfortTitle": "Comfort tips",
+      "comfortTips": {
+        "bridge": "If glasses slide down your nose, try a narrower bridge or frames with adjustable nose pads.",
+        "temples": "Arms that press behind your ears are too short; ones that stick out past them are too long.",
+        "pads": "Metal and titanium frames have adjustable pads, which any optician can fine-tune in a minute."
+      }
+    },
+    "prescription": {
+      "title": "How to read your prescription",
+      "intro": "A prescription looks cryptic, but it's only a few numbers per eye. Here's what each one means.",
+      "exampleTitle": "An example",
+      "exampleCaption": "Example prescription with sphere, cylinder, axis and addition for each eye",
+      "exampleNote": "Minus numbers correct short sight (distance is blurry); plus numbers correct long sight. Your prescription may leave some boxes empty.",
+      "eyes": {
+        "od": "OD (right eye)",
+        "os": "OS (left eye)"
+      },
+      "termsTitle": "What the terms mean",
+      "terms": {
+        "sph": {
+          "short": "SPH",
+          "name": "SPH (sphere)",
+          "body": "The main power of the lens, in dioptres. Minus for short sight, plus for long sight."
+        },
+        "cyl": {
+          "short": "CYL",
+          "name": "CYL (cylinder)",
+          "body": "Extra power for astigmatism, when the eye focuses differently in one direction. Empty means none."
+        },
+        "axis": {
+          "short": "AXIS",
+          "name": "AXIS",
+          "body": "The direction of the cylinder, from 1 to 180 degrees. It only appears with a CYL value."
+        },
+        "add": {
+          "short": "ADD",
+          "name": "ADD (addition)",
+          "body": "Extra magnification for reading, used for progressive and reading lenses. It is usually the same for both eyes."
+        },
+        "pd": {
+          "short": "PD",
+          "name": "PD (pupillary distance)",
+          "body": "The distance between the centres of your pupils, so the optical centre of each lens sits in front of each eye."
+        }
+      },
+      "range": "We can make {min} to {max}.",
+      "rangeDegrees": "From {min} to {max} degrees.",
+      "rangeMm": "Usually {min} to {max} mm for adults.",
+      "validityTitle": "How recent should it be?",
+      "validityBody": "Eye-care professionals generally recommend an eye test every one to two years. If your vision has changed since your last test, get a new prescription before ordering."
+    },
+    "returns": {
+      "title": "Returns and warranty",
+      "intro": "Not right? Return any order within {days} days of delivery for a full refund, prescription lenses included.",
+      "howTitle": "How to return",
+      "steps": {
+        "one": "Within {days} days of delivery, email {email} with your order number and what you'd like to return.",
+        "two": "We reply within one working day with a free pickup slot.",
+        "three": "Pack the glasses in their case and box. Our courier collects them from your address.",
+        "four": "We check them when they arrive and refund you straight away."
+      },
+      "refundsTitle": "Refunds",
+      "refundsBody": "Refunds go back to the way you paid, within 5 to 7 working days of the return reaching us. Cash-on-delivery orders are refunded to a UPI ID or bank account you give us.",
+      "warrantyTitle": "{months}-month warranty",
+      "warrantyBody": "Every frame is covered for {months} months from delivery against manufacturing faults. We repair or replace it free, including shipping.",
+      "warrantyList": {
+        "covered": "Covered: loose or broken hinges, peeling coatings, cracks that appear without an impact.",
+        "notCovered": "Not covered: accidental damage, scratches from wear, or loss."
+      },
+      "policyLink": "The full terms are in our",
+      "policyLinkText": "returns policy"
+    }
+  },
+  "legal": {
+    "nav": "Policies",
+    "updated": "Last updated {date}"
+  },
+  "configurator": {
+    "title": "Lenses for {name}",
+    "subtitle": "Frame colour: {colour}",
+    "close": "Close lens choices",
+    "stepsLabel": "Lens choices",
+    "steps": {
+      "purpose": "Type",
+      "prescription": "Prescription",
+      "thickness": "Thickness",
+      "coatings": "Coatings",
+      "tint": "Tint",
+      "review": "Review"
+    },
+    "headings": {
+      "purpose": "What are these glasses for?",
+      "prescription": "Your prescription",
+      "thickness": "How thin should the lenses be?",
+      "coatings": "Coatings",
+      "tint": "Tint",
+      "review": "Review your lenses"
+    },
+    "progress": "Step {current} of {total}",
+    "incomplete": {
+      "purpose": "Choose a lens type to continue.",
+      "prescription": "Finish your prescription, upload it, or choose to send it later.",
+      "thickness": "Choose a lens thickness to continue.",
+      "coatings": "One of these coatings can't be combined with your other choices.",
+      "tint": "Choose a tint colour to continue.",
+      "review": "Some choices need attention before adding to your bag."
+    },
+    "recommend": "Not sure? Recommend for me",
+    "totalExact": "Frame and lenses",
+    "totalSoFar": "So far",
+    "back": "Back",
+    "next": "Continue",
+    "addToBag": "Add to bag",
+    "adding": "Adding…",
+    "added": "{name} with your lenses is in your bag.",
+    "viewBag": "View bag",
+    "addFailed": "We couldn't add that to your bag. Please try again.",
+    "loadFailed": "We couldn't load the lens options. Check your connection and open this again.",
+    "purpose": {
+      "legend": "Lens type",
+      "included": "Included",
+      "from": "from {price}",
+      "helpTitle": "Two quick questions",
+      "hasPrescription": "Do you have a prescription for glasses?",
+      "needsReading": "Do you need help reading up close as well as seeing far away?",
+      "useSuggestion": "Choose the lens that fits",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "prescription": {
+      "legend": "How to give us your prescription",
+      "manualTitle": "Type it in",
+      "manualDescription": "About a minute, with your prescription in front of you.",
+      "uploadTitle": "Upload a photo or PDF",
+      "uploadDescription": "An optician reads it and checks it before your lenses are made.",
+      "laterTitle": "Send it later",
+      "laterDescription": "Order now; we'll hold your lenses until you add it from your order page or by replying to our email.",
+      "recommend": "Not sure? Send it later"
+    },
+    "rx": {
+      "rightEye": "Right eye",
+      "leftEye": "Left eye",
+      "sph": "SPH",
+      "cyl": "CYL",
+      "axis": "AXIS",
+      "add": "ADD",
+      "none": "None",
+      "decrease": "Decrease {field}",
+      "increase": "Increase {field}",
+      "pdTitle": "Pupillary distance (PD)",
+      "pdSingle": "One number",
+      "pdDual": "Two numbers",
+      "pd": "PD",
+      "pdEmpty": "Enter",
+      "pdRight": "Right PD",
+      "pdLeft": "Left PD",
+      "whatMeanTitle": "What do these mean?",
+      "sphHelpTerm": "SPH (sphere)",
+      "sphHelp": "The main power. Minus for short sight (distance is blurry), plus for long sight. 0.00 or 'plano' means no correction.",
+      "cylHelpTerm": "CYL (cylinder)",
+      "cylHelp": "Corrects astigmatism. Leave it empty if your prescription has no cylinder.",
+      "axisHelpTerm": "AXIS",
+      "axisHelp": "The angle of the cylinder, from 1 to 180. It is only used with a cylinder.",
+      "addHelpTerm": "ADD (addition)",
+      "addHelp": "The extra power for reading, used by progressive lenses. It is usually the same for both eyes.",
+      "pdHelpTerm": "PD (pupillary distance)",
+      "pdHelp": "The distance between your pupils in millimetres, so the centre of each lens sits in front of your eye. Two numbers mean each eye is measured from the middle of your nose.",
+      "measureTitle": "Don't know your PD?",
+      "measureStep1": "Stand about 20 cm from a mirror and hold a millimetre ruler flat against your brow.",
+      "measureStep2": "Close your right eye and line up 0 with the centre of your left pupil.",
+      "measureStep3": "Open your right eye, close your left, and read the number at the centre of your right pupil. Most adults measure between 54 and 74 mm."
+    },
+    "upload": {
+      "choose": "Choose a photo or PDF",
+      "replace": "Replace the file",
+      "uploading": "Uploading…",
+      "uploaded": "{name} uploaded",
+      "hint": "JPEG, PNG, WebP or PDF, up to 8 MB. Location and camera details are removed from photos before they are stored.",
+      "tooLarge": "That file is over 8 MB. Try a smaller photo or a PDF.",
+      "failed": "The upload didn't work. Please try again."
+    },
+    "thickness": {
+      "legend": "Lens material",
+      "included": "Included",
+      "recommended": "Recommended",
+      "thickest": "About {mm} mm at the thickest point",
+      "example": "Example for a {power} prescription. Type in your prescription to see your own lenses.",
+      "yours": "Your lenses, cut through the middle",
+      "slider": "Compare lens thickness",
+      "thicker": "Thicker",
+      "thinner": "Thinner",
+      "estimateNote": "Estimates: real lenses vary a little with the frame and lens curve."
+    },
+    "coatings": {
+      "packages": "Coating packages",
+      "extras": "Add individually",
+      "none": "No coatings",
+      "noneDescription": "Plain lenses, nothing added.",
+      "included": "Included",
+      "popular": "Most chosen",
+      "includedList": "Included: {list}.",
+      "glareAlt": "A window reflected in a lens without anti-reflective coating, and the same view through a coated lens with no reflection.",
+      "without": "Without anti-reflective",
+      "with": "With anti-reflective",
+      "withYours": "With your choice"
+    },
+    "tint": {
+      "legend": "Lens tint",
+      "included": "Included",
+      "colour": "Colour",
+      "strength": "Strength",
+      "preview": "Preview",
+      "indoors": "Indoors",
+      "outdoors": "In sunlight"
+    },
+    "review": {
+      "needsAttention": "A few choices need attention:",
+      "included": "Included",
+      "total": "Total",
+      "tax": "Includes {tax} of {amount}.",
+      "rxManual": "We'll use the prescription you typed in. An optician checks every prescription before lenses are made.",
+      "rxUpload": "An optician will read your uploaded prescription before your lenses are made.",
+      "rxLater": "Add your prescription after ordering, from your order page. Your lenses are made once it's checked.",
+      "delivery": "Lenses are made and fitted in about {days} working days, then shipped.",
+      "rxSaved": "We will use your saved prescription “{label}”. An optician checks every prescription before lenses are made."
+    },
+    "saved": {
+      "title": "Use a saved prescription",
+      "description": "Choose one from your account. No retyping.",
+      "choose": "Saved prescriptions",
+      "version": "Version {version}",
+      "expired": "Expired {date}",
+      "expiring": "Expires {date}",
+      "fileOnly": "Photo, checked by an optician",
+      "none": "You have no saved prescriptions yet. Save one from your account, or type it in below.",
+      "manage": "Manage prescriptions"
+    },
+    "pdHelper": {
+      "open": "Measure my PD with the camera",
+      "title": "Measure your PD",
+      "body": "Hold a bank card (or any card that size) flat against your forehead, just above your eyebrows, and look straight at the camera. Everything happens on this device; nothing is uploaded or saved.",
+      "start": "Start camera",
+      "capture": "Take the measurement",
+      "adjust": "Drag the two markers to the card’s left and right edges, then confirm.",
+      "leftEdge": "Card left edge",
+      "rightEdge": "Card right edge",
+      "confirm": "Use these edges",
+      "quick": "No card? Estimate from eye size",
+      "result": "Your PD is about {pd} mm",
+      "estimate": "An estimate, usually within 1–2 mm. Your optician’s measurement is best if you have it.",
+      "use": "Use {pd} mm",
+      "again": "Measure again",
+      "cancel": "Cancel",
+      "noFace": "We couldn’t see your eyes clearly. Face the camera in good light and try again.",
+      "implausible": "That doesn’t look right. Check the markers sit on the card’s edges and try again.",
+      "live": "Hold the card flat against your forehead, then take the measurement. Or skip the card and estimate from your eyes.",
+      "measuringIris": "Hold still and look at the camera…",
+      "starting": "Starting the camera…",
+      "stillAlt": "Your photo with the card, for marking its edges",
+      "privacy": "Your camera image stays on this device and is discarded as soon as you’re done.",
+      "retry": "Try again",
+      "saved": "Saved on this device, so try-on can show frames at their true size."
+    }
+  },
+  "bag": {
+    "title": "Your bag",
+    "loadFailed": "We couldn't load your bag. Check your connection and try again.",
+    "changeFailed": "That change didn't go through. Please try again.",
+    "retry": "Try again",
+    "emptyTitle": "Your bag is empty",
+    "emptyBody": "Frames you add, with or without lenses, wait here until you check out.",
+    "browse": "Browse frames",
+    "itemsHeading": "{count, plural, one {# item} other {# items}} in your bag",
+    "summaryHeading": "Summary",
+    "checkout": "Check out",
+    "fixIssues": "Some items need attention before you can check out.",
+    "reassurance": "14-day returns. Prices include GST; nothing is added at checkout except delivery speed and any cash-on-delivery fee.",
+    "item": {
+      "frameOnly": "Frame only, no lenses",
+      "remove": "Remove",
+      "quantity": "Quantity of {name}",
+      "qtyOption": "Qty {quantity}",
+      "each": "{price} each",
+      "rx": {
+        "manual": "Prescription typed in",
+        "upload": "Prescription photo uploaded",
+        "later": "Prescription to send after ordering",
+        "saved": "Saved prescription"
+      },
+      "issue": {
+        "unavailable": "This frame is no longer sold. Remove it to check out.",
+        "out-of-stock": "This colour has sold out. Remove it to check out.",
+        "insufficient-stock": "Only {count} available now. Lower the quantity to check out."
+      }
+    },
+    "coupon": {
+      "label": "Coupon code",
+      "apply": "Apply",
+      "applied": "{code} applied",
+      "remove": "Remove coupon {code}",
+      "failed": "That code couldn't be checked. Please try again."
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "discount": "Discount ({code})",
+      "delivery": {
+        "standard": "Standard delivery",
+        "express": "Express delivery"
+      },
+      "deliveryFrom": "Standard delivery",
+      "free": "Free",
+      "codFee": "Cash on delivery fee",
+      "total": "Total",
+      "tax": "Includes {tax} of {amount}",
+      "freeShippingGap": "{amount} more and standard delivery is free."
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "intro": "Three short steps. Nothing is charged until you place the order.",
+    "loadFailed": "We couldn't load your bag. Check your connection and reload the page; what you typed is kept.",
+    "emptyTitle": "Your bag is empty",
+    "browse": "Browse frames",
+    "showSummary": "Order summary",
+    "summaryLabel": "Order summary",
+    "frameOnly": "Frame only",
+    "edit": "Edit",
+    "continue": "Continue",
+    "place": "Place order · {total}",
+    "placing": "Placing your order…",
+    "placeFailed": "Your order couldn't be placed. Nothing was charged; please try again.",
+    "terms": "By placing the order you agree to our terms and returns policy. Your details are used only to deliver this order.",
+    "contact": {
+      "title": "Contact",
+      "email": "Email",
+      "emailHint": "For your confirmation and delivery updates. No marketing unless you ask.",
+      "phone": "Mobile number",
+      "phoneHint": "The courier calls this number if they can't find you."
+    },
+    "delivery": {
+      "title": "Delivery",
+      "fullName": "Full name",
+      "postalHint": "We fill in the city and state from it; change them if they're wrong.",
+      "line1": "House, building and street",
+      "line2": "Area or locality (optional)",
+      "landmark": "Landmark (optional)",
+      "city": "City",
+      "chooseRegion": "Choose your {label}",
+      "speed": "Delivery speed",
+      "standard": "Standard",
+      "express": "Express",
+      "window": "Arrives {from} – {to}",
+      "windowPending": "Dates appear once your PIN code is in."
+    },
+    "payment": {
+      "title": "Payment",
+      "legend": "How would you like to pay?",
+      "mock": {
+        "title": "Test payment",
+        "description": "A local payment simulator: after placing the order you choose whether the payment succeeds, fails or stays pending. No money moves."
+      },
+      "razorpay": {
+        "title": "Card, UPI or netbanking",
+        "description": "Pay on Razorpay's secure page, then you come straight back here."
+      },
+      "stripe": {
+        "title": "Card",
+        "description": "Pay on Stripe's secure page, then you come straight back here."
+      },
+      "cod": {
+        "title": "Cash on delivery",
+        "description": "Pay in cash when your order arrives."
+      }
+    },
+    "errors": {
+      "email": "Enter an email address like name@example.com.",
+      "phone": "Enter a 10-digit mobile number, like {example}.",
+      "fullName": "Enter the name of the person receiving the order.",
+      "line1": "Enter the house, building and street.",
+      "city": "Enter the city.",
+      "region": "Choose your {label}.",
+      "postalCode": "Enter a valid {label}, like {example}."
+    },
+    "updatingTotal": "Updating your total…",
+    "account": {
+      "signInPrompt": "Have an account? <link>Sign in</link> to use your saved addresses, or carry on as a guest.",
+      "signedInAs": "Signed in as {email}",
+      "savedAddresses": "Your saved addresses",
+      "useAddress": "Deliver here",
+      "newAddress": "A different address",
+      "saveAddress": "Save this address to my account"
+    }
+  },
+  "order": {
+    "metaTitle": "Your order",
+    "missingTitle": "We couldn't open that order",
+    "trackInstead": "Find it with your order number",
+    "timeline": "Progress",
+    "upcoming": "still to come",
+    "waitingForPayment": "We're waiting to hear from the payment provider. This page updates by itself.",
+    "retry": "Try paying again",
+    "retrying": "Starting payment…",
+    "retryFailed": "The payment couldn't be started. Please try again.",
+    "held": "Your frames are still held for you while you try again.",
+    "keepShopping": "Keep shopping",
+    "help": "Delivery and returns",
+    "hero": {
+      "eta": "Estimated delivery {from} – {to}",
+      "confirmed": {
+        "title": "Thank you. Your order is confirmed.",
+        "body": "Order {number}. We've sent a confirmation to {email}."
+      },
+      "awaiting-payment": {
+        "title": "Almost there",
+        "body": "Order {number} is saved. Complete the payment to confirm it."
+      },
+      "processing": {
+        "title": "Your payment is processing",
+        "body": "Your bank is confirming the payment for order {number}. This page updates by itself, and we'll email {email} when it's done."
+      },
+      "failed": {
+        "title": "Your payment didn't go through",
+        "body": "{reason} No money was taken. You can try again; your frames are held for a few minutes."
+      },
+      "cancelled": {
+        "title": "This order was cancelled",
+        "body": "Order {number} was cancelled. If a payment went through, it is refunded to you automatically."
+      },
+      "delivered": {
+        "title": "Delivered",
+        "body": "Order {number} has arrived. We hope you love your new glasses."
+      },
+      "returning": {
+        "title": "Your return",
+        "body": "Order {number}: {status}. We email you at every step."
+      }
+    },
+    "mock": {
+      "title": "Test payment",
+      "body": "This is the local payment simulator. Choose what the bank does; the result arrives as a signed webhook, like a real payment.",
+      "success": "Pay successfully",
+      "failure": "Decline the payment",
+      "pending": "Leave it pending",
+      "waiting": "Waiting for the payment provider…",
+      "failed": "The simulator couldn't be reached. Is the API running?"
+    },
+    "prescription": {
+      "title": "We still need your prescription",
+      "body": "Your lenses are made once an optician has checked it. Upload a photo or type in the values.",
+      "for": "{name}, {colour}",
+      "how": "How to add your prescription",
+      "upload": "Upload a photo",
+      "manual": "Type it in",
+      "save": "Save prescription",
+      "failed": "That didn't save. Please try again."
+    },
+    "details": {
+      "title": "Order {number}",
+      "rxReceived": "Prescription received: an optician will check it.",
+      "rxNeeded": "Prescription still needed",
+      "subtotal": "Subtotal",
+      "discount": "Discount ({code})",
+      "delivery": {
+        "standard": "Standard delivery",
+        "express": "Express delivery"
+      },
+      "free": "Free",
+      "codFee": "Cash on delivery fee",
+      "total": "Total",
+      "tax": "Includes {tax} of {amount}",
+      "deliverTo": "Delivering to",
+      "payment": "Payment",
+      "shipment": "Shipment",
+      "provider": {
+        "mock": "Test payment",
+        "razorpay": "Razorpay",
+        "stripe": "Stripe",
+        "cod": "Cash on delivery"
+      }
+    },
+    "actions": {
+      "title": "Manage this order",
+      "invoice": "Download invoice (PDF)",
+      "invoiceFailed": "The invoice couldn't be downloaded. Please try again.",
+      "reorder": "Buy again",
+      "reordering": "Adding to your bag…",
+      "reordered": "{count, plural, one {# item} other {# items}} added to your bag at today’s prices.",
+      "reorderSkipped": "Not added: {items}.",
+      "viewBag": "View bag",
+      "cancel": "Cancel order",
+      "cancelTitle": "Cancel this order?",
+      "cancelBody": "Nothing will be made or sent. If you paid online, the full amount is refunded to the way you paid.",
+      "cancelNote": "Anything we should know? (optional)",
+      "cancelConfirm": "Yes, cancel the order",
+      "cancelKeep": "Keep the order",
+      "cancelling": "Cancelling…",
+      "cancelled": "Your order is cancelled.",
+      "return": "Return",
+      "returnTitle": "Return this order",
+      "returnBody": "Free pickup within {days} days of delivery, until {date}. We refund you once the frames are back.",
+      "returnReason": "Why are you returning it?",
+      "reasons": {
+        "fit": "Doesn’t fit well",
+        "style": "Didn’t suit me",
+        "vision": "Vision isn’t right",
+        "damaged": "Arrived damaged",
+        "wrong-item": "Wrong item",
+        "other": "Something else"
+      },
+      "returnNote": "Tell us more (optional)",
+      "returnConfirm": "Request the return",
+      "returning": "Sending…",
+      "returned": "Return requested. We’ll email you a pickup slot within one working day.",
+      "failed": "That didn't work. Please try again."
+    },
+    "createAccount": {
+      "title": "Save your details for next time",
+      "body": "Choose a password to create an account with {email}. This order, your prescription and address will be there next time. Optional, and only if you want it.",
+      "password": "Password",
+      "submit": "Create my account",
+      "submitting": "Creating your account…",
+      "done": "Your account is ready. This order is now in it."
+    },
+    "backToOrders": "All your orders"
+  },
+  "track": {
+    "title": "Track your order",
+    "intro": "Enter your order number and the email you used. No account needed.",
+    "number": "Order number",
+    "numberHint": "It's in your confirmation email, like LO-26-001234.",
+    "email": "Email",
+    "submit": "Find my order",
+    "finding": "Finding your order…",
+    "failed": "We couldn't check that right now. Please try again."
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInIntro": "Welcome back. Your bag and wishlist from this browser come with you.",
+    "registerTitle": "Create your account",
+    "registerIntro": "Keep your orders, prescriptions, addresses and wishlist in one place. Checkout never needs an account.",
+    "name": "Your name",
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "passwordHint": "At least {min} characters. A short phrase is easy to remember and hard to guess.",
+    "show": "Show password",
+    "hide": "Hide password",
+    "marketing": "Email me about new frames and offers (at most twice a month)",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "register": "Create account",
+    "registering": "Creating your account…",
+    "forgot": "Forgot your password?",
+    "noAccount": "New here?",
+    "createOne": "Create an account",
+    "haveAccount": "Already have an account?",
+    "failed": "That didn't work. Please try again.",
+    "forgotTitle": "Reset your password",
+    "forgotIntro": "Enter your email. If it has an account, we’ll send a link to choose a new password.",
+    "send": "Send the link",
+    "sending": "Sending…",
+    "sentTitle": "Check your email",
+    "sent": "If {email} has an account, a reset link is on its way. It works once, for 30 minutes. Check your spam folder if it doesn’t arrive.",
+    "backToSignIn": "Back to sign in",
+    "resetTitle": "Choose a new password",
+    "resetIntro": "Choose a new password. You’ll be signed out everywhere and can sign in with it straight away.",
+    "resetSubmit": "Save new password",
+    "saving": "Saving…",
+    "resetDone": "Your password is changed. Sign in with the new one.",
+    "resetMissing": "This reset link is incomplete. Open the link from your email again, or ask for a new one.",
+    "errors": {
+      "name": "Enter your name.",
+      "email": "Enter an email address like name@example.com.",
+      "password": "Enter your password.",
+      "too-short": "Use at least {min} characters.",
+      "too-long": "Use at most {max} characters.",
+      "too-common": "That password is one of the most used, so it is easy to guess. Choose another.",
+      "contains-email": "Your password should not contain your email address."
+    }
+  },
+  "account": {
+    "metaTitle": "Your account",
+    "nav": {
+      "label": "Account",
+      "overview": "Overview",
+      "orders": "Orders",
+      "prescriptions": "Prescriptions",
+      "addresses": "Addresses",
+      "settings": "Settings",
+      "signOut": "Sign out"
+    },
+    "loading": "Loading your account…",
+    "loadFailed": "We couldn't load this. Check your connection and try again.",
+    "retry": "Try again",
+    "overview": {
+      "greeting": "Hello, {name}",
+      "intro": "Your orders, prescriptions and addresses.",
+      "recentOrders": "Recent orders",
+      "noOrders": "No orders yet. When you order, you can follow it here.",
+      "allOrders": "See all orders",
+      "rxAlert": "{count, plural, one {A saved prescription expires soon or has expired.} other {# saved prescriptions expire soon or have expired.}}",
+      "rxAlertLink": "Review prescriptions",
+      "shop": "Browse frames"
+    },
+    "orders": {
+      "title": "Orders",
+      "empty": "No orders yet.",
+      "placed": "Placed {date}",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "view": "View order {number}",
+      "previous": "Newer orders",
+      "next": "Older orders",
+      "page": "Page {page} of {pages}"
+    },
+    "addresses": {
+      "title": "Addresses",
+      "intro": "Choose one at checkout with a single tap.",
+      "empty": "No saved addresses yet.",
+      "add": "Add an address",
+      "edit": "Edit",
+      "editTitle": "Edit address",
+      "addTitle": "New address",
+      "remove": "Delete",
+      "removeNamed": "Delete the address for {name}",
+      "removed": "Address deleted.",
+      "makeDefault": "Make default",
+      "default": "Default",
+      "phone": "Mobile number",
+      "setDefault": "Use as my default address",
+      "save": "Save address",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "saved": "Address saved.",
+      "failed": "That didn't save. Please try again."
+    },
+    "prescriptions": {
+      "title": "Prescriptions",
+      "intro": "Save a prescription once and choose it when you add lenses. Editing keeps the old values in its history.",
+      "empty": "No saved prescriptions yet.",
+      "add": "Add a prescription",
+      "addTitle": "New prescription",
+      "editTitle": "Update “{label}”",
+      "edit": "Update values",
+      "rename": "Rename",
+      "renameLabel": "Name",
+      "remove": "Delete",
+      "removeConfirm": "Delete “{label}” and its history? Orders that used it keep their copy.",
+      "removed": "Prescription deleted.",
+      "label": "Name",
+      "labelHint": "For example “Everyday” or “Reading”.",
+      "prescribedAt": "Date of eye test (optional)",
+      "expiresAt": "Expiry date (optional)",
+      "expiresHint": "If there is none on it, we count {months} months from the test date.",
+      "save": "Save prescription",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "saved": "Prescription saved.",
+      "version": "Version {version}",
+      "history": "Earlier versions: {count}",
+      "updated": "Saved {date}",
+      "expiry": {
+        "valid": "Valid until {date}",
+        "expiring": "Expires {date}",
+        "expired": "Expired {date}",
+        "unknown": "No expiry date"
+      },
+      "status": {
+        "PENDING_REVIEW": "Not yet checked by an optician",
+        "VERIFIED": "Checked by an optician",
+        "NEEDS_CORRECTION": "An optician needs to check something"
+      },
+      "file": "View the uploaded file",
+      "fileOnly": "Uploaded photo or PDF. Add the values to use it without waiting for an optician.",
+      "right": "Right eye (OD)",
+      "left": "Left eye (OS)",
+      "sph": "SPH",
+      "cyl": "CYL",
+      "axis": "Axis",
+      "pd": "PD",
+      "failed": "That didn't save. Please try again.",
+      "pdMissing": "Add your pupillary distance (PD) to save the prescription.",
+      "addPower": "ADD"
+    },
+    "settings": {
+      "title": "Settings",
+      "profile": "Profile",
+      "name": "Name",
+      "email": "Email",
+      "emailHint": "To change your email, write to us from the new address.",
+      "phone": "Mobile number (optional)",
+      "marketing": "Email me about new frames and offers (at most twice a month)",
+      "save": "Save profile",
+      "saving": "Saving…",
+      "saved": "Profile saved.",
+      "password": "Password",
+      "passwordIntro": "Changing it signs you out on every other device.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "changePassword": "Change password",
+      "changed": "Password changed. Other devices are signed out.",
+      "data": "Your data",
+      "dataIntro": "Download everything we hold about you: profile, addresses, prescriptions, orders and wishlist, as a JSON file.",
+      "export": "Download my data",
+      "exportFailed": "The download didn't start. Please try again.",
+      "delete": "Delete account",
+      "deleteIntro": "This erases your profile, addresses, saved prescriptions and wishlist, and signs you out everywhere. Orders stay on record for tax law, without your account. This can’t be undone.",
+      "deletePassword": "Enter your password to confirm",
+      "deleteConfirm": "Delete my account",
+      "deleting": "Deleting…",
+      "deleted": "Your account is deleted.",
+      "failed": "That didn't work. Please try again."
+    }
+  },
+  "tryOn": {
+    "metaTitle": "Virtual try-on",
+    "metaDescription": "See frames on your face with your camera. It all happens on your device: nothing is uploaded or stored.",
+    "title": "Try frames on",
+    "intro": "See frames on your face, life-size, with your camera or a photo.",
+    "open": "Try on",
+    "openNamed": "Try {name} on with your camera",
+    "close": "Close try-on",
+    "consent": {
+      "title": "Your camera stays on your device",
+      "body": "Try-on runs entirely in this browser. Nothing is uploaded, recorded or stored, and the camera turns off when you leave.",
+      "points": {
+        "local": "Face tracking happens on your device, not on our servers.",
+        "nothing": "No photos, video or face measurements are sent or saved.",
+        "off": "You can turn the camera off at any time."
+      },
+      "start": "Start camera",
+      "photo": "Use a photo instead",
+      "photoHint": "A front-facing photo works best: good light, glasses off, hair away from your eyes."
+    },
+    "starting": "Getting the camera and face tracker ready…",
+    "status": {
+      "looking": "Looking for your face. Face the camera with your eyes level.",
+      "tracking": "Wearing {name}",
+      "lowLight": "Move to brighter light for a steadier fit.",
+      "paused": "Paused while this tab is in the background.",
+      "noFace": "We couldn’t find a face in that photo. Try a brighter, front-facing one."
+    },
+    "fit": {
+      "good": "This frame suits your face width.",
+      "wide": "This frame runs slightly wide on you.",
+      "narrow": "This frame runs slightly narrow on you.",
+      "note": "Based on your face width, measured on this device."
+    },
+    "errors": {
+      "denied": {
+        "title": "Camera access is off",
+        "body": "Your browser blocked the camera for this site. Allow it from the camera icon in the address bar and try again, or use a photo instead."
+      },
+      "unavailable": {
+        "title": "No camera found",
+        "body": "This device doesn’t seem to have a camera we can use. You can still try frames on a photo."
+      },
+      "in-use": {
+        "title": "The camera is busy",
+        "body": "Another app or tab is using the camera. Close it and try again, or use a photo instead."
+      },
+      "insecure": {
+        "title": "Camera needs a secure page",
+        "body": "Browsers only allow the camera on https:// pages and on localhost. Open the shop that way, or use a photo instead."
+      },
+      "unknown": {
+        "title": "The camera couldn’t start",
+        "body": "Something went wrong starting the camera. Try again, or use a photo instead."
+      },
+      "webgl": {
+        "title": "Try-on needs 3D graphics",
+        "body": "This browser can’t draw 3D (WebGL 2 is turned off or unsupported). Each product page still shows frames in 3D where possible, with photos and real measurements."
+      },
+      "tracker": {
+        "title": "Face tracking couldn’t start",
+        "body": "The face tracker didn’t load in this browser. Reload the page to try again; product pages show every frame with real measurements."
+      }
+    },
+    "retry": "Try again",
+    "frames": "Frames to try",
+    "framesHint": "Use the left and right arrow keys to switch frames.",
+    "colours": "Colour",
+    "colourNamed": "{colour}",
+    "compare": "Compare",
+    "compareOff": "Stop comparing",
+    "compareWith": "Compare with {name}",
+    "compareHint": "Drag the divider, or use the arrow keys, to compare {left} and {right}.",
+    "divider": "Comparison divider",
+    "snapshot": "Save a photo",
+    "snapshotSaved": "Photo saved to your device.",
+    "snapshotFailed": "The photo couldn’t be saved. Try again.",
+    "watermark": "Add the {brand} mark to photos",
+    "mirror": "Mirror view",
+    "usePhoto": "Use a photo",
+    "useCamera": "Use the camera",
+    "stopCamera": "Turn camera off",
+    "addToBag": "Add frame to bag · {price}",
+    "adding": "Adding…",
+    "added": "{name} in {colour} is in your bag.",
+    "details": "View details and lenses",
+    "privacy": "Nothing leaves your device.",
+    "photoAlt": "Your photo with {name}",
+    "liveAlt": "Live camera view with {name}",
+    "addFailed": "That couldn’t be added to your bag. Try again.",
+    "measureErrors": {
+      "denied": {
+        "title": "Camera access is off",
+        "body": "Your browser blocked the camera for this site. Allow it from the camera icon in the address bar and try again, or choose an answer yourself."
+      },
+      "unavailable": {
+        "title": "No camera found",
+        "body": "This device doesn’t seem to have a camera we can use. You can still choose an answer yourself."
+      },
+      "in-use": {
+        "title": "The camera is busy",
+        "body": "Another app or tab is using the camera. Close it and try again."
+      },
+      "insecure": {
+        "title": "Camera needs a secure page",
+        "body": "Browsers only allow the camera on https:// pages and on localhost."
+      },
+      "unknown": {
+        "title": "The camera couldn’t start",
+        "body": "Something went wrong starting the camera. Try again."
+      },
+      "tracker": {
+        "title": "Face measuring couldn’t start",
+        "body": "The face tracker didn’t load in this browser. Reload the page to try again."
+      }
+    },
+    "browse": "Browse frames"
+  },
+  "frameFinder": {
+    "metaTitle": "Frame Finder",
+    "metaDescription": "Five quick questions, then frames ranked for your face, style and budget, with the reason each one fits.",
+    "title": "Find your frame",
+    "intro": "Five quick questions, each one optional. We rank every frame and tell you why it fits.",
+    "progress": "Step {step} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip this question",
+    "showResults": "Show my frames",
+    "steps": {
+      "face": {
+        "title": "What shape is your face?",
+        "hint": "Pick the closest, or let the camera measure it. It’s a guide, not a rule.",
+        "detect": "Detect from camera"
+      },
+      "vibe": {
+        "title": "What’s your style?",
+        "hint": "Pick any that feel like you."
+      },
+      "use": {
+        "title": "What are they mostly for?"
+      },
+      "budget": {
+        "title": "What would you like to spend?",
+        "hint": "Frame price; lenses are extra and priced as you choose them."
+      },
+      "look": {
+        "title": "Any material or colour you love?",
+        "hint": "Optional. Leave blank to see everything."
+      }
+    },
+    "faceShapes": {
+      "oval": "Oval",
+      "round": "Round",
+      "square": "Square",
+      "heart": "Heart",
+      "oblong": "Oblong",
+      "diamond": "Diamond"
+    },
+    "faceShapeHints": {
+      "oval": "Balanced, a little longer than wide",
+      "round": "Soft curves, similar width and length",
+      "square": "Strong jaw, wide forehead",
+      "heart": "Wider forehead, narrow chin",
+      "oblong": "Longer than wide, straight sides",
+      "diamond": "Wide cheekbones, narrow forehead and chin"
+    },
+    "vibes": {
+      "classic": "Classic",
+      "minimal": "Minimal",
+      "retro": "Retro",
+      "bold": "Bold"
+    },
+    "vibeHints": {
+      "classic": "Timeless shapes that go with everything",
+      "minimal": "Thin, light, barely there",
+      "retro": "Round, browline and vintage details",
+      "bold": "Thick acetate and statement shapes"
+    },
+    "uses": {
+      "everyday": "Everyday wear",
+      "screens": "Screens and work",
+      "outdoors": "Sun and outdoors",
+      "active": "Active and on the go"
+    },
+    "budgets": {
+      "value": "Up to {max}",
+      "mid": "{min} to {max}",
+      "premium": "{min} and up"
+    },
+    "detect": {
+      "title": "Measure your face shape",
+      "body": "Look straight at the camera with your hair away from your face. We measure your face’s proportions on this device; nothing is uploaded or saved.",
+      "start": "Start camera",
+      "measuring": "Hold still… measuring",
+      "result": "Your face looks {shape}",
+      "confidence": "{percent}% confident",
+      "ratios": "Length {length} × width · forehead {forehead} · jaw {jaw} of cheekbone width",
+      "width": "Face width about {width} mm",
+      "use": "Use {shape}",
+      "again": "Measure again",
+      "cancel": "Cancel",
+      "teaser": "Not sure? The camera can measure your face’s proportions and suggest a shape.",
+      "starting": "Starting the camera…",
+      "straight": "Face the camera straight on",
+      "between": "It’s close to {other} too, so either is a good place to start.",
+      "retry": "Try again",
+      "privacy": "Your camera image and face measurements stay on this device and are discarded when you leave this step."
+    },
+    "results": {
+      "title": "Your frames",
+      "count": "{count, plural, one {# frame} other {# frames}}, best match first",
+      "answers": "Your answers",
+      "edit": "Change answers",
+      "tryAll": "Try these on",
+      "match": "{score}% match",
+      "why": "Why it matches:",
+      "none": "No frames match all of that. Remove an answer to see more.",
+      "error": "We couldn’t load recommendations. Check your connection and try again.",
+      "startOver": "Start over",
+      "groups": {
+        "face": "Face shape",
+        "vibe": "Style",
+        "use": "Mostly for",
+        "budget": "Budget"
+      },
+      "remove": "Remove {answer}",
+      "selected": "(selected)",
+      "noAnswers": "No answers yet, so these are ranked by popularity. Add any answer to tailor them.",
+      "width": "Face width {width} mm",
+      "retry": "Try again"
+    },
+    "reasons": {
+      "shape": "suits {faceShape} faces",
+      "size": "right width for your face",
+      "style": "{tags} style",
+      "budget": "within your budget",
+      "use": "made for {use}",
+      "material": "{material} frame",
+      "colour": "comes in {colour}"
+    },
+    "useReasons": {
+      "everyday": "everyday wear",
+      "screens": "screen time",
+      "outdoors": "the outdoors",
+      "active": "an active day"
+    }
+  }
+}

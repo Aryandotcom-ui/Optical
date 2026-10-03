@@ -1,0 +1,46 @@
+{
+  "name": "@optical/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./money": "./src/money/index.ts",
+    "./api": "./src/api/index.ts",
+    "./catalog": "./src/catalog/index.ts",
+    "./catalog/lite": "./src/catalog/lite.ts",
+    "./rx": "./src/rx/index.ts",
+    "./lens/engine": "./src/lens/engine.ts",
+    "./lens": "./src/lens/index.ts",
+    "./pricing": "./src/pricing/index.ts",
+    "./pricing/delivery": "./src/pricing/delivery.ts",
+    "./frame-geometry": "./src/frame-geometry/index.ts",
+    "./orders": "./src/orders/index.ts",
+    "./checkout": "./src/checkout/index.ts",
+    "./account": "./src/account/index.ts",
+    "./account/password-policy": "./src/account/password-policy.ts",
+    "./face": "./src/face/index.ts",
+    "./frame-finder": "./src/frame-finder/index.ts",
+    "./frame-finder/schemas": "./src/frame-finder/schemas.ts",
+    "./admin": "./src/admin/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@optical/config": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "@vitest/coverage-v8": "^5.0.3",
+    "eslint": "^9.39.5",
+    "fast-check": "^4.10.2",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  }
+}

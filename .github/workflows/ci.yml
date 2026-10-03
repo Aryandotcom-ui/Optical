@@ -1,0 +1,194 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  quality:
+    name: Format, lint, typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+
+  test:
+    name: Unit and integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: optical
+          POSTGRES_PASSWORD: optical
+          POSTGRES_DB: optical_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U optical -d optical_test"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      TEST_DATABASE_URL: postgresql://optical:optical@localhost:5432/optical_test
+      TEST_REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Tests with coverage (thresholds enforced)
+        run: pnpm test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: '**/coverage/'
+          retention-days: 7
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  e2e:
+    name: End-to-end, accessibility and performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: optical
+          POSTGRES_PASSWORD: optical
+          POSTGRES_DB: optical
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U optical -d optical"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      mailpit:
+        image: axllent/mailpit:v1.31
+        ports: ['1025:1025', '8025:8025']
+        options: >-
+          --health-cmd "/mailpit readyz"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      DATABASE_URL: postgresql://optical:optical@localhost:5432/optical
+      REDIS_URL: redis://localhost:6379
+      SMTP_URL: smtp://localhost:1025
+      E2E_BASE_URL: http://localhost:3000
+      LHCI_BASE_URL: http://localhost:3000
+      # Every e2e order comes from one IP, and pending test payments settle quickly.
+      RATE_LIMIT_SCALE: '50'
+      MOCK_PENDING_SETTLE_SECONDS: '5'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Generate a throwaway signing secret
+        run: echo "APP_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - name: Install Chromium for Playwright, Lighthouse and image rendering
+        run: pnpm --filter @optical/web exec playwright install --with-deps chromium
+      - name: Migrate and seed the demo data
+        run: pnpm db:migrate && pnpm db:seed
+      # Rendering every product image takes several minutes, so renders are
+      # cached; the renderer only redraws images whose inputs changed.
+      - uses: actions/cache@v4
+        with:
+          path: apps/web/public/renders
+          key: renders-${{ hashFiles('packages/shared/src/frame-geometry/**', 'scripts/render-product-images/**', 'apps/api/prisma/seed/**') }}
+          restore-keys: renders-
+      - run: pnpm render:images
+      - run: pnpm build
+      - name: Start the API, the worker and the storefront
+        run: |
+          pnpm --filter @optical/api start > api.log 2>&1 &
+          pnpm --filter @optical/api start:worker > worker.log 2>&1 &
+          pnpm --filter @optical/web start > web.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf http://localhost:4000/readyz > /dev/null && curl -sf http://localhost:3000/healthz > /dev/null && exit 0
+            sleep 1
+          done
+          echo "The apps did not start"; tail -50 api.log worker.log web.log; exit 1
+      - name: Initial JavaScript budget
+        run: pnpm --filter @optical/web budget:js http://localhost:3000
+      - name: Playwright (journeys, purchases, axe in light and dark, responsiveness)
+        run: pnpm --filter @optical/web test:e2e
+      - name: Lighthouse CI budgets (Home, listing, product page, Frame Finder)
+        run: |
+          export CHROME_PATH="$(pnpm --filter @optical/web exec node -p "require('@playwright/test').chromium.executablePath()")"
+          pnpm --filter @optical/web lhci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-reports
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+            apps/web/.lighthouseci/
+            api.log
+            worker.log
+            web.log
+          retention-days: 7
+
+  audit:
+    name: Dependency audit (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          # No install in this job, so there is no pnpm store to cache.
+          package-manager-cache: false
+      - run: pnpm audit --prod

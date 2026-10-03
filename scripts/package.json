@@ -1,0 +1,30 @@
+{
+  "name": "@optical/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Developer scripts: product image rendering and asset setup.",
+  "scripts": {
+    "render:images": "tsx render-product-images/index.ts",
+    "setup:assets": "tsx setup-assets.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@optical/config": "workspace:*",
+    "@optical/shared": "workspace:*",
+    "esbuild": "^0.28.2",
+    "pg": "^8.23.0",
+    "playwright-core": "^1.63.0",
+    "sharp": "^0.35.5",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "@types/pg": "^8.23.1",
+    "@types/three": "^0.186.0",
+    "eslint": "^9.39.5",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3"
+  }
+}

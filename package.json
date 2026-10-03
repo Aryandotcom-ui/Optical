@@ -1,0 +1,54 @@
+{
+  "name": "optical",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Premium eyewear e-commerce platform: storefront, admin and API.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.22.1",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "bootstrap": "node scripts/setup.mjs",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "docker:up": "docker compose up -d --wait",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "db:migrate": "pnpm --filter @optical/api db:migrate",
+    "db:seed": "pnpm --filter @optical/api db:seed",
+    "db:reset": "pnpm --filter @optical/api db:reset",
+    "db:studio": "pnpm --filter @optical/api db:studio",
+    "render:images": "pnpm --filter @optical/scripts render:images",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "preflight": "node scripts/preflight.mjs",
+    "prepare": "husky",
+    "setup:assets": "pnpm --filter @optical/scripts setup:assets"
+  },
+  "devDependencies": {
+    "@optical/config": "workspace:*",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.9",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "turbo": "^2.11.5",
+    "typescript": "~5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs}": [
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "extends": "@optical/config/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["node", "@testing-library/jest-dom"],
+    // Lets Node-run scripts (scripts/*.mts) import TypeScript helpers by their real file name.
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "src",
+    "test",
+    "e2e",
+    "scripts",
+    "messages",
+    "*.ts",
+    "*.mjs",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next/cache"]
+}
