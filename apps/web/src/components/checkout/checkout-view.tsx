@@ -1,7 +1,7 @@
 'use client';
 
 import { isValidPostalCode } from '@optical/config/commerce';
-import type { Cart, CheckoutQuote } from '@optical/shared/checkout';
+import type { Cart, CheckoutQuote, PaymentProviderCode } from '@optical/shared/checkout';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -49,6 +49,14 @@ const SavedAddresses = dynamic(() =>
  * you go and collapsible once done. Everything typed survives a reload.
  * The server prices every step and has the final word on the total.
  */
+/** The first available online method, else cash on delivery. */
+function defaultProvider(quote: CheckoutQuote): PaymentProviderCode | null {
+  const usable = quote.paymentOptions
+    .filter((option) => option.available)
+    .map((option) => option.provider);
+  return usable.find((code) => code !== 'cod') ?? usable[0] ?? null;
+}
+
 export function CheckoutView() {
   const t = useTranslations('checkout');
   const tErrors = useTranslations('checkout.errors');
@@ -94,7 +102,15 @@ export function CheckoutView() {
         })
         .then(
           (next) => {
-            if (!cancelled) setQuoted({ key, quote: next });
+            if (cancelled) return;
+            setQuoted({ key, quote: next });
+            // Nothing chosen yet: select the default method, which re-prices with
+            // its fee (cash on delivery) before Place order is enabled.
+            const fallback = defaultProvider(next);
+            if (fallback)
+              setDraft((current) =>
+                current.provider ? current : { ...current, provider: fallback },
+              );
           },
           () => undefined,
         );
@@ -108,13 +124,13 @@ export function CheckoutView() {
   const quoteCurrent = quoted?.key === quoteKey;
 
   // The chosen payment method, or the first one available for this order.
-  const usable =
-    quote?.paymentOptions.filter((option) => option.available).map((option) => option.provider) ??
-    [];
   const provider =
-    draft.provider && usable.includes(draft.provider)
+    draft.provider &&
+    quote?.paymentOptions.some((option) => option.available && option.provider === draft.provider)
       ? draft.provider
-      : (usable.find((code) => code !== 'cod') ?? usable[0] ?? null);
+      : quote
+        ? defaultProvider(quote)
+        : null;
 
   const update = (next: CheckoutDraft) => {
     setDraft(next);
