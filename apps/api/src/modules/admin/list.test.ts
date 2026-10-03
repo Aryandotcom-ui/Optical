@@ -44,3 +44,51 @@ describe('image size', () => {
     expect(imageSize(Buffer.alloc(40))).toBeNull();
   });
 });
+
+describe('image size (WebP)', () => {
+  const webp = (chunk: string, fill: (data: Buffer) => void) => {
+    const data = Buffer.alloc(40);
+    data.write('RIFF', 0, 'ascii');
+    data.write('WEBP', 8, 'ascii');
+    data.write(chunk, 12, 'ascii');
+    fill(data);
+    return data;
+  };
+
+  it('reads lossy, lossless and extended WebP headers', () => {
+    expect(
+      imageSize(
+        webp('VP8 ', (data) => {
+          data.writeUInt16LE(1200, 26);
+          data.writeUInt16LE(900, 28);
+        }),
+      ),
+    ).toEqual({ width: 1200, height: 900 });
+    expect(
+      imageSize(
+        webp('VP8L', (data) => {
+          data.writeUInt32LE((800 - 1) | ((600 - 1) << 14), 21);
+        }),
+      ),
+    ).toEqual({ width: 800, height: 600 });
+    expect(
+      imageSize(
+        webp('VP8X', (data) => {
+          data.writeUIntLE(1600 - 1, 24, 3);
+          data.writeUIntLE(1200 - 1, 27, 3);
+        }),
+      ),
+    ).toEqual({ width: 1600, height: 1200 });
+    expect(imageSize(webp('ALPH', () => undefined))).toBeNull();
+  });
+
+  it('gives up on short or broken files', () => {
+    expect(imageSize(Buffer.alloc(10))).toBeNull();
+    const broken = Buffer.alloc(40);
+    broken[0] = 0xff;
+    broken[1] = 0xd8;
+    broken[2] = 0x00;
+    expect(imageSize(broken)).toBeNull();
+    expect(imageSize(Buffer.alloc(40, 1))).toBeNull();
+  });
+});
