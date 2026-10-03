@@ -7,6 +7,7 @@ import { FaceShapes } from '@/components/home/face-shapes';
 import { HeroFrame } from '@/components/home/hero-frame';
 import { LensStory, type LensStoryStep } from '@/components/home/lens-story';
 import { TrustStrip } from '@/components/home/trust-strip';
+import { TryOnDemo } from '@/components/home/try-on-demo';
 import { ProductImage } from '@/components/product/product-image';
 import { ProductRail } from '@/components/product/product-rail';
 import { Button } from '@/components/ui/button';
@@ -118,6 +119,20 @@ export default async function HomePage() {
               <Link href={'/shop/sunglasses' as Route}>{t('hero.shopSunglasses')}</Link>
             </Button>
           </div>
+          <p className="mt-6 text-ink-secondary">
+            <Link
+              href={'/frame-finder'}
+              className="font-medium text-accent underline-offset-4 hover:underline"
+            >
+              {t('hero.finder')}
+            </Link>{' '}
+            <Link
+              href={'/try-on'}
+              className="font-medium text-accent underline-offset-4 hover:underline"
+            >
+              {t('hero.tryOn')}
+            </Link>
+          </p>
         </div>
         {hero && heroImage ? (
           <figure>
@@ -183,6 +198,35 @@ export default async function HomePage() {
           <div className="mt-12">
             <LensStory steps={steps} visuals={visuals} />
           </div>
+        </section>
+
+        <section
+          aria-labelledby="try-on-demo"
+          className="grid items-center gap-10 rounded-card bg-surface-muted p-6 sm:p-10 lg:grid-cols-2"
+        >
+          <div>
+            <p className="text-caption font-medium tracking-wide text-ink-secondary uppercase">
+              {t('tryOn.eyebrow')}
+            </p>
+            <h2 id="try-on-demo" className="mt-3 text-display-lg font-semibold text-balance">
+              {t('tryOn.title')}
+            </h2>
+            <p className="mt-4 max-w-prose text-body-lg text-ink-secondary">{t('tryOn.body')}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link href={'/try-on'}>{t('tryOn.start')}</Link>
+              </Button>
+              <Button asChild size="lg" variant="secondary">
+                <Link href={'/frame-finder'}>{t('tryOn.finder')}</Link>
+              </Button>
+            </div>
+          </div>
+          <figure className="mx-auto w-full max-w-sm">
+            <TryOnDemo label={t('tryOn.alt')} />
+            <figcaption className="mt-3 text-center text-caption text-ink-secondary">
+              {t('tryOn.note')}
+            </figcaption>
+          </figure>
         </section>
 
         <section aria-labelledby="face-shapes">

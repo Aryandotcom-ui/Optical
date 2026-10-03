@@ -22,7 +22,7 @@ const median = { aggregationMethod: 'median-run' };
 module.exports = {
   ci: {
     collect: {
-      url: [`${base}/`, `${base}/shop`, `${base}/p/harbour`],
+      url: [`${base}/`, `${base}/shop`, `${base}/p/harbour`, `${base}/frame-finder`],
       numberOfRuns: Number(process.env.LHCI_RUNS ?? 3),
       settings: {
         throttlingMethod: 'devtools',

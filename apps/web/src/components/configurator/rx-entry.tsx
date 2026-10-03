@@ -6,6 +6,7 @@ import { useId } from 'react';
 import { Disclosure } from '@/components/ui/disclosure';
 import { cn } from '@/lib/cn';
 import type { RxDraft } from './lens-draft';
+import { PdHelper } from './pd-helper';
 import { formatDioptres, RxStepper } from './rx-stepper';
 
 const mm = (value: number) => `${value} mm`;
@@ -197,6 +198,11 @@ export function RxEntry({
             ))
           )}
         </div>
+        <PdHelper
+          onMeasured={(pd) => {
+            onChange({ ...rx, pdKind: 'single', pd, pdRight: null, pdLeft: null });
+          }}
+        />
       </fieldset>
 
       <div id={issuesId} aria-live="polite" className="space-y-1 text-caption">

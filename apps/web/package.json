@@ -12,11 +12,13 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "budget:js": "node scripts/check-js-budget.mjs",
+    "measure:try-on": "node scripts/measure-try-on.mts",
     "lhci": "lhci autorun --config=lighthouserc.cjs",
     "test:e2e": "playwright test",
     "typegen": "next typegen"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "1.0.1",
     "@optical/config": "workspace:*",
     "@optical/shared": "workspace:*",
     "@react-three/drei": "^10.7.9",

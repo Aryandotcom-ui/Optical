@@ -8,6 +8,11 @@ overrides:
   mysql2: ^3.24.5
   deepmerge-ts: ^8.0.2
 
+patchedDependencies:
+  '@mediapipe/tasks-vision@1.0.1':
+    hash: 7811c4c613bb98bf91076ddfb38224951fc0635f1fd2595bf7ff41bc7c61e6e5
+    path: patches/@mediapipe__tasks-vision@1.0.1.patch
+
 importers:
 
   .:
@@ -154,6 +159,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@mediapipe/tasks-vision':
+        specifier: 1.0.1
+        version: 1.0.1(patch_hash=7811c4c613bb98bf91076ddfb38224951fc0635f1fd2595bf7ff41bc7c61e6e5)
       '@optical/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -1228,6 +1236,9 @@ packages:
 
   '@mediapipe/tasks-vision@0.10.17':
     resolution: {integrity: sha512-CZWV/q6TTe8ta61cZXjfnnHsfWIdFhms03M9T7Cnd5y2mdpylJM0rF1qRq+wsQVRMLz1OYPVEBU9ph2Bx8cxrg==}
+
+  '@mediapipe/tasks-vision@1.0.1':
+    resolution: {integrity: sha512-rvRE2FmAZ6ZxKSw7wq+e+jQDpN3t1B/tD2mJz9SmAzb1msoDkd4dMoE4wAh8Z30Um0PQwLiHr9QtomhmXk3aUQ==}
 
   '@monogrid/gainmap-js@3.4.0':
     resolution: {integrity: sha512-2Z0FATFHaoYJ8b+Y4y4Hgfn3FRFwuU5zRrk+9dFWp4uGAdHGqVEdP7HP+gLA3X469KXHmfupJaUbKo1b/aDKIg==}
@@ -7749,6 +7760,8 @@ snapshots:
   '@lukeed/ms@2.0.2': {}
 
   '@mediapipe/tasks-vision@0.10.17': {}
+
+  '@mediapipe/tasks-vision@1.0.1(patch_hash=7811c4c613bb98bf91076ddfb38224951fc0635f1fd2595bf7ff41bc7c61e6e5)': {}
 
   '@monogrid/gainmap-js@3.4.0(three@0.186.1)':
     dependencies:

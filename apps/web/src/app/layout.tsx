@@ -25,6 +25,8 @@ const CLIENT_NAMESPACES = [
   'pdp',
   'wishlistPage',
   'comparePage',
+  // Try-on opens over product pages and listings, so its strings go everywhere.
+  'tryOn',
 ] as const;
 
 const inter = localFont({

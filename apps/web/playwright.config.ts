@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { FAKE_CAMERA_FILE } from './e2e/fake-camera';
 
 /**
  * End-to-end tests against production builds of the web app, API and
@@ -11,6 +12,8 @@ const executablePath = process.env.CHROMIUM_PATH ?? undefined;
 
 export default defineConfig({
   testDir: './e2e',
+  // Makes the fake camera video from the test face before any browser starts.
+  globalSetup: './e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   // A flaky test is a bug to fix, not to retry past.
@@ -28,10 +31,30 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop',
-      testIgnore: /responsiveness/,
+      testIgnore: /responsiveness|camera\.spec/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
-    { name: 'mobile', testIgnore: /responsiveness/, use: { ...devices['Pixel 7'] } },
+    { name: 'mobile', testIgnore: /responsiveness|camera\.spec/, use: { ...devices['Pixel 7'] } },
+    // Try-on, face shape and PD with Chromium's fake camera playing the test face,
+    // and software WebGL so three.js and MediaPipe run without a GPU.
+    {
+      name: 'camera',
+      testMatch: /camera\.spec\.ts$/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 900 },
+        permissions: ['camera'],
+        launchOptions: {
+          ...(executablePath ? { executablePath } : {}),
+          args: [
+            '--use-fake-ui-for-media-stream',
+            '--use-fake-device-for-media-stream',
+            `--use-file-for-fake-video-capture=${FAKE_CAMERA_FILE}`,
+            '--enable-unsafe-swiftshader',
+          ],
+        },
+      },
+    },
     // Timing runs last and alone, so other test browsers don't compete for the CPU.
     {
       name: 'responsiveness',

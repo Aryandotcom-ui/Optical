@@ -190,6 +190,11 @@ export function MegaMenu({ nav }: { nav: NavModel }) {
           </li>
         ))}
         <li>
+          <Link href="/try-on" className={triggerClass}>
+            {t('tryOn')}
+          </Link>
+        </li>
+        <li>
           <Link href="/help" className={triggerClass}>
             {t('help')}
           </Link>

@@ -34,7 +34,17 @@ const nextConfig: NextConfig = {
   // `SOURCEMAPS=1 pnpm build` emits browser source maps, for attributing bundle bytes.
   productionBrowserSourceMaps: process.env.SOURCEMAPS === '1',
   headers() {
-    return Promise.resolve([{ source: '/:path*', headers: securityHeaders }]);
+    return Promise.resolve([
+      { source: '/:path*', headers: securityHeaders },
+      {
+        // The face tracker's runtime and model (15 MB) change only with the pinned
+        // @mediapipe/tasks-vision version: cache for a week, then revalidate.
+        source: '/mediapipe/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' },
+        ],
+      },
+    ]);
   },
 };
 

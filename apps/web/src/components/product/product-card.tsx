@@ -10,6 +10,7 @@ import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/format';
 import { LinkPending } from './link-pending';
 import { ProductImage } from './product-image';
+import { TryOnButton } from '@/components/try-on/try-on-button';
 import { WishlistButton } from './wishlist-button';
 
 const MAX_SWATCHES = 4;
@@ -82,6 +83,15 @@ export function ProductCard({
         name={product.name}
         className="absolute top-2 right-2 z-10"
       />
+      {product.shape ? (
+        <TryOnButton
+          slug={product.slug}
+          name={product.name}
+          variantId={variant.id}
+          compact
+          className="absolute top-14 right-2 z-10"
+        />
+      ) : null}
 
       <div className="mt-3 flex items-start justify-between gap-3">
         <div className="min-w-0">

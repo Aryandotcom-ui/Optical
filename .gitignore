@@ -32,6 +32,12 @@ logs/
 # Generated product renders (produced by `pnpm render:images`, never committed)
 apps/web/public/renders/
 
+# MediaPipe runtime, copied from node_modules before dev and build (the model itself is committed)
+apps/web/public/mediapipe/wasm/
+
+# Fake camera video for the try-on e2e tests, made from e2e/fixtures/face.png
+apps/web/e2e/.generated/
+
 # OS / editor
 .DS_Store
 Thumbs.db

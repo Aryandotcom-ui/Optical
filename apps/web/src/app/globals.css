@@ -6,6 +6,9 @@
     background-color: var(--color-background);
     color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
+    /* Below md the tab bar is fixed to the bottom: keep focused and scrolled-to
+       elements clear of it (WCAG 2.2 Focus Not Obscured). */
+    scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-optical-sizing: auto;
@@ -27,6 +30,12 @@
 
   ::selection {
     background-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  }
+
+  @media (min-width: 48rem) {
+    html {
+      scroll-padding-bottom: 0;
+    }
   }
 
   /* Tabular figures wherever numbers are compared (prices, measurements). */
@@ -54,6 +63,9 @@
   --animate-sheet-in-bottom: sheet-in-bottom var(--duration-ui) var(--ease-standard);
   --animate-sheet-out-bottom: sheet-out-bottom 250ms var(--ease-standard);
   --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  /* Home try-on illustration: three pairs in turn, and a gentle head turn. */
+  --animate-try-on-cycle: try-on-cycle 9s linear infinite;
+  --animate-head-sway: head-sway 4.5s ease-in-out infinite alternate;
 
   @keyframes fade-in {
     from {
@@ -101,6 +113,27 @@
     }
     to {
       transform: translateY(100%);
+    }
+  }
+  @keyframes try-on-cycle {
+    0%,
+    30% {
+      opacity: 1;
+    }
+    34%,
+    96% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes head-sway {
+    from {
+      transform: rotate(-2.5deg);
+    }
+    to {
+      transform: rotate(2.5deg);
     }
   }
   @keyframes shimmer {

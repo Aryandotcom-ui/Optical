@@ -3,11 +3,6 @@ packages:
   - packages/*
   - scripts
 
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - unrs-resolver
-
 # Both ship prebuilt native binaries; their install scripts are only fallbacks.
 ignoredBuiltDependencies:
   - '@parcel/watcher'
@@ -17,9 +12,16 @@ ignoredBuiltDependencies:
   # Optional MessagePack speed-up for BullMQ; the pure JavaScript fallback is used.
   - msgpackr-extract
 
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
+
 # Security patches for transitive dependencies of the Prisma CLI, which pins
 # vulnerable versions (GHSA-3f6p-5ww8-9rcr, GHSA-rgwj-5xj2-c3m3,
 # GHSA-ggr8-5vv4-36mx). Remove once Prisma ships patched pins.
 overrides:
-  mysql2: ^3.24.5
   deepmerge-ts: ^8.0.2
+  mysql2: ^3.24.5
+patchedDependencies:
+  '@mediapipe/tasks-vision@1.0.1': patches/@mediapipe__tasks-vision@1.0.1.patch

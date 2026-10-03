@@ -12,6 +12,8 @@ import {
   type ListingQuery,
   type ReviewSort,
 } from '@optical/shared/catalog';
+import type { FinderAnswers } from '@optical/shared/frame-finder';
+import { finderResultsSchema } from '@optical/shared/frame-finder/schemas';
 import { lensCatalogSchema } from '@optical/shared/lens';
 import { z } from 'zod';
 import { apiRequest, type ApiResult } from './api';
@@ -132,4 +134,21 @@ export async function getHelpArticles() {
     { revalidate: 300, tags: [CATALOG_TAG] },
   );
   return unwrap(result, 'help articles').items;
+}
+
+/**
+ * Frame Finder results for a set of answers. Answers come from the URL,
+ * so the same link always shows the same ranking; a failure is returned
+ * (not thrown) so the page can show answers and a retry beside it.
+ */
+export async function getRecommendations(answers: FinderAnswers) {
+  const result = await apiRequest('/v1/frame-finder/recommendations', finderResultsSchema, {
+    init: {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(answers),
+    },
+    timeoutMs: 5_000,
+  });
+  return result.ok ? result.data : null;
 }

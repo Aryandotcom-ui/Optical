@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 import { formatMm } from '@/lib/format';
 import { createLocalValue } from '@/lib/local-value';
-import { estimatedTotalWidth, FitDiagram, type FrameSize } from './fit-diagram';
+import { estimatedTotalWidth, FitDiagram, type FrameSize, type UnitOutline } from './fit-diagram';
 
 const LIMITS = { lensWidthMm: [38, 65], bridgeMm: [12, 26], templeMm: [115, 155] } as const;
 type Field = keyof typeof LIMITS;
@@ -61,7 +61,7 @@ function verdictFor(
  * Measurements, a to-scale drawing and a comparison with a pair the customer
  * already owns, using the three numbers printed inside its arm.
  */
-export function FitGuide({ frame }: { frame: FrameSpec }) {
+export function FitGuide({ frame, outline }: { frame: FrameSpec; outline: UnitOutline }) {
   const t = useTranslations('pdp.fit');
   const tShape = useTranslations('filters.shapeValues');
   const tMaterial = useTranslations('filters.materialValues');
@@ -100,7 +100,7 @@ export function FitGuide({ frame }: { frame: FrameSpec }) {
     <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
       <div>
         <FitDiagram
-          shape={frame.shape}
+          outline={outline}
           size={frame}
           totalWidthMm={frame.totalWidthMm}
           compare={compare}

@@ -22,6 +22,10 @@ const PAGES = [
   '/p/harbour',
   '/wishlist',
   '/compare',
+  // Try-on's three.js and MediaPipe load after the page, so its first load stays in budget too.
+  '/try-on',
+  '/frame-finder',
+  '/frame-finder?face=oval&vibe=classic&view=results',
   '/help',
   '/help/size-guide',
   '/legal/privacy',

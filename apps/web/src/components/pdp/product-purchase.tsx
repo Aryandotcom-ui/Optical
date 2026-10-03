@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { CompareButton } from '@/components/product/compare-button';
 import { WishlistButton } from '@/components/product/wishlist-button';
+import { TryOnButton } from '@/components/try-on/try-on-button';
 import { RatingStars } from '@/components/ui/rating';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/format';
@@ -156,12 +157,20 @@ export function ProductPurchase({ categoryName }: { categoryName: string }) {
           className="flex-1 sm:flex-none"
         />
         {frame ? (
-          <CompareButton
-            id={product.id}
-            slug={product.slug}
-            name={product.name}
-            className="flex-1 sm:flex-none"
-          />
+          <>
+            <TryOnButton
+              slug={product.slug}
+              name={product.name}
+              variantId={variant.id}
+              className="flex-1 sm:flex-none"
+            />
+            <CompareButton
+              id={product.id}
+              slug={product.slug}
+              name={product.name}
+              className="flex-1 sm:flex-none"
+            />
+          </>
         ) : null}
       </div>
 

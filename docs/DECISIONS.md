@@ -400,3 +400,101 @@ the return window after delivery; later steps (received, refunded) are staff act
 (Phase 6), and the email template already covers them. Invoices are rendered on request with
 `pdfkit` from the order's own snapshot; built-in Helvetica has no rupee sign, so amounts read
 "INR 1,234.00".
+
+## ADR-043: Try-on runs entirely in the browser, on MediaPipe and three.js
+
+**Status:** accepted · Phase 5
+Try-on, face-shape detection and the PD helper use MediaPipe Face Landmarker (478 landmarks with
+irises, plus the facial transformation matrix) and draw with three.js over the camera image. No
+frame, landmark or measurement is sent anywhere: there is no server-side model, so there is
+nothing to upload. The model and WASM runtime are served from this site (`/mediapipe/…`, see
+`docs/ASSETS.md`), never from a CDN, so try-on works offline and with strict networks. The
+tracker prefers the GPU delegate and falls back to the CPU if the GPU fails to start or fails
+while running. When WebGL itself is software (SwiftShader, llvmpipe) it starts on the CPU, which
+we measured as about 5× faster there (50 ms against 280 ms per frame). All of this, with three.js,
+loads only when try-on is opened, so product pages keep their JavaScript budget.
+
+## ADR-044: Pose from the transformation matrix, scale from the pupils, smoothed with One-Euro
+
+**Status:** accepted · Phase 5
+The scene is in image pixels (origin at the centre, y up) with an orthographic camera, so
+landmarks map straight on. Rotation comes from MediaPipe's transformation matrix when it agrees
+with the landmark basis within 25°, and from the landmarks otherwise, which guards against a bad
+matrix. Scale is pixels per millimetre from the pupil distance in pixels and the customer's PD
+(63 mm when unknown), so frames show at their real size. The glasses sit 12 mm in front of the
+pupils (a typical vertex distance). A head-shaped ellipsoid writes depth but no colour, so temples
+disappear behind the head, and a soft contact shadow sits under the nose pads. Position, rotation
+and scale each go through a One-Euro filter (steady when still, responsive when moving). Below
+20 fps for three seconds the renderer steps down pixel ratio, then drops the shadow. The camera
+pauses while the tab is hidden, and a dark picture or tracking that keeps dropping suggests more light.
+
+## ADR-045: MediaPipe's usage logging is patched off
+
+**Status:** accepted · Phase 5
+The `@mediapipe/tasks-vision` web runtime batches usage statistics and POSTs them to
+`odml.pa.googleapis.com` every minute and when a task closes. The camera e2e test that checks
+"nothing leaves the page" caught it. It carries no images, but it is still a third-party request
+from a feature that promises none, and it fails offline. The runtime has no option to turn it
+off, so `patches/@mediapipe__tasks-vision@1.0.1.patch` (applied by pnpm at install) marks the
+logger as failed when it is created. It then never queues or sends anything. The patch file is
+large only because the bundles are single minified lines: the change is one expression per
+bundle. `mediapipe-patch.test.ts` fails if an upgrade drops the patch or no longer matches it, and
+the camera e2e tests fail on any request with a body.
+
+## ADR-046: The try-on session lives in the tab, and opens over the page
+
+**Status:** accepted · Phase 5
+The frames being compared, the chosen colours, mirror and watermark settings are kept in
+`sessionStorage` (zustand `persist`), so going to a product page or the bag and coming back carries
+on where you left off, and closing the tab forgets it. Nothing about the face is kept. "Try on"
+on product pages and listing cards opens the same experience in a full-screen dialog over the page
+and adds that frame to the session. The page's own state and scroll position stay put, and focus
+returns to the button. The dialog's code loads on the first press. Opened with one or two frames,
+the session is topped up with popular frames, so there is always something to compare. The `tryOn`
+messages (about 4 kB) are sent with every page because the button appears on most of them.
+
+## ADR-047: Frame Finder keeps its answers in the URL, and ranks on the server
+
+**Status:** accepted · Phase 5
+Each of the five questions is a plain GET form (`next/form`), with earlier answers riding along as
+hidden fields: back, reload, sharing and bookmarking all work, and so does the whole flow without
+JavaScript. Results are server-rendered from `POST /v1/frame-finder/recommendations`, which scores
+every published frame with `scoreFrame` in `@optical/shared/frame-finder`, a pure, unit-tested
+function. Weights: face shape 0.30, style 0.20, size 0.15, budget 0.15, use 0.10, material 0.05,
+colour 0.05. Skipped questions drop out and the rest are rescaled, so skipping never penalises a
+frame. The ranking's reasons ("suits heart faces", "right width for your face") come from the same
+scoring, so the explanation is always the real one. On the results, every answer is a link that
+switches it, so the "filters" are edited in place and the back button undoes each change. Answer
+URLs are `noindex` with `/frame-finder` as canonical.
+
+## ADR-048: Face shape and PD are measured from front-on frames, and only the PD is kept
+
+**Status:** accepted · Phase 5
+Face shape averages 30 frames that face the camera (turned less than 12° by the transformation
+matrix; yaw from the eye line without it, since the landmark basis leans back with the forehead).
+It classifies length, forehead and jaw against cheekbone width, nearest to six prototypes, and
+shows the confidence, the runner-up when it is close, and the ratios themselves. The PD helper
+offers two methods. A bank card (ISO/IEC 7810 ID-1, 85.6 mm) on the forehead acts as a ruler: the
+customer drags two markers to its edges on a frozen frame, which is more reliable than detecting
+the card's edges automatically. Without a card, an estimate from iris size (11.7 mm) takes the
+median of 20 frames. Results outside 50–80 mm are rejected as mis-measured. Only a PD the customer
+chooses to use is kept, in this browser's `localStorage`, so try-on can draw frames at their true
+size. Landmarks and images are dropped as soon as a reading is done.
+
+## ADR-049: The home page's try-on preview is a drawing, not a recording
+
+**Status:** accepted · Phase 5
+"See it on you" on the home page is an SVG illustration: a drawn face trying three frames in turn,
+built from the same lens outlines as the 3D frames. It needs no JavaScript and never asks for the
+camera. A recording would cost megabytes on the home page and would need a real person's consent,
+or would look staged. With reduced motion it holds still on the first pair. A test checks the home
+page never calls `getUserMedia`.
+
+## ADR-050: The fit diagram's lens outline is computed on the server
+
+**Status:** accepted · Phase 5
+Adding "Try on" to the product page took it 0.3 kB over the 170 kB budget. The fit diagram was
+shipping the lens-outline geometry (superellipse recipes, resampling) only to draw the shape the
+server already knew. The page now passes a 64-point unit outline, scaled in the browser to the
+frame's own size and to the customer's comparison size. That moves about 1 kB of JavaScript into
+about 1 kB of HTML and brings the page to 169.5 kB.

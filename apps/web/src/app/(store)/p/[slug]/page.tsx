@@ -3,6 +3,7 @@ import type { Metadata, Route } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { unitLensOutline } from '@/components/pdp/fit-outline';
 import { FitGuide } from '@/components/pdp/fit-guide';
 import { ProductGallery } from '@/components/pdp/product-gallery';
 import { ProductPurchase } from '@/components/pdp/product-purchase';
@@ -158,7 +159,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
                 </h2>
                 <p className="mt-2 max-w-prose text-ink-secondary">{t('fitIntro')}</p>
                 <div className="mt-8">
-                  <FitGuide frame={product.frame} />
+                  <FitGuide frame={product.frame} outline={unitLensOutline(product.frame.shape)} />
                 </div>
                 <p className="mt-6 text-caption">
                   <Link

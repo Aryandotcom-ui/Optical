@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] },
-    "types": ["node", "@testing-library/jest-dom"]
+    "types": ["node", "@testing-library/jest-dom"],
+    // Lets Node-run scripts (scripts/*.mts) import TypeScript helpers by their real file name.
+    "allowImportingTsExtensions": true
   },
   "include": [
     "next-env.d.ts",

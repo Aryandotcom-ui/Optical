@@ -68,3 +68,8 @@ export async function fetchProduct(
     throw error;
   }
 }
+
+/** A page of product cards for listing parameters, e.g. "category=eyeglasses&pageSize=8". */
+export async function fetchListing(query: string, signal?: AbortSignal): Promise<ProductSummary[]> {
+  return (await getJson<{ items: ProductSummary[] }>(`/v1/products?${query}`, signal)).items;
+}

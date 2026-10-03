@@ -165,9 +165,23 @@ function MobileMenu({ nav }: { nav: NavModel }) {
               ))}
             </ul>
           </section>
-          <Link href="/help" className="flex min-h-11 items-center font-medium">
-            {t('help')}
-          </Link>
+          <ul>
+            <li>
+              <Link href="/try-on" className="flex min-h-11 items-center font-medium">
+                {t('tryOn')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/frame-finder" className="flex min-h-11 items-center font-medium">
+                {t('frameFinder')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/help" className="flex min-h-11 items-center font-medium">
+                {t('help')}
+              </Link>
+            </li>
+          </ul>
         </nav>
       </LazySheet>
     </>

@@ -14,10 +14,14 @@ export async function SiteFooter({ nav }: { nav: NavModel }) {
   const groups: { title: string; links: { href: string; label: string }[] }[] = [
     {
       title: t('shop'),
-      links: nav.categories.map((category) => ({
-        href: `/shop/${category.slug}`,
-        label: category.name,
-      })),
+      links: [
+        ...nav.categories.map((category) => ({
+          href: `/shop/${category.slug}`,
+          label: category.name,
+        })),
+        { href: '/try-on', label: t('tryOn') },
+        { href: '/frame-finder', label: t('frameFinder') },
+      ],
     },
     {
       title: t('help'),

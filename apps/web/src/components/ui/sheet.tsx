@@ -21,6 +21,8 @@ const sides = {
   /** Full screen on phones, a wide slide-over from the right on larger screens. */
   panel:
     'inset-0 h-dvh w-full sm:left-auto sm:max-w-2xl data-[state=open]:animate-sheet-in-right data-[state=closed]:animate-sheet-out-right',
+  /** The whole viewport (try-on). */
+  full: 'inset-0 h-dvh w-full data-[state=open]:animate-fade-in',
   center:
     'top-1/2 left-1/2 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-card data-[state=open]:animate-fade-in',
 } as const;

@@ -161,7 +161,7 @@ jobs:
         run: pnpm --filter @optical/web budget:js http://localhost:3000
       - name: Playwright (journeys, purchases, axe in light and dark, responsiveness)
         run: pnpm --filter @optical/web test:e2e
-      - name: Lighthouse CI budgets (Home, listing, product page)
+      - name: Lighthouse CI budgets (Home, listing, product page, Frame Finder)
         run: |
           export CHROME_PATH="$(pnpm --filter @optical/web exec node -p "require('@playwright/test').chromium.executablePath()")"
           pnpm --filter @optical/web lhci

@@ -16,7 +16,9 @@
       "shopEyeglasses": "Shop eyeglasses",
       "shopSunglasses": "Shop sunglasses",
       "shown": "Shown: {name} in {colour}, {price}",
-      "pause": "Pause the rotating frame"
+      "pause": "Pause the rotating frame",
+      "finder": "Not sure where to start? Find your frame in five questions",
+      "tryOn": "or try frames on with your camera"
     },
     "categoriesTitle": "Shop by category",
     "categoryCount": "{count, plural, one {# style} other {# styles}}",
@@ -58,6 +60,15 @@
       "deliveryBody": "Otherwise {fee}. Delivery dates are shown before you pay, by PIN code.",
       "measureTitle": "Real measurements",
       "measureBody": "Lens, bridge, temple and weight on every frame, with a to-scale drawing."
+    },
+    "tryOn": {
+      "eyebrow": "Virtual try-on",
+      "title": "See it on you",
+      "body": "Try frames on with your camera, life-size and from every angle, and compare two pairs side by side. It all runs on your device: nothing is uploaded or saved.",
+      "start": "Try frames on",
+      "finder": "Find your frame",
+      "alt": "Illustration: a face trying on round, rectangle and aviator frames in turn",
+      "note": "An illustration. Try-on uses your camera only when you start it."
     }
   },
   "status": {
@@ -182,7 +193,9 @@
     "announcement": "Free delivery on orders over {amount} · {days}-day returns, no questions asked",
     "bag": "Bag",
     "bagWithCount": "Bag, {count, plural, one {# item} other {# items}}",
-    "account": "Account"
+    "account": "Account",
+    "tryOn": "Try on",
+    "frameFinder": "Frame Finder"
   },
   "footer": {
     "shop": "Shop",
@@ -211,7 +224,9 @@
       "netbanking": "Netbanking",
       "cod": "Cash on delivery"
     },
-    "trackOrder": "Track your order"
+    "trackOrder": "Track your order",
+    "tryOn": "Virtual try-on",
+    "frameFinder": "Frame Finder"
   },
   "filters": {
     "title": "Filters",
@@ -842,6 +857,32 @@
       "fileOnly": "Photo, checked by an optician",
       "none": "You have no saved prescriptions yet. Save one from your account, or type it in below.",
       "manage": "Manage prescriptions"
+    },
+    "pdHelper": {
+      "open": "Measure my PD with the camera",
+      "title": "Measure your PD",
+      "body": "Hold a bank card (or any card that size) flat against your forehead, just above your eyebrows, and look straight at the camera. Everything happens on this device; nothing is uploaded or saved.",
+      "start": "Start camera",
+      "capture": "Take the measurement",
+      "adjust": "Drag the two markers to the card’s left and right edges, then confirm.",
+      "leftEdge": "Card left edge",
+      "rightEdge": "Card right edge",
+      "confirm": "Use these edges",
+      "quick": "No card? Estimate from eye size",
+      "result": "Your PD is about {pd} mm",
+      "estimate": "An estimate, usually within 1–2 mm. Your optician’s measurement is best if you have it.",
+      "use": "Use {pd} mm",
+      "again": "Measure again",
+      "cancel": "Cancel",
+      "noFace": "We couldn’t see your eyes clearly. Face the camera in good light and try again.",
+      "implausible": "That doesn’t look right. Check the markers sit on the card’s edges and try again.",
+      "live": "Hold the card flat against your forehead, then take the measurement. Or skip the card and estimate from your eyes.",
+      "measuringIris": "Hold still and look at the camera…",
+      "starting": "Starting the camera…",
+      "stillAlt": "Your photo with the card, for marking its edges",
+      "privacy": "Your camera image stays on this device and is discarded as soon as you’re done.",
+      "retry": "Try again",
+      "saved": "Saved on this device, so try-on can show frames at their true size."
     }
   },
   "bag": {
@@ -1291,6 +1332,253 @@
       "deleting": "Deleting…",
       "deleted": "Your account is deleted.",
       "failed": "That didn't work. Please try again."
+    }
+  },
+  "tryOn": {
+    "metaTitle": "Virtual try-on",
+    "metaDescription": "See frames on your face with your camera. It all happens on your device: nothing is uploaded or stored.",
+    "title": "Try frames on",
+    "intro": "See frames on your face, life-size, with your camera or a photo.",
+    "open": "Try on",
+    "openNamed": "Try {name} on with your camera",
+    "close": "Close try-on",
+    "consent": {
+      "title": "Your camera stays on your device",
+      "body": "Try-on runs entirely in this browser. Nothing is uploaded, recorded or stored, and the camera turns off when you leave.",
+      "points": {
+        "local": "Face tracking happens on your device, not on our servers.",
+        "nothing": "No photos, video or face measurements are sent or saved.",
+        "off": "You can turn the camera off at any time."
+      },
+      "start": "Start camera",
+      "photo": "Use a photo instead",
+      "photoHint": "A front-facing photo works best: good light, glasses off, hair away from your eyes."
+    },
+    "starting": "Getting the camera and face tracker ready…",
+    "status": {
+      "looking": "Looking for your face. Face the camera with your eyes level.",
+      "tracking": "Wearing {name}",
+      "lowLight": "Move to brighter light for a steadier fit.",
+      "paused": "Paused while this tab is in the background.",
+      "noFace": "We couldn’t find a face in that photo. Try a brighter, front-facing one."
+    },
+    "fit": {
+      "good": "This frame suits your face width.",
+      "wide": "This frame runs slightly wide on you.",
+      "narrow": "This frame runs slightly narrow on you.",
+      "note": "Based on your face width, measured on this device."
+    },
+    "errors": {
+      "denied": {
+        "title": "Camera access is off",
+        "body": "Your browser blocked the camera for this site. Allow it from the camera icon in the address bar and try again, or use a photo instead."
+      },
+      "unavailable": {
+        "title": "No camera found",
+        "body": "This device doesn’t seem to have a camera we can use. You can still try frames on a photo."
+      },
+      "in-use": {
+        "title": "The camera is busy",
+        "body": "Another app or tab is using the camera. Close it and try again, or use a photo instead."
+      },
+      "insecure": {
+        "title": "Camera needs a secure page",
+        "body": "Browsers only allow the camera on https:// pages and on localhost. Open the shop that way, or use a photo instead."
+      },
+      "unknown": {
+        "title": "The camera couldn’t start",
+        "body": "Something went wrong starting the camera. Try again, or use a photo instead."
+      },
+      "webgl": {
+        "title": "Try-on needs 3D graphics",
+        "body": "This browser can’t draw 3D (WebGL 2 is turned off or unsupported). Each product page still shows frames in 3D where possible, with photos and real measurements."
+      },
+      "tracker": {
+        "title": "Face tracking couldn’t start",
+        "body": "The face tracker didn’t load in this browser. Reload the page to try again; product pages show every frame with real measurements."
+      }
+    },
+    "retry": "Try again",
+    "frames": "Frames to try",
+    "framesHint": "Use the left and right arrow keys to switch frames.",
+    "colours": "Colour",
+    "colourNamed": "{colour}",
+    "compare": "Compare",
+    "compareOff": "Stop comparing",
+    "compareWith": "Compare with {name}",
+    "compareHint": "Drag the divider, or use the arrow keys, to compare {left} and {right}.",
+    "divider": "Comparison divider",
+    "snapshot": "Save a photo",
+    "snapshotSaved": "Photo saved to your device.",
+    "snapshotFailed": "The photo couldn’t be saved. Try again.",
+    "watermark": "Add the {brand} mark to photos",
+    "mirror": "Mirror view",
+    "usePhoto": "Use a photo",
+    "useCamera": "Use the camera",
+    "stopCamera": "Turn camera off",
+    "addToBag": "Add frame to bag · {price}",
+    "adding": "Adding…",
+    "added": "{name} in {colour} is in your bag.",
+    "details": "View details and lenses",
+    "privacy": "Nothing leaves your device.",
+    "photoAlt": "Your photo with {name}",
+    "liveAlt": "Live camera view with {name}",
+    "addFailed": "That couldn’t be added to your bag. Try again.",
+    "measureErrors": {
+      "denied": {
+        "title": "Camera access is off",
+        "body": "Your browser blocked the camera for this site. Allow it from the camera icon in the address bar and try again, or choose an answer yourself."
+      },
+      "unavailable": {
+        "title": "No camera found",
+        "body": "This device doesn’t seem to have a camera we can use. You can still choose an answer yourself."
+      },
+      "in-use": {
+        "title": "The camera is busy",
+        "body": "Another app or tab is using the camera. Close it and try again."
+      },
+      "insecure": {
+        "title": "Camera needs a secure page",
+        "body": "Browsers only allow the camera on https:// pages and on localhost."
+      },
+      "unknown": {
+        "title": "The camera couldn’t start",
+        "body": "Something went wrong starting the camera. Try again."
+      },
+      "tracker": {
+        "title": "Face measuring couldn’t start",
+        "body": "The face tracker didn’t load in this browser. Reload the page to try again."
+      }
+    },
+    "browse": "Browse frames"
+  },
+  "frameFinder": {
+    "metaTitle": "Frame Finder",
+    "metaDescription": "Five quick questions, then frames ranked for your face, style and budget, with the reason each one fits.",
+    "title": "Find your frame",
+    "intro": "Five quick questions, each one optional. We rank every frame and tell you why it fits.",
+    "progress": "Step {step} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip this question",
+    "showResults": "Show my frames",
+    "steps": {
+      "face": {
+        "title": "What shape is your face?",
+        "hint": "Pick the closest, or let the camera measure it. It’s a guide, not a rule.",
+        "detect": "Detect from camera"
+      },
+      "vibe": {
+        "title": "What’s your style?",
+        "hint": "Pick any that feel like you."
+      },
+      "use": {
+        "title": "What are they mostly for?"
+      },
+      "budget": {
+        "title": "What would you like to spend?",
+        "hint": "Frame price; lenses are extra and priced as you choose them."
+      },
+      "look": {
+        "title": "Any material or colour you love?",
+        "hint": "Optional. Leave blank to see everything."
+      }
+    },
+    "faceShapes": {
+      "oval": "Oval",
+      "round": "Round",
+      "square": "Square",
+      "heart": "Heart",
+      "oblong": "Oblong",
+      "diamond": "Diamond"
+    },
+    "faceShapeHints": {
+      "oval": "Balanced, a little longer than wide",
+      "round": "Soft curves, similar width and length",
+      "square": "Strong jaw, wide forehead",
+      "heart": "Wider forehead, narrow chin",
+      "oblong": "Longer than wide, straight sides",
+      "diamond": "Wide cheekbones, narrow forehead and chin"
+    },
+    "vibes": {
+      "classic": "Classic",
+      "minimal": "Minimal",
+      "retro": "Retro",
+      "bold": "Bold"
+    },
+    "vibeHints": {
+      "classic": "Timeless shapes that go with everything",
+      "minimal": "Thin, light, barely there",
+      "retro": "Round, browline and vintage details",
+      "bold": "Thick acetate and statement shapes"
+    },
+    "uses": {
+      "everyday": "Everyday wear",
+      "screens": "Screens and work",
+      "outdoors": "Sun and outdoors",
+      "active": "Active and on the go"
+    },
+    "budgets": {
+      "value": "Up to {max}",
+      "mid": "{min} to {max}",
+      "premium": "{min} and up"
+    },
+    "detect": {
+      "title": "Measure your face shape",
+      "body": "Look straight at the camera with your hair away from your face. We measure your face’s proportions on this device; nothing is uploaded or saved.",
+      "start": "Start camera",
+      "measuring": "Hold still… measuring",
+      "result": "Your face looks {shape}",
+      "confidence": "{percent}% confident",
+      "ratios": "Length {length} × width · forehead {forehead} · jaw {jaw} of cheekbone width",
+      "width": "Face width about {width} mm",
+      "use": "Use {shape}",
+      "again": "Measure again",
+      "cancel": "Cancel",
+      "teaser": "Not sure? The camera can measure your face’s proportions and suggest a shape.",
+      "starting": "Starting the camera…",
+      "straight": "Face the camera straight on",
+      "between": "It’s close to {other} too, so either is a good place to start.",
+      "retry": "Try again",
+      "privacy": "Your camera image and face measurements stay on this device and are discarded when you leave this step."
+    },
+    "results": {
+      "title": "Your frames",
+      "count": "{count, plural, one {# frame} other {# frames}}, best match first",
+      "answers": "Your answers",
+      "edit": "Change answers",
+      "tryAll": "Try these on",
+      "match": "{score}% match",
+      "why": "Why it matches:",
+      "none": "No frames match all of that. Remove an answer to see more.",
+      "error": "We couldn’t load recommendations. Check your connection and try again.",
+      "startOver": "Start over",
+      "groups": {
+        "face": "Face shape",
+        "vibe": "Style",
+        "use": "Mostly for",
+        "budget": "Budget"
+      },
+      "remove": "Remove {answer}",
+      "selected": "(selected)",
+      "noAnswers": "No answers yet, so these are ranked by popularity. Add any answer to tailor them.",
+      "width": "Face width {width} mm",
+      "retry": "Try again"
+    },
+    "reasons": {
+      "shape": "suits {faceShape} faces",
+      "size": "right width for your face",
+      "style": "{tags} style",
+      "budget": "within your budget",
+      "use": "made for {use}",
+      "material": "{material} frame",
+      "colour": "comes in {colour}"
+    },
+    "useReasons": {
+      "everyday": "everyday wear",
+      "screens": "screen time",
+      "outdoors": "the outdoors",
+      "active": "an active day"
     }
   }
 }

@@ -10,6 +10,8 @@ export const dynamic = 'force-dynamic';
 const STATIC_PATHS = [
   '/',
   '/shop',
+  '/try-on',
+  '/frame-finder',
   '/help',
   '/help/size-guide',
   '/help/prescription',

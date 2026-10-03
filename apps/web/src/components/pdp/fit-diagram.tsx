@@ -1,5 +1,5 @@
-import type { FrameShape } from '@optical/shared/catalog';
-import { lensOutline } from '@optical/shared/frame-geometry';
+/** A lens outline fitted to a 1 × 1 box, centred; scaled to any lens size. */
+export type UnitOutline = readonly (readonly [number, number])[];
 
 /** ISO/IEC 7810 ID-1: every bank card is this size, so it makes a familiar ruler. */
 const CARD = { width: 85.6, height: 53.98, radius: 3.18 };
@@ -17,13 +17,12 @@ export function estimatedTotalWidth(size: Pick<FrameSize, 'lensWidthMm' | 'bridg
   return size.lensWidthMm * 2 + size.bridgeMm + ENDPIECE_MM * 2;
 }
 
-function lensPath(shape: FrameShape, size: FrameSize, side: 1 | -1): string {
+function lensPath(outline: UnitOutline, size: FrameSize, side: 1 | -1): string {
   const centreX = side * (size.bridgeMm / 2 + size.lensWidthMm / 2);
-  const points = lensOutline(shape, size.lensWidthMm, size.lensHeightMm, 64);
-  return `${points
+  return `${outline
     .map(
       ([x, y], index) =>
-        `${index === 0 ? 'M' : 'L'}${(centreX + side * x).toFixed(2)},${(-y).toFixed(2)}`,
+        `${index === 0 ? 'M' : 'L'}${(centreX + side * x * size.lensWidthMm).toFixed(2)},${(-y * size.lensHeightMm).toFixed(2)}`,
     )
     .join(' ')} Z`;
 }
@@ -34,13 +33,13 @@ function lensPath(shape: FrameShape, size: FrameSize, side: 1 | -1): string {
  * shows the customer's own glasses for comparison.
  */
 export function FitDiagram({
-  shape,
+  outline,
   size,
   totalWidthMm,
   compare,
   labels,
 }: {
-  shape: FrameShape;
+  outline: UnitOutline;
   size: FrameSize;
   totalWidthMm: number;
   compare?: FrameSize | null;
@@ -73,13 +72,13 @@ export function FitDiagram({
     >
       {compare ? (
         <g fill="none" stroke="var(--color-accent)" strokeWidth="0.7" strokeDasharray="2 1.5">
-          <path d={lensPath(shape, compare, 1)} />
-          <path d={lensPath(shape, compare, -1)} />
+          <path d={lensPath(outline, compare, 1)} />
+          <path d={lensPath(outline, compare, -1)} />
         </g>
       ) : null}
       <g fill="var(--color-surface-muted)" stroke="currentColor" strokeWidth="1.1">
-        <path d={lensPath(shape, size, 1)} />
-        <path d={lensPath(shape, size, -1)} />
+        <path d={lensPath(outline, size, 1)} />
+        <path d={lensPath(outline, size, -1)} />
       </g>
       <line
         x1={-totalWidthMm / 2}
