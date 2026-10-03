@@ -21,6 +21,11 @@ const pages = [
   '/help/prescription',
   '/help/returns',
   '/legal/privacy',
+  '/cart',
+  '/sign-in',
+  '/register',
+  '/track',
+  '/admin',
   '/not-a-page',
 ];
 

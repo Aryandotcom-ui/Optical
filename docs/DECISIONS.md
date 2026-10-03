@@ -547,3 +547,24 @@ the API like the account area (the web server never handles team credentials or 
 It is `noindex`, disallowed in robots.txt, and sends `Cache-Control: no-store` on API responses.
 Uploaded product photos are served by the API from `catalog/` storage keys; the storefront skips
 Next's optimiser for them because they are already sized on upload.
+
+## ADR-056: A static Content-Security-Policy, with inline scripts allowed
+
+**Status:** accepted · Phase 7
+The shop sends one CSP from `next.config.ts`: everything from this site, plus images and API
+calls to the API origin; `wasm-unsafe-eval` and `blob:` workers for the face tracker; no
+frames, plugins or foreign form targets; `frame-ancestors 'none'`. `script-src` keeps
+`'unsafe-inline'`: Next.js streams page data through inline scripts, and the alternative,
+per-request nonces, forces every page to render dynamically and defeats the data cache. The
+risk is limited because React escapes all output and the one raw-HTML use (JSON-LD) escapes
+`<`. An e2e test checks the header and that no page triggers a violation. `NEXT_PUBLIC_API_URL`
+is read at build time, so the policy is built with the image (`infra/deploy/DEPLOYMENT.md`).
+
+## ADR-057: Screenshot baselines run on request, not in every CI run
+
+**Status:** accepted · Phase 7
+Screenshots differ between browser builds, font rasterisers and GPUs, so baselines made on one
+machine fail on another for reasons that are not regressions. Visual tests (`pnpm test:visual`)
+cover calm pages at three widths in both themes and run in a separate Playwright project that
+exists only with `VISUAL=1`. Baselines are made with `--update-snapshots` on the machine that
+will compare them; behaviour, accessibility, motion and CSP are covered by the regular e2e suite.

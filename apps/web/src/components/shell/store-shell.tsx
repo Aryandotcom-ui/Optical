@@ -12,12 +12,13 @@ import { SiteHeader } from './site-header';
 
 /** The storefront frame: announcement, header, main content, footer and mobile tabs. */
 export async function StoreShell({ children }: { children: ReactNode }) {
-  const [nav, t, cookieStore, settings] = await Promise.all([
+  const [catalogNav, t, cookieStore, settings] = await Promise.all([
     getNavModel(),
     getTranslations('shell'),
     cookies(),
     getStoreSettings(),
   ]);
+  const nav = { ...catalogNav, features: settings.flags };
   const dismissed = cookieStore.get(ANNOUNCEMENT_COOKIE)?.value === ANNOUNCEMENT_VERSION;
   return (
     <>

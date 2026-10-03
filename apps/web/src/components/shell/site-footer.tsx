@@ -20,8 +20,10 @@ export async function SiteFooter({ nav }: { nav: NavModel }) {
           href: `/shop/${category.slug}`,
           label: category.name,
         })),
-        { href: '/try-on', label: t('tryOn') },
-        { href: '/frame-finder', label: t('frameFinder') },
+        ...(nav.features?.virtualTryOn === false ? [] : [{ href: '/try-on', label: t('tryOn') }]),
+        ...(nav.features?.frameFinder === false
+          ? []
+          : [{ href: '/frame-finder', label: t('frameFinder') }]),
       ],
     },
     {

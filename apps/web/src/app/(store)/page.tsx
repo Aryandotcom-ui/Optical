@@ -18,7 +18,9 @@ import {
   getListing,
   getProduct,
 } from '@/lib/catalog';
+import { getEnv } from '@/env';
 import { formatPrice } from '@/lib/format';
+import { jsonLdScript, siteJsonLd } from '@/lib/structured-data';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('home');
@@ -105,6 +107,12 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(siteJsonLd(getEnv().NEXT_PUBLIC_SITE_URL)),
+        }}
+      />
       <section className="mx-auto grid max-w-content items-center gap-10 px-gutter pt-8 pb-section lg:grid-cols-2 lg:pt-16">
         <div>
           <h1 className="text-display-xl font-semibold text-balance">{brand.tagline}</h1>

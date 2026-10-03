@@ -2,16 +2,17 @@
 
 ## Commands
 
-| Command                                | What it runs                                                                        |
-| -------------------------------------- | ----------------------------------------------------------------------------------- |
-| `pnpm test`                            | Every package's unit and integration tests (Vitest), in parallel through Turborepo. |
-| `pnpm test:coverage`                   | The same, with V8 coverage. `packages/shared` and `apps/api` fail below 80%.        |
-| `pnpm lint`                            | ESLint with type-aware rules, React, hooks, jsx-a11y and Next.js rules.             |
-| `pnpm typecheck`                       | `tsc --noEmit` in every package.                                                    |
-| `pnpm check`                           | lint, typecheck, test and build, in that order. Run it before pushing.              |
-| `pnpm --filter @optical/web test:e2e`  | Playwright against production builds (see below).                                   |
-| `pnpm --filter @optical/web budget:js` | Initial JavaScript per page, gzipped, against the 170 kB budget.                    |
-| `pnpm --filter @optical/web lhci`      | Lighthouse CI budgets on Home, a listing, a product page and Frame Finder.          |
+| Command                                  | What it runs                                                                                                                                                                  |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm test`                              | Every package's unit and integration tests (Vitest), in parallel through Turborepo.                                                                                           |
+| `pnpm test:coverage`                     | The same, with V8 coverage. `packages/shared` and `apps/api` fail below 80%; `apps/web` sets per-module thresholds on its unit-tested logic (screens are covered end to end). |
+| `pnpm lint`                              | ESLint with type-aware rules, React, hooks, jsx-a11y and Next.js rules.                                                                                                       |
+| `pnpm typecheck`                         | `tsc --noEmit` in every package.                                                                                                                                              |
+| `pnpm check`                             | lint, typecheck, test and build, in that order. Run it before pushing.                                                                                                        |
+| `pnpm --filter @optical/web test:e2e`    | Playwright against production builds (see below).                                                                                                                             |
+| `pnpm --filter @optical/web budget:js`   | Initial JavaScript per page, gzipped, against the 170 kB budget.                                                                                                              |
+| `pnpm --filter @optical/web test:visual` | Screenshot comparisons (ADR-057); add `--update-snapshots` to remake the baselines.                                                                                           |
+| `pnpm --filter @optical/web lhci`        | Lighthouse CI budgets on Home, a listing, a product page and Frame Finder.                                                                                                    |
 
 Run a single package with `pnpm --filter @optical/api test`, or watch mode with
 `pnpm --filter @optical/shared exec vitest`.
@@ -84,10 +85,6 @@ storefront on that port.
 Lighthouse uses its mobile profile with applied throttling (ADR-024). Total Blocking Time is
 reported as a warning above 200 ms.
 
-## Coming in later phases
-
-- **Phase 7:** visual regression baselines at three breakpoints in both themes.
-
 ## Try-on in tests
 
 The `camera` project launches Chromium with a fake camera that plays `e2e/fixtures/face.png` (made
@@ -134,3 +131,17 @@ waits for inference.
 - `e2e/admin.spec.ts` (desktop): a shopper orders and types a prescription; staff approve it and
   the order moves into production with an email in Mailpit; staff can't open admin-only pages;
   an admin adjusts stock and finds it in the audit log; axe runs on the admin pages.
+
+## Hardening checks (Phase 7)
+
+- `e2e/hardening.spec.ts`: every main page sends the Content-Security-Policy and triggers no
+  violation (a `securitypolicyviolation` listener); with `prefers-reduced-motion: reduce`
+  nothing loops or animates for longer than 300 ms on the home, listing and product pages;
+  the home page carries Organization and WebSite JSON-LD and product pages Product JSON-LD with
+  offers and a canonical link.
+- `e2e/a11y.spec.ts` covers the bag, sign-in, registration, tracking and the admin gate as well,
+  in light and dark.
+- `e2e/visual.spec.ts` (opt-in, `VISUAL=1`): help, shipping policy, sign-in, the empty bag and the
+  404 page at 390, 820 and 1440 px in both themes, with motion reduced. The committed baselines in
+  `e2e/__screenshots__` were made with Playwright's bundled Chromium on Linux; on another machine,
+  remake them first with `--update-snapshots`, then compare after a change.

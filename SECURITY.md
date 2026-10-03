@@ -16,6 +16,8 @@ information.
 
 ## Practices
 
+The full control-by-control review is in [`docs/SECURITY-REVIEW.md`](docs/SECURITY-REVIEW.md).
+
 - Secrets never live in the repository. `.env*` files are git-ignored except `.env.example`.
 - All input is validated with Zod at the API boundary; queries are parameterised.
 - The API sends a `default-src 'none'` CSP, `nosniff`, and a strict CORS allow-list.

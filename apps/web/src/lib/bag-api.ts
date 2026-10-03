@@ -45,7 +45,11 @@ export function refreshSession(): Promise<boolean> {
     headers: { accept: 'application/json' },
   })
     .then(
-      (response) => response.ok,
+      async (response) => {
+        // Read the body so the connection is released.
+        await response.body?.cancel().catch(() => undefined);
+        return response.ok;
+      },
       () => false,
     )
     .finally(() => {
@@ -77,6 +81,7 @@ export async function call<T>(
   }
   // An expired sign-in: refresh once and repeat (as a guest, if the refresh failed).
   if (response.status === 401 && !retried && !path.startsWith('/v1/auth/')) {
+    await response.body?.cancel().catch(() => undefined);
     await refreshSession();
     return call<T>(method, path, options, true);
   }

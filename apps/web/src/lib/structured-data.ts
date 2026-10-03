@@ -50,3 +50,34 @@ export function productJsonLd(product: ProductDetail, siteUrl: string): Record<s
 export function jsonLdScript(data: Record<string, unknown>): string {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
+
+/** schema.org Organization and WebSite (with the site search) for the home page. */
+export function siteJsonLd(siteUrl: string): Record<string, unknown> {
+  const url = new URL('/', siteUrl).toString();
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${url}#organization`,
+        name: brand.name,
+        legalName: brand.legalName,
+        url,
+        logo: new URL('/icon.svg', siteUrl).toString(),
+        email: brand.supportEmail,
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${url}#website`,
+        name: brand.name,
+        url,
+        publisher: { '@id': `${url}#organization` },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: { '@type': 'EntryPoint', urlTemplate: `${url}search?q={search_term_string}` },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
+  };
+}

@@ -166,16 +166,20 @@ function MobileMenu({ nav }: { nav: NavModel }) {
             </ul>
           </section>
           <ul>
-            <li>
-              <Link href="/try-on" className="flex min-h-11 items-center font-medium">
-                {t('tryOn')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/frame-finder" className="flex min-h-11 items-center font-medium">
-                {t('frameFinder')}
-              </Link>
-            </li>
+            {nav.features?.virtualTryOn === false ? null : (
+              <li>
+                <Link href="/try-on" className="flex min-h-11 items-center font-medium">
+                  {t('tryOn')}
+                </Link>
+              </li>
+            )}
+            {nav.features?.frameFinder === false ? null : (
+              <li>
+                <Link href="/frame-finder" className="flex min-h-11 items-center font-medium">
+                  {t('frameFinder')}
+                </Link>
+              </li>
+            )}
             <li>
               <Link href="/help" className="flex min-h-11 items-center font-medium">
                 {t('help')}

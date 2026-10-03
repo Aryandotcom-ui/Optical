@@ -6,6 +6,8 @@ export interface NavModel {
   categories: { slug: CategorySlug; name: string; description: string }[];
   shapes: FrameShape[];
   collections: { slug: string; name: string; tagline: string }[];
+  /** Features the admin can switch off; their links disappear with them. */
+  features?: { virtualTryOn: boolean; frameFinder: boolean };
 }
 
 /**

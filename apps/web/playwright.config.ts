@@ -21,6 +21,7 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
   timeout: 45_000,
   expect: { timeout: 10_000 },
+  snapshotPathTemplate: '{testDir}/__screenshots__/{arg}{ext}',
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
     baseURL,
@@ -31,12 +32,12 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop',
-      testIgnore: /responsiveness|camera\.spec/,
+      testIgnore: /responsiveness|camera\.spec|visual\.spec/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     {
       name: 'mobile',
-      testIgnore: /responsiveness|camera\.spec|admin\.spec/,
+      testIgnore: /responsiveness|camera\.spec|admin\.spec|visual\.spec/,
       use: { ...devices['Pixel 7'] },
     },
     // Try-on, face shape and PD with Chromium's fake camera playing the test face,
@@ -64,6 +65,11 @@ export default defineConfig({
         },
       },
     },
+    // Screenshot baselines (`pnpm test:visual`): only when asked for, because
+    // pixels depend on the browser build and fonts of the machine (TESTING.md).
+    ...(process.env.VISUAL === '1'
+      ? [{ name: 'visual', testMatch: /visual\.spec\.ts$/, use: { ...devices['Desktop Chrome'] } }]
+      : []),
     // Timing runs last and alone, so other test browsers don't compete for the CPU.
     {
       name: 'responsiveness',

@@ -15,6 +15,7 @@
     "measure:try-on": "node scripts/measure-try-on.mts",
     "lhci": "lhci autorun --config=lighthouserc.cjs",
     "test:e2e": "playwright test",
+    "test:visual": "VISUAL=1 playwright test --project=visual",
     "typegen": "next typegen"
   },
   "dependencies": {

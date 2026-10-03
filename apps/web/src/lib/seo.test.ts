@@ -1,7 +1,7 @@
 import type { ProductDetail } from '@optical/shared/catalog';
 import { describe, expect, it } from 'vitest';
 import { listingRobots } from './seo';
-import { jsonLdScript, productJsonLd } from './structured-data';
+import { jsonLdScript, productJsonLd, siteJsonLd } from './structured-data';
 
 describe('listingRobots', () => {
   it('indexes clean listings and sorted or paged views', () => {
@@ -86,5 +86,19 @@ describe('productJsonLd', () => {
 
   it('escapes markup so the script tag cannot be closed early', () => {
     expect(jsonLdScript({ name: '</script><script>alert(1)</script>' })).not.toContain('</script>');
+  });
+});
+
+describe('siteJsonLd', () => {
+  it('describes the store and its search for rich results', () => {
+    const data = siteJsonLd('https://shop.example/');
+    const graph = data['@graph'] as {
+      '@type': string;
+      potentialAction?: { target: { urlTemplate: string } };
+    }[];
+    expect(graph.map((node) => node['@type'])).toEqual(['Organization', 'WebSite']);
+    expect(graph[1]?.potentialAction?.target.urlTemplate).toBe(
+      'https://shop.example/search?q={search_term_string}',
+    );
   });
 });

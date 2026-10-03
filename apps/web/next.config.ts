@@ -7,7 +7,33 @@ import { fileURLToPath } from 'node:url';
 const workspaceRoot = fileURLToPath(new URL('../..', import.meta.url));
 loadEnvConfig(workspaceRoot, process.env.NODE_ENV !== 'production');
 
+const isDev = process.env.NODE_ENV !== 'production';
+const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000').origin;
+
+/**
+ * Content-Security-Policy (ADR-056). Scripts and styles may be inline
+ * because Next streams its data in inline scripts and a per-request nonce
+ * would make every page uncacheable; everything else is locked to this
+ * site and the API. `wasm-unsafe-eval` is for the face tracker's WebAssembly.
+ */
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ''}`,
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob: ${apiOrigin}`,
+  "font-src 'self'",
+  `connect-src 'self' ${apiOrigin}${isDev ? ' ws: wss:' : ''}`,
+  "media-src 'self' blob:",
+  "worker-src 'self' blob:",
+  "frame-src 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+
 const securityHeaders = [
+  { key: 'Content-Security-Policy', value: contentSecurityPolicy },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'DENY' },
